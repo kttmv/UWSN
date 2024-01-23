@@ -38,6 +38,7 @@ namespace UWSN.Model
                             Sensors[placedCount].Position = new System.Numerics.Vector3((float)((i * StepRange) + NextDouble(rnd, -StepRange/2, StepRange/2)), 
                                                                                         (float)((j * StepRange) + NextDouble(rnd, -StepRange/2, StepRange/2)), 
                                                                                         (float)((k * StepRange) + NextDouble(rnd, -StepRange/2, StepRange/2)));
+                            
                             placedCount++;
                         }
                     }
@@ -47,8 +48,34 @@ namespace UWSN.Model
             {
                 TRngStream rng = new TRngStream();
                 var dst = new TMtxVec();
+
+                // на каждый сенсор по три рандомных числа из равномерного распределения
                 dst.Length = Sensors.Count * 3;
                 rng.RandomUniform(dst, UniParameterA, UniParameterB);
+
+                int placedCount = 0;
+                int dstIndx = 0;
+                int cubicEdge = (int)(Math.Ceiling(Math.Pow(Sensors.Count, 1 / 3)));
+
+                for (int i = 0; i < cubicEdge; i++)
+                {
+                    for (int j = 0; j < cubicEdge; j++)
+                    {
+                        for (int k = 0; k < cubicEdge; k++)
+                        {
+                            if (placedCount >= Sensors.Count)
+                            {
+                                break;
+                            }
+
+                            Sensors[placedCount].Position = new System.Numerics.Vector3((float)((i * StepRange) + UniformDouble(dst.Values[dstIndx], -StepRange/2, StepRange/2)),
+                                                                                        (float)((j * StepRange) + UniformDouble(dst.Values[dstIndx + 1], -StepRange/2, StepRange/2)),
+                                                                                        (float)((k * StepRange) + UniformDouble(dst.Values[dstIndx + 2], - StepRange/2, StepRange/2)));
+                            placedCount++;
+                            dstIndx += 3;
+                        }
+                    }
+                }
             }
 
             return Sensors;
@@ -70,12 +97,12 @@ namespace UWSN.Model
             }
         }
 
-        private double NextDouble(Random rnd, double min, double max)
+        private static double NextDouble(Random rnd, double min, double max)
         {
             return min + (rnd.NextDouble() * (max - min));
         }
 
-        private double UniformDouble(double uniformValue, double min, double max)
+        private static double UniformDouble(double uniformValue, double min, double max)
         {
             return min + (uniformValue * (max - min));
         }
