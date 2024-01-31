@@ -8,8 +8,6 @@ namespace UWSN.Model
 {
     public interface ISensorPlacementModel
     {
-        public List<Sensor> Sensors { get; set; }
-
         public List<Sensor> PlaceSensors();
     }
 }

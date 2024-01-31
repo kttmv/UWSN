@@ -9,11 +9,11 @@ namespace UWSN.Model
 {
     public class SensorPlacementRandomStep : ISensorPlacementModel
     {
-        public required List<Sensor> Sensors { get; set; }
-        public required float StepRange { get; set; }
-        public required string DistrType { get; set; }
-        public required double UniParameterA { get; set; }
-        public required double UniParameterB { get; set; }
+        private List<Sensor> Sensors { get; set; }
+        private float StepRange { get; set; }
+        private string DistrType { get; set; }
+        private double UniParameterA { get; set; }
+        private double UniParameterB { get; set; }
 
         public List<Sensor> PlaceSensors()
         {
@@ -22,7 +22,7 @@ namespace UWSN.Model
                 Random rnd = new Random();
 
                 int placedCount = 0;
-                int cubicEdge = (int)(Math.Ceiling(Math.Pow(Sensors.Count, 1 / 3)));
+                int cubicEdge = (int)(Math.Ceiling(Math.Pow(Sensors.Count, 1.0 / 3.0)));
 
                 for (int i = 0; i < cubicEdge; i++)
                 {
@@ -47,7 +47,11 @@ namespace UWSN.Model
             if (DistrType == "Uniform")
             {
                 TRngStream rng = new TRngStream();
-                var dst = new TMtxVec();
+                rng.NewStream(0, 0);
+                //var dst = new TMtxVec();
+                
+                //dst.Length = Sensors.Count * 3;
+                var dst = new TVec();
 
                 // на каждый сенсор по три рандомных числа из равномерного распределения
                 dst.Length = Sensors.Count * 3;
@@ -55,7 +59,7 @@ namespace UWSN.Model
 
                 int placedCount = 0;
                 int dstIndx = 0;
-                int cubicEdge = (int)(Math.Ceiling(Math.Pow(Sensors.Count, 1 / 3)));
+                int cubicEdge = (int)(Math.Ceiling(Math.Pow(Sensors.Count, 1.0 / 3.0)));
 
                 for (int i = 0; i < cubicEdge; i++)
                 {
@@ -85,7 +89,7 @@ namespace UWSN.Model
         {
             Sensors = sensors;
             StepRange = stepRange;
-            if (DistrType != "Normal" && DistrType != "Uniform")
+            if (distrType != "Normal" && distrType != "Uniform")
             {
                 throw new Exception("Неверное распределение");
             }

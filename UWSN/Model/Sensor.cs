@@ -11,13 +11,11 @@ namespace UWSN.Model
     {
         public int Id { get; set; }
         public Vector3 Position { get; set; }
-        public ISensorPlacementModel PlacementType { get; set; }
 
-        public Sensor(int id, ISensorPlacementModel placementType) 
+        public Sensor(int id) 
         {
             Id = id;
             Position = new Vector3();
-            PlacementType = placementType;
         }
     }
 }

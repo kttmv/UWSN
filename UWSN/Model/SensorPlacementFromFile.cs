@@ -9,8 +9,8 @@ namespace UWSN.Model
 {
     public class SensorPlacementFromFile : ISensorPlacementModel
     {
-        public required List<Sensor> Sensors { get; set; }
-        public required string FilePath { get; set; }
+        private List<Sensor> Sensors;
+        private string FilePath;
 
         public List<Sensor> PlaceSensors()
         {

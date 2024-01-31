@@ -8,13 +8,13 @@ namespace UWSN.Model
 {
     public class SensorPlacementOrthogonalGrid : ISensorPlacementModel
     {
-        public required List<Sensor> Sensors { get; set; }
-        public required float Step { get; set; }
+        private List<Sensor> Sensors { get; set; }
+        private float Step { get; set; }
 
         public List<Sensor> PlaceSensors()
         {
             int placedCount = 0;
-            int cubicEdge = (int)(Math.Ceiling(Math.Pow(Sensors.Count, 1 / 3)));
+            int cubicEdge = (int)Math.Ceiling(Math.Pow(Sensors.Count, 1.0 / 3.0));
 
             for (int i = 0; i < cubicEdge; i++)
             {

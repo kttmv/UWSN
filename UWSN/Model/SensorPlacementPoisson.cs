@@ -8,16 +8,29 @@ using System.Threading.Tasks;
 
 namespace UWSN.Model
 {
+    /// <summary>
+    /// Модель расстановки узлов по закону Пуассона
+    /// </summary>
     public class SensorPlacementPoisson : ISensorPlacementModel
     {
-        public required List<Sensor> Sensors { get; set; }
-        public required double LambdaParameter { get; set; }
-        public required Vector3[] AreaLimits { get; set; }
+        private List<Sensor> Sensors { get; set; }
+        private double LambdaParameter { get; set; }
+        private Vector3[] AreaLimits { get; set; }
 
         public List<Sensor> PlaceSensors()
         {
             TRngStream rng = new TRngStream();
-            var dst = new TMtxVecInt();
+
+            var rand = new Random();
+
+            var bytes = new byte[4];
+            rand.NextBytes(bytes);
+            uint seed = BitConverter.ToUInt32(bytes);
+
+            rng.NewStream(0, seed);
+
+            //var dst = new TMtxVecInt();
+            var dst = new TVecInt();
             dst.Length = Sensors.Count * 3;
 
             rng.RandomPoisson(dst, LambdaParameter);
