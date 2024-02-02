@@ -39,9 +39,11 @@ namespace UWSN.Model
 
             for (int i = 0; i < Sensors.Count; i++)
             {
-                Sensors[i].Position = new Vector3((float)PoissonDouble(dst.BValues[dstIndex], AreaLimits[0].X, AreaLimits[1].X),
-                                                  (float)PoissonDouble(dst.BValues[dstIndex + 1], AreaLimits[0].Y, AreaLimits[1].Y),
-                                                  (float)PoissonDouble(dst.BValues[dstIndex + 2], AreaLimits[0].Z, AreaLimits[1].Z));
+                float x = (float)PoissonDouble(dst.IValues[dstIndex + 0], AreaLimits[0].X, AreaLimits[1].X);
+                float y = (float)PoissonDouble(dst.IValues[dstIndex + 1], AreaLimits[0].Y, AreaLimits[1].Y);
+                float z = (float)PoissonDouble(dst.IValues[dstIndex + 2], AreaLimits[0].Z, AreaLimits[1].Z);
+
+                Sensors[i].Position = new Vector3(x, y, z);
 
                 dstIndex += 3;
             }
