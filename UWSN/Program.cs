@@ -12,6 +12,8 @@ public class Program
 
     static void Main(string[] args)
     {
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+
         Parser.Default.ParseArguments<InitOptions, PlaceSensorsOrthOptions, PlaceSensorsRandomStepOptions, PlaceSensorsPoissonOptions>(args)
             .WithParsed<InitOptions>(o =>
             {
@@ -26,6 +28,8 @@ public class Program
                     Sensors = new List<Model.Sensor>(),
                     PlacementType = null
                 };
+
+                Console.WriteLine("Инициализация проведена успешно.");
 
                 Environment.SaveEnv(o.FilePath);
 
@@ -43,6 +47,8 @@ public class Program
                 Environment.PlacementType = new SensorPlacementOrthogonalGrid(Environment.Sensors, o.OrthogonalStep);
                 Environment.Sensors = Environment.PlacementType.PlaceSensors();
 
+                Console.WriteLine($"Расстановка сенсоров ({o.SensorsCount}) на ортогональной сетке прошла успешно.");
+
                 Environment.SaveEnv(o.FilePath);
 
             }).WithParsed<PlaceSensorsRandomStepOptions>(o =>
@@ -55,9 +61,11 @@ public class Program
                 {
                     Environment.Sensors.Add(new Sensor(i));
                 }
-                
+
                 Environment.PlacementType = new SensorPlacementRandomStep(Environment.Sensors, o.StepRange, o.DistrType, o.UniParameterA, o.UniParameterB);
                 Environment.Sensors = Environment.PlacementType.PlaceSensors();
+
+                Console.WriteLine($"Расстановка сенсоров ({o.SensorsCount}) прошла успешно.");
 
                 Environment.SaveEnv(o.FilePath);
 
@@ -80,6 +88,8 @@ public class Program
 
                 Environment.PlacementType = new SensorPlacementPoisson(Environment.Sensors, o.LambdaParameter, areaLimits);
                 Environment.Sensors = Environment.PlacementType.PlaceSensors();
+
+                Console.WriteLine($"Расстановка сенсоров ({o.SensorsCount}) прошла успешно.");
 
                 Environment.SaveEnv(o.FilePath);
             });

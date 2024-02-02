@@ -15,6 +15,11 @@ namespace UWSN
 
         public Model.Environment LoadEnv()
         {
+            if (!File.Exists(EnvFilePath))
+            {
+                throw new FileNotFoundException("Не удалось найти указанный файл.");
+            }
+
             using StreamReader reader = new StreamReader(EnvFilePath);
 
             var env = JsonConvert.DeserializeObject<Model.Environment>(reader.ReadToEnd(), new JsonSerializerSettings
