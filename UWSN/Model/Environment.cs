@@ -15,6 +15,7 @@ namespace UWSN.Model
         
         public required List<Sensor> Sensors { get; set; }
 
+        [JsonIgnore]
         public required ISensorPlacementModel PlacementType { get; set; }
 
         public void SaveEnv(string envFilePath)
@@ -27,6 +28,8 @@ namespace UWSN.Model
 
             string json = JsonConvert.SerializeObject(this, settings);
             File.WriteAllText(envFilePath, json);
+
+            Console.WriteLine($"Файл {envFilePath} успешно сохранен.");
         }
     }
 }
