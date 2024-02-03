@@ -1,16 +1,23 @@
 import { Button, Card, CardBody, Flex, Text } from '@chakra-ui/react'
 import { IconCaretDown, IconCaretUp } from '@tabler/icons-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import useAppStore from '../app/store'
 
 export default function Console() {
-    const { consoleOutput, setConsoleOutput } = useAppStore()
+    const { consoleOutput, addLineToConsoleOutput } =
+        useAppStore()
     const [isOpen, setIsOpen] = useState(true)
 
-    window.electron.ipcRenderer.on('shell-reply', (data) => {
-        setConsoleOutput(consoleOutput + '\n' + data)
-        console.log(1)
-    })
+    useEffect(() => {
+        const removeListener = window.electron.ipcRenderer.on(
+            'shell-reply',
+            (data) => {
+                addLineToConsoleOutput(data as string)
+            }
+        )
+
+        return removeListener
+    }, [])
 
     return (
         <Flex direction='column' gap={1} h={isOpen ? '33vh' : ''}>
@@ -28,13 +35,11 @@ export default function Console() {
             {isOpen && (
                 <Card h='100%'>
                     <CardBody fontFamily='monospace' overflowY='scroll'>
-                        {consoleOutput === ''
+                        {consoleOutput.length === 0
                             ? 'Пусто...'
-                            : consoleOutput
-                                  .split('\n')
-                                  .map((value, index) => (
-                                      <Text key={index}>{value}</Text>
-                                  ))}
+                            : consoleOutput.map((value, index) => (
+                                  <Text key={index}>{value}</Text>
+                              ))}
                     </CardBody>
                 </Card>
             )}

@@ -14,13 +14,14 @@ interface State {
     addSensorNode: (sensor: SensorNodeData) => void
     clearSensorsNodes: () => void
 
-    consoleOutput: string
-    setConsoleOutput: (value: string) => void
+    consoleOutput: string[]
+    addLineToConsoleOutput: (value: string) => void
 }
 
 const useAppStore = create<State>((set) => ({
-    consoleOutput: '',
-    setConsoleOutput: (value: string) => set(() => ({ consoleOutput: value })),
+    consoleOutput: [],
+    addLineToConsoleOutput: (value: string) =>
+        set((state) => ({ consoleOutput: [...state.consoleOutput, value] })),
     sensorNodes: [],
     addSensorNode: (sensor) =>
         set((state) => ({ sensorNodes: [...state.sensorNodes, sensor] })),
