@@ -6,28 +6,26 @@ import {
     TabList,
     TabPanel,
     TabPanels,
-    Tabs
+    Tabs,
+    useColorModeValue
 } from '@chakra-ui/react'
-import { executeCommand as executeShellCommand } from '..'
+import { executeShellCommand } from '..'
 import Console from '../console/Console'
 import { readFile } from '../helpers/fsHelpers'
+import EnvironmentTab from '../tabs/EnvironmentTab'
 import Viewer3D from '../viewer/Viewer3D'
 import './App.css'
 import useAppStore, { SensorNodeData } from './store'
 
 export default function App() {
+    const bgColor = useColorModeValue('gray.50', 'gray.800')
+
     const {
         addSensorNode,
         consoleOutput,
         setConsoleOutput,
         clearSensorsNodes
     } = useAppStore()
-
-    const clickedInit = () => {
-        executeShellCommand(
-            '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe init -1 -1 -1 1 1 1 --file D:\\Env.json'
-        )
-    }
 
     const clickedPlaceOrth = () => {
         executeShellCommand(
@@ -74,6 +72,8 @@ export default function App() {
             })
     }
 
+    console.log(bgColor)
+
     return (
         <Flex direction={{ base: 'column', lg: 'row' }} h='100vh' gap={4} p={4}>
             <Box
@@ -83,21 +83,26 @@ export default function App() {
             >
                 <Viewer3D />
             </Box>
-            <Flex direction='column' height='100%' flexGrow={1}>
-                <Tabs flexGrow={1}>
-                    <TabList>
+            <Flex
+                direction='column'
+                flexGrow={1}
+                gap={4}
+                minW={0}
+                w={{ base: '100%', lg: '50%' }}
+            >
+                <Tabs h={0} overflowY='auto' flexGrow={1}>
+                    <TabList position='sticky' top={0} bg={bgColor} zIndex={50}>
+                        <Tab>Окружение</Tab>
                         <Tab>One</Tab>
                         <Tab>Two</Tab>
                         <Tab>Three</Tab>
                     </TabList>
 
                     <TabPanels>
+                        <EnvironmentTab />
                         <TabPanel>
                             <p>one!</p>
                             <Flex direction='column' gap={1}>
-                                <Button onClick={clickedInit}>
-                                    Инициализация
-                                </Button>
                                 <Button onClick={clickedPlaceOrth}>
                                     Ортогональное распределение
                                 </Button>

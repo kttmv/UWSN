@@ -1,7 +1,7 @@
 import { Button, Card, CardBody, Flex, Text } from '@chakra-ui/react'
 import { IconCaretDown, IconCaretUp } from '@tabler/icons-react'
 import { useState } from 'react'
-import useAppStore from '../store'
+import useAppStore from '../app/store'
 
 export default function Console() {
     const { consoleOutput, setConsoleOutput } = useAppStore()
@@ -13,21 +13,20 @@ export default function Console() {
     })
 
     return (
-        <Flex direction='column' gap={1}>
+        <Flex direction='column' gap={1} h={isOpen ? '33vh' : ''}>
             <Button size='xs' onClick={() => setIsOpen(!isOpen)}>
                 {isOpen ? (
                     <>
-                        <IconCaretDown /> Скрыть
+                        <IconCaretDown /> Скрыть вывод консоли
                     </>
                 ) : (
                     <>
-                        <IconCaretUp /> Показать
+                        <IconCaretUp /> Показать вывод консоли
                     </>
-                )}{' '}
-                вывод консоли
+                )}
             </Button>
             {isOpen && (
-                <Card h='33vh'>
+                <Card h='100%'>
                     <CardBody fontFamily='monospace' overflowY='scroll'>
                         {consoleOutput === ''
                             ? 'Пусто...'

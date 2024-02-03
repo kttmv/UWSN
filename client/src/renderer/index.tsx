@@ -1,18 +1,22 @@
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './app/App'
+import theme from './app/theme'
 
 const container = document.getElementById('root') as HTMLElement
 const root = createRoot(container)
 root.render(
-    <ChakraProvider>
+    <>
         <StrictMode>
-            <App />
+            <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+            <ChakraProvider theme={theme}>
+                <App />
+            </ChakraProvider>
         </StrictMode>
-    </ChakraProvider>
+    </>
 )
 
-export function executeCommand(command: string) {
+export function executeShellCommand(command: string) {
     window.electron.ipcRenderer.sendMessage('shell', command)
 }
