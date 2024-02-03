@@ -12,10 +12,10 @@ import { spawn } from 'child_process'
 import { BrowserWindow, app, ipcMain, shell } from 'electron'
 import log from 'electron-log'
 import { autoUpdater } from 'electron-updater'
+import fs from 'fs'
 import path from 'path'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
-import fs from 'fs'
 
 class AppUpdater {
     constructor() {
@@ -139,22 +139,25 @@ app.whenReady()
     })
     .catch(console.log)
 
-ipcMain.on('shell', (event, arg) => {
-    console.log(arg)
-    let child = spawn(arg, [], {
+ipcMain.on('run-simulator', (event, args) => {
+    const path = app.isPackaged
+        ? '.\\'
+        : '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe'
+
+    let child = spawn(`${path} ${args}`, [], {
         shell: true
     })
 
     child.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`)
         // event.reply('shell-reply', { isError: false, reply: data.toString() })
-        event.reply('shell-reply', data.toString())
+        event.reply('simulator-reply', data.toString())
     })
 
     child.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`)
         // event.reply('shell-reply', { isError: true, reply: data.toString() })
-        event.reply('shell-reply', data.toString())
+        event.reply('simulator-reply', data.toString())
     })
 
     child.on('close', (code) => {

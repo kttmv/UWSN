@@ -17,6 +17,6 @@ root.render(
     </>
 )
 
-export function executeShellCommand(command: string) {
-    window.electron.ipcRenderer.sendMessage('shell', command)
+export function runSimulatorShell(args: string) {
+    window.electron.ipcRenderer.sendMessage('run-simulator', args)
 }

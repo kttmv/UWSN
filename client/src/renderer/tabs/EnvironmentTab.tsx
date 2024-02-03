@@ -2,7 +2,7 @@ import { Button, Flex, TabPanel, Text } from '@chakra-ui/react'
 import { IconBox } from '@tabler/icons-react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { Vector3 } from 'three'
-import { executeShellCommand } from '..'
+import { runSimulatorShell } from '..'
 import EnvironmentBoundaries from './EnvironmentBoundaries'
 
 export interface EnvironmentInputs {
@@ -31,7 +31,7 @@ export default function EnvironmentTab() {
     const fields = watch()
 
     const clickedInit = () => {
-        executeShellCommand(
+        runSimulatorShell(
             '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe init -1 -1 -1 1 1 1 --file D:\\Env.json'
         )
     }

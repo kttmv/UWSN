@@ -8,7 +8,7 @@ import {
     Tabs,
     useColorModeValue
 } from '@chakra-ui/react'
-import { executeShellCommand } from '..'
+import { runSimulatorShell } from '..'
 import Console from '../console/Console'
 import { readFile } from '../helpers/fsHelpers'
 import EnvironmentTab from '../tabs/EnvironmentTab'
@@ -19,34 +19,24 @@ import useAppStore, { SensorNodeData } from './store'
 export default function App() {
     const bgColor = useColorModeValue('gray.50', 'gray.800')
 
-    const {
-        addSensorNode,
-        consoleOutput,
-        addLineToConsoleOutput,
-        clearSensorsNodes
-    } = useAppStore()
+    const { addSensorNode, addLineToConsoleOutput, clearSensorsNodes } =
+        useAppStore()
 
     const clickedPlaceOrth = () => {
-        executeShellCommand(
-            '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe placeSensorsOrth 5 64 -f D:\\Env.json'
-        )
+        runSimulatorShell('placeSensorsOrth 5 64 -f D:\\Env.json')
     }
 
     const clickedPoisson = () => {
-        executeShellCommand(
-            '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe placeSensorsPoisson  5 64 -f D:\\Env.json'
-        )
+        runSimulatorShell('placeSensorsPoisson  5 64 -f D:\\Env.json')
     }
 
     const clickedRandomStepNormal = () => {
-        executeShellCommand(
-            '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe placeSensorsRndStep Normal 5 0 1 64 -f D:\\Env.json'
-        )
+        runSimulatorShell('placeSensorsRndStep Normal 5 0 1 64 -f D:\\Env.json')
     }
 
     const clickedRandomStepUniform = () => {
-        executeShellCommand(
-            '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe placeSensorsRndStep Uniform 5 0 1 64 -f D:\\Env.json'
+        runSimulatorShell(
+            'placeSensorsRndStep Uniform 5 0 1 64 -f D:\\Env.json'
         )
     }
 

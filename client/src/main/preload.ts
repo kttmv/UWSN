@@ -2,7 +2,7 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron'
 
-export type Channels = 'shell' | 'shell-reply' | 'read-file' | 'read-file-reply'
+export type Channels = 'run-simulator' | 'simulator-reply' | 'read-file' | 'read-file-reply'
 
 const electronHandler = {
     ipcRenderer: {
