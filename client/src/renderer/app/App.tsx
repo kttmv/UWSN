@@ -8,12 +8,12 @@ import {
     TabPanels,
     Tabs
 } from '@chakra-ui/react'
-import { executeCommand as executeShellCommand } from '.'
+import { executeCommand as executeShellCommand } from '..'
+import Console from '../console/Console'
+import { readFile } from '../helpers/fsHelpers'
+import Viewer3D from '../viewer/Viewer3D'
 import './App.css'
-import Console from './console/Console'
-import { readFile } from './helpers/fsHelpers'
 import useAppStore, { SensorNodeData } from './store'
-import Viewer3D from './viewer/Viewer3D'
 
 export default function App() {
     const {
