@@ -15,9 +15,6 @@ namespace UWSN.Model
         
         public required List<Sensor> Sensors { get; set; }
 
-        [JsonIgnore]
-        public required ISensorPlacementModel PlacementType { get; set; }
-
         public void SaveEnv(string envFilePath)
         {
             var settings = new JsonSerializerSettings
