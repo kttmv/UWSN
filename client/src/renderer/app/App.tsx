@@ -75,14 +75,8 @@ export default function App() {
     console.log(bgColor)
 
     return (
-        <Flex direction={{ base: 'column', lg: 'row' }} h='100vh' gap={4} p={4}>
-            <Box
-                minW={0}
-                h={{ base: '33%', lg: '100%' }}
-                w={{ base: '100%', lg: '50%' }}
-            >
-                <Viewer3D />
-            </Box>
+        <Flex direction={{ base: 'column', lg: 'row' }} h='100vh' gap={4} p={2}>
+            <Viewer3D />
             <Flex
                 direction='column'
                 flexGrow={1}
