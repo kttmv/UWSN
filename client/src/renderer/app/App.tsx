@@ -1,5 +1,4 @@
 import {
-    Box,
     Button,
     Flex,
     Tab,
@@ -23,7 +22,7 @@ export default function App() {
     const {
         addSensorNode,
         consoleOutput,
-        setConsoleOutput,
+        addLineToConsoleOutput,
         clearSensorsNodes
     } = useAppStore()
 
@@ -61,18 +60,14 @@ export default function App() {
                 data.Sensors.forEach((sensor: SensorNodeData) => {
                     addSensorNode(sensor)
                 })
-                setConsoleOutput(
-                    consoleOutput +
-                        '\n' +
-                        `Успешно загружены сенсоры (${data.Sensors.length})`
+                addLineToConsoleOutput(
+                    `Успешно загружены сенсоры (${data.Sensors.length})`
                 )
             })
             .catch(() => {
                 console.log('Не удалось открыть файл')
             })
     }
-
-    console.log(bgColor)
 
     return (
         <Flex direction={{ base: 'column', lg: 'row' }} h='100vh' gap={4} p={2}>
@@ -87,9 +82,6 @@ export default function App() {
                 <Tabs h={0} overflowY='auto' flexGrow={1}>
                     <TabList position='sticky' top={0} bg={bgColor} zIndex={50}>
                         <Tab>Окружение</Tab>
-                        <Tab>One</Tab>
-                        <Tab>Two</Tab>
-                        <Tab>Three</Tab>
                     </TabList>
 
                     <TabPanels>
@@ -115,12 +107,6 @@ export default function App() {
                                     Загрузить сенсоры
                                 </Button>
                             </Flex>
-                        </TabPanel>
-                        <TabPanel>
-                            <p>two!</p>
-                        </TabPanel>
-                        <TabPanel>
-                            <p>three!</p>
                         </TabPanel>
                     </TabPanels>
                 </Tabs>
