@@ -1,12 +1,7 @@
 import { Button, Flex, useBreakpointValue } from '@chakra-ui/react'
 import { OrbitControls, Sky } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import {
-    IconCaretDown,
-    IconCaretLeft,
-    IconCaretRight,
-    IconCaretUp
-} from '@tabler/icons-react'
+import { IconCaretDown, IconCaretUp } from '@tabler/icons-react'
 import { useState } from 'react'
 import useAppStore from '../app/store'
 import SensorNode from './SensorNode'
@@ -14,14 +9,9 @@ import SensorNode from './SensorNode'
 export default function Viewer3D() {
     const [isOpen, setIsOpen] = useState(true)
 
-    const toggleButtonHideIcon = useBreakpointValue({
-        base: <IconCaretUp />,
-        md: <IconCaretLeft />
-    })
-
-    const toggleButtonShowIcon = useBreakpointValue({
-        base: <IconCaretDown />,
-        md: <IconCaretRight />
+    const canvasClassName = useBreakpointValue({
+        base: 'rounded-t-md',
+        lg: 'rounded-l-md'
     })
 
     const { sensorNodes } = useAppStore()
@@ -29,13 +19,12 @@ export default function Viewer3D() {
     return (
         <Flex
             direction={{ base: 'column', lg: 'row' }}
-            h={{ base: '33%', lg: '100%' }}
-            w={{ base: '100%', lg: '50%' }}
+            h={isOpen ? { base: '33%', lg: '100%' } : undefined}
+            w={isOpen ? { base: '100%', lg: '50%' } : undefined}
             minW={0}
-            gap={1}
         >
             {isOpen && (
-                <Canvas className='rounded-xl shadow-md'>
+                <Canvas className={canvasClassName}>
                     <Sky />
                     <ambientLight />
                     <spotLight
@@ -64,6 +53,9 @@ export default function Viewer3D() {
                 </Canvas>
             )}
             <Button
+                borderTopRightRadius={{ base: 0, lg: 'md' }}
+                borderTopLeftRadius={{ base: 0, lg: 0 }}
+                borderBottomLeftRadius={{ base: 'md', lg: 0 }}
                 size='xs'
                 h={{ lg: '100%' }}
                 w={{ lg: 6 }}

@@ -1,6 +1,7 @@
 import {
     Flex,
     FormControl,
+    FormErrorMessage,
     FormLabel,
     Grid,
     Input,
@@ -18,12 +19,9 @@ export default function EnvironmentBoundaries({ register, errors }: Props) {
     console.log(errors)
     return (
         <>
-            <FormControl>
+            <FormControl isInvalid={Object.keys(errors).length !== 0}>
                 <FormLabel>Границы</FormLabel>
-                <Grid
-                    templateColumns='repeat(3, 1fr)'
-                    gap={4}
-                >
+                <Grid templateColumns='repeat(3, 1fr)' gap={4}>
                     <Flex align='center' gap={2}>
                         <Text>x₁</Text>
                         <Input
@@ -85,6 +83,9 @@ export default function EnvironmentBoundaries({ register, errors }: Props) {
                         />
                     </Flex>
                 </Grid>
+                <FormErrorMessage>
+                    Необходимо ввести все значения
+                </FormErrorMessage>
             </FormControl>
         </>
     )

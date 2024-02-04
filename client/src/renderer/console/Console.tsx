@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react'
 import useAppStore from '../app/store'
 
 export default function Console() {
-    const { consoleOutput, addLineToConsoleOutput } =
-        useAppStore()
+    const { consoleOutput, addLineToConsoleOutput } = useAppStore()
     const [isOpen, setIsOpen] = useState(true)
 
     useEffect(() => {
@@ -20,8 +19,12 @@ export default function Console() {
     }, [])
 
     return (
-        <Flex direction='column' gap={1} h={isOpen ? '33vh' : ''}>
-            <Button size='xs' onClick={() => setIsOpen(!isOpen)}>
+        <Flex direction='column' h={isOpen ? '33vh' : ''}>
+            <Button
+                borderBottomRadius={0}
+                size='xs'
+                onClick={() => setIsOpen(!isOpen)}
+            >
                 {isOpen ? (
                     <>
                         <IconCaretDown /> Скрыть вывод консоли
@@ -33,7 +36,7 @@ export default function Console() {
                 )}
             </Button>
             {isOpen && (
-                <Card h='100%'>
+                <Card h='100%' borderRadius={0}>
                     <CardBody fontFamily='monospace' overflowY='scroll'>
                         {consoleOutput.length === 0
                             ? 'Пусто...'

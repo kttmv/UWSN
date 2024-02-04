@@ -60,7 +60,7 @@ export default function App() {
     }
 
     return (
-        <Flex direction={{ base: 'column', lg: 'row' }} h='100vh' gap={4} p={2}>
+        <Flex direction={{ base: 'column', lg: 'row' }} h='100vh' gap={4}>
             <Viewer3D />
             <Flex
                 direction='column'
