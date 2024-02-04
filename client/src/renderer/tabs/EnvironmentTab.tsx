@@ -2,7 +2,7 @@ import { Button, Flex, TabPanel, Text } from '@chakra-ui/react'
 import { IconBox } from '@tabler/icons-react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { Vector3 } from 'three'
-import { runSimulatorShell } from '..'
+import { runInitialization } from '../simulator/simulatorHelper'
 import EnvironmentBoundaries from './EnvironmentBoundaries'
 
 export interface EnvironmentInputs {
@@ -25,15 +25,7 @@ export default function EnvironmentTab() {
         mode: 'all'
     })
     const onSubmit: SubmitHandler<EnvironmentInputs> = (data) => {
-        console.log(data)
-    }
-
-    const fields = watch()
-
-    const clickedInit = () => {
-        runSimulatorShell(
-            '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe init -1 -1 -1 1 1 1 --file D:\\Env.json'
-        )
+        runInitialization(data.v1, data.v2)
     }
 
     return (
@@ -44,11 +36,7 @@ export default function EnvironmentTab() {
                         errors={errors}
                         register={register}
                     />
-                    <Button
-                        type='submit'
-                        onClick={clickedInit}
-                        isDisabled={!isValid}
-                    >
+                    <Button type='submit' isDisabled={!isValid}>
                         <IconBox />
                         <Text m={1}>Инициализировать окружение</Text>
                     </Button>
