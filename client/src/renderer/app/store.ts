@@ -18,7 +18,7 @@ interface State {
     addLineToConsoleOutput: (value: string) => void
 }
 
-const useAppStore = create<State>((set) => ({
+const useApplicationStore = create<State>((set) => ({
     consoleOutput: [],
     addLineToConsoleOutput: (value: string) =>
         set((state) => ({ consoleOutput: [...state.consoleOutput, value] })),
@@ -28,4 +28,4 @@ const useAppStore = create<State>((set) => ({
     clearSensorsNodes: () => set(() => ({ sensorNodes: [] }))
 }))
 
-export default useAppStore
+export default useApplicationStore

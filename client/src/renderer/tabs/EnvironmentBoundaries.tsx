@@ -16,7 +16,6 @@ interface Props {
 }
 
 export default function EnvironmentBoundaries({ register, errors }: Props) {
-    console.log(errors)
     return (
         <>
             <FormControl isInvalid={Object.keys(errors).length !== 0}>

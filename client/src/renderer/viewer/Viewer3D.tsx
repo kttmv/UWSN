@@ -3,7 +3,7 @@ import { OrbitControls, Sky } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { IconCaretDown, IconCaretUp } from '@tabler/icons-react'
 import { useState } from 'react'
-import useAppStore from '../app/store'
+import useApplicationStore from '../app/store'
 import SensorNode from './SensorNode'
 
 export default function Viewer3D() {
@@ -14,7 +14,7 @@ export default function Viewer3D() {
         lg: 'rounded-l-md'
     })
 
-    const { sensorNodes } = useAppStore()
+    const { sensorNodes } = useApplicationStore()
 
     return (
         <Flex
