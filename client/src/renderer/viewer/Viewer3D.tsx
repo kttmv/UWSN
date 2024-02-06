@@ -10,7 +10,7 @@ export default function Viewer3D() {
     const [isOpen, setIsOpen] = useState(true)
 
     const canvasClassName = useBreakpointValue({
-        base: 'rounded-t-md',
+        base: 'rounded-none',
         lg: 'rounded-l-md'
     })
 
@@ -20,8 +20,9 @@ export default function Viewer3D() {
         <Flex
             direction={{ base: 'column', lg: 'row' }}
             h={isOpen ? { base: '33%', lg: '100%' } : undefined}
-            w={isOpen ? { base: '100%', lg: '50%' } : undefined}
+            flexGrow={1}
             minW={0}
+            minH={0}
         >
             {isOpen && (
                 <Canvas className={canvasClassName}>

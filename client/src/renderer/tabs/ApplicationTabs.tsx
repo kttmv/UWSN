@@ -57,7 +57,7 @@ export default function ApplicationTabs() {
     }
 
     return (
-        <Tabs h={0} overflowY='auto' flexGrow={1}>
+        <Tabs minH={0} overflowY='auto' flexGrow={1}>
             <TabList position='sticky' top={0} bg={bgColor} zIndex={50}>
                 <Tab>Окружение</Tab>
                 <Tab>Распределение</Tab>

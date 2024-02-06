@@ -36,7 +36,7 @@ export default function Console() {
                 )}
             </Button>
             {isOpen && (
-                <Card h='100%' borderRadius={0}>
+                <Card h='100%' borderTopRadius={0}>
                     <CardBody fontFamily='monospace' overflowY='scroll'>
                         {consoleOutput.length === 0
                             ? 'Пусто...'
