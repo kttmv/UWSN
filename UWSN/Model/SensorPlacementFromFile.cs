@@ -16,9 +16,9 @@ namespace UWSN.Model
         {
             var lines = File.ReadAllLines(FilePath);
 
-            if (lines.Length > Sensors.Count)
+            for (int i = 0; i < lines.Length; i++)
             {
-                lines = lines.Take(Sensors.Count).ToArray();
+                Sensors.Add(new Sensor(i));
             }
 
             try
@@ -37,9 +37,8 @@ namespace UWSN.Model
             return Sensors;
         }
 
-        public SensorPlacementFromFile(List<Sensor> sensors, string filePath) 
+        public SensorPlacementFromFile(string filePath) 
         {
-            Sensors = sensors;
             if (File.Exists(filePath))
             {
                 FilePath = filePath;
@@ -48,6 +47,8 @@ namespace UWSN.Model
             {
                 throw new Exception("Файл не существует");
             }
+
+            Sensors = new List<Sensor>();
         }
     }
 }

@@ -14,7 +14,7 @@ public class Program
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-        Parser.Default.ParseArguments<InitOptions, PlaceSensorsOrthOptions, PlaceSensorsRandomStepOptions, PlaceSensorsPoissonOptions>(args)
+        Parser.Default.ParseArguments<InitOptions, PlaceSensorsOrthOptions, PlaceSensorsRandomStepOptions, PlaceSensorsPoissonOptions, PlaceSensorsFromFileOptions>(args)
             .WithParsed<InitOptions>(o =>
             {
                 var areaLimits = o.AreaLimits.ToList();
@@ -95,7 +95,19 @@ public class Program
 
                 Environment.Sensors = new SensorPlacementPoisson(Environment.Sensors, o.LambdaParameter, areaLimits).PlaceSensors();
 
-                Console.WriteLine($"Расстановка сенсоров ({o.SensorsCount}) по распределению Пуассона прошла успешно.");
+                Console.WriteLine($"Расстановка сенсоров ({o.SensorsCount}) по закону Пуассона прошла успешно.");
+
+                Environment.SaveEnv(o.FilePath);
+
+            }).WithParsed<PlaceSensorsFromFileOptions>(o =>
+            {
+                var loader = new Loader(o.FilePath);
+                Environment = loader.LoadEnv();
+
+                Environment.Sensors.Clear();
+
+                Environment.Sensors = new SensorPlacementFromFile(o.SensorsFilePath).PlaceSensors();
+                Console.WriteLine($"Расстановка сенсоров ({Environment.Sensors.Count}) из пользовательского файла прошла успешно.");
 
                 Environment.SaveEnv(o.FilePath);
             });

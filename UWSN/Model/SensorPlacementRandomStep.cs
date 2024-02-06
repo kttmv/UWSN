@@ -50,7 +50,14 @@ namespace UWSN.Model
             if (DistrType == "Uniform")
             {
                 TRngStream rng = new TRngStream();
-                rng.NewStream(0, 0);
+
+                var rand = new Random();
+
+                var bytes = new byte[4];
+                rand.NextBytes(bytes);
+                uint seed = BitConverter.ToUInt32(bytes);
+
+                rng.NewStream(0, seed);
                 
                 var dst = new TVec();
 
