@@ -12,23 +12,16 @@ namespace UWSN.Model
         {
             foreach (var sensor in Simulation.instance.Environment.Sensors)
             {
-                double distance = Math.Sqrt(Math.Pow(sensor.Position.X - emittingSensor.Position.X, 2)
-                + Math.Pow(sensor.Position.Y - emittingSensor.Position.Y, 2)
-                + Math.Pow(sensor.Position.Z - emittingSensor.Position.Z, 2));
+                double distance = Math.Sqrt(
+                       Math.Pow(sensor.Position.X - emittingSensor.Position.X, 2) +
+                       Math.Pow(sensor.Position.Y - emittingSensor.Position.Y, 2) +
+                       Math.Pow(sensor.Position.Z - emittingSensor.Position.Z, 2)
+                                           );
 
-                double deliveryProb = 0.9;
+                double deliveryProb = 0.9; // здесь будет вычисление по формуле
 
-                if (distance < 600)
+                if (new Random().NextDouble() <= deliveryProb)
                 {
-                    var packetCopy = new Packet(packet);
-
-                    Random rnd = new Random();
-
-                    if (rnd.NextDouble() > 0.9)
-                    {
-                        packetCopy.IsDamaged = true;
-                    }
-
                     //Simulation.instance.AddEvent(new Event(DateTime.MinValue, new Action(() => sensor.Physical.ReceivePacket(packetCopy))));
                 }
             }
