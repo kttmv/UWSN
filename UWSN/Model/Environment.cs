@@ -1,19 +1,19 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using JsonSerializer = System.Text.Json.JsonSerializer;
+﻿using System.Numerics;
+using Newtonsoft.Json;
 
 namespace UWSN.Model
 {
     public class Environment
     {
-        public required Tuple<Vector3, Vector3> AreaLimits { get; set; }
-        
-        public required List<Sensor> Sensors { get; set; }
+        public Tuple<Vector3, Vector3> AreaLimits { get; set; }
+
+        public List<Sensor> Sensors { get; set; }
+
+        public Environment(Vector3 v1, Vector3 v2, List<Sensor> sensors)
+        {
+            AreaLimits = new Tuple<Vector3, Vector3>(v1, v2);
+            Sensors = sensors;
+        }
 
         public void SaveEnv(string envFilePath)
         {

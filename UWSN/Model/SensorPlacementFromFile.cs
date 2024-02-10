@@ -1,24 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
+﻿using System.Numerics;
 
 namespace UWSN.Model
 {
     public class SensorPlacementFromFile : ISensorPlacementModel
     {
-        private List<Sensor> Sensors;
-        private string FilePath;
+        private readonly List<Sensor> _sensors;
+        private readonly string _filePath;
 
         public List<Sensor> PlaceSensors()
         {
-            var lines = File.ReadAllLines(FilePath);
+            var lines = File.ReadAllLines(_filePath);
 
             for (int i = 0; i < lines.Length; i++)
             {
-                Sensors.Add(new Sensor(i));
+                _sensors.Add(new Sensor(i));
             }
 
             try
@@ -26,7 +21,7 @@ namespace UWSN.Model
                 for (int i = 0; i < lines.Length; i++)
                 {
                     var split = lines[i].Split(" ");
-                    Sensors[i].Position = new System.Numerics.Vector3(float.Parse(split[0]), float.Parse(split[1]), float.Parse(split[2]));
+                    _sensors[i].Position = new Vector3(float.Parse(split[0]), float.Parse(split[1]), float.Parse(split[2]));
                 }
             }
             catch
@@ -34,21 +29,21 @@ namespace UWSN.Model
                 throw new Exception("Не удалось распарсить файл с координатами");
             }
 
-            return Sensors;
+            return _sensors;
         }
 
-        public SensorPlacementFromFile(string filePath) 
+        public SensorPlacementFromFile(string filePath)
         {
             if (File.Exists(filePath))
             {
-                FilePath = filePath;
+                _filePath = filePath;
             }
             else
             {
                 throw new Exception("Файл не существует");
             }
 
-            Sensors = new List<Sensor>();
+            _sensors = new List<Sensor>();
         }
     }
 }

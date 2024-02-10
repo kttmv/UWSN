@@ -1,10 +1,5 @@
-﻿using Dew.Math;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
+using Dew.Math;
 
 namespace UWSN.Model
 {
@@ -13,13 +8,13 @@ namespace UWSN.Model
     /// </summary>
     public class SensorPlacementPoisson : ISensorPlacementModel
     {
-        private List<Sensor> Sensors { get; set; }
-        private double LambdaParameter { get; set; }
-        private Vector3[] AreaLimits { get; set; }
+        private readonly List<Sensor> _sensors;
+        private readonly double _lambdaParameter;
+        private readonly Vector3[] _areaLimits;
 
         public List<Sensor> PlaceSensors()
         {
-            TRngStream rng = new TRngStream();
+            var rng = new TRngStream();
 
             var rand = new Random();
 
@@ -30,32 +25,34 @@ namespace UWSN.Model
             rng.NewStream(0, seed);
 
             //var dst = new TMtxVecInt();
-            var dst = new TVecInt();
-            dst.Length = Sensors.Count * 3;
+            var dst = new TVecInt
+            {
+                Length = _sensors.Count * 3
+            };
 
-            rng.RandomPoisson(dst, LambdaParameter);
+            rng.RandomPoisson(dst, _lambdaParameter);
 
             int dstIndex = 0;
 
-            for (int i = 0; i < Sensors.Count; i++)
+            for (int i = 0; i < _sensors.Count; i++)
             {
-                float x = (float)PoissonDouble(dst.IValues[dstIndex + 0], AreaLimits[0].X, AreaLimits[1].X);
-                float y = (float)PoissonDouble(dst.IValues[dstIndex + 1], AreaLimits[0].Y, AreaLimits[1].Y);
-                float z = (float)PoissonDouble(dst.IValues[dstIndex + 2], AreaLimits[0].Z, AreaLimits[1].Z);
+                float x = (float)PoissonDouble(dst.IValues[dstIndex + 0], _areaLimits[0].X, _areaLimits[1].X);
+                float y = (float)PoissonDouble(dst.IValues[dstIndex + 1], _areaLimits[0].Y, _areaLimits[1].Y);
+                float z = (float)PoissonDouble(dst.IValues[dstIndex + 2], _areaLimits[0].Z, _areaLimits[1].Z);
 
-                Sensors[i].Position = new Vector3(x, y, z);
+                _sensors[i].Position = new Vector3(x, y, z);
 
                 dstIndex += 3;
             }
 
-            return Sensors;
+            return _sensors;
         }
 
         public SensorPlacementPoisson(List<Sensor> sensors, double lambdaParameter, Vector3[] areaLimits)
         {
-            Sensors = sensors;
-            LambdaParameter = lambdaParameter;
-            AreaLimits = areaLimits;
+            _sensors = sensors;
+            _lambdaParameter = lambdaParameter;
+            _areaLimits = areaLimits;
         }
 
         private static double PoissonDouble(double uniformValue, double min, double max)

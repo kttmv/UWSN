@@ -1,14 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UWSN.Model
+﻿namespace UWSN.Model
 {
     public class Simulation
     {
-        public static Simulation instance;
+        private static Simulation? _instance;
+
+        public static Simulation Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    throw new Exception("Экземпляр класса Simulation не был создан.");
+                }
+                return _instance;
+            }
+        }
 
         public Environment Environment { get; set; }
 
@@ -17,11 +23,16 @@ namespace UWSN.Model
         /// <summary>
         /// Отсортированный по времени список событый
         /// </summary>
-        public SortedList<DateTime, Event> EventScheduler { get; set; }
+        private SortedList<DateTime, Event> EventScheduler { get; set; }
 
         public Simulation(Environment env)
         {
-            instance = this;
+            if (_instance != null)
+            {
+                throw new Exception("Экземпляр класса Simulation уже создан.");
+            }
+
+            _instance = this;
             Environment = env;
             EventScheduler = new SortedList<DateTime, Event>();
         }
@@ -42,8 +53,11 @@ namespace UWSN.Model
         {
             while (EventScheduler.Count > 0)
             {
-                Time = EventScheduler.First().Key;
-                EventScheduler.First().Value.Action.Invoke();
+                var e = EventScheduler.First();
+
+                Time = e.Key;
+
+                e.Value.Action.Invoke();
                 EventScheduler.RemoveAt(0);
             }
         }

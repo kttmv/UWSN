@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 
 namespace UWSN.Model
 {
@@ -12,7 +7,7 @@ namespace UWSN.Model
         public int Id { get; set; }
         public Vector3 Position { get; set; }
 
-        public Sensor(int id) 
+        public Sensor(int id)
         {
             Id = id;
             Position = new Vector3();

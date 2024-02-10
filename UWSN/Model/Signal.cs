@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UWSN.Model
+﻿namespace UWSN.Model
 {
     public static class Signal
     {
         public static void Emit(Sensor emittingSensor, Packet packet)
         {
-            foreach (var sensor in Simulation.instance.Environment.Sensors)
+            foreach (var sensor in Simulation.Instance.Environment.Sensors)
             {
                 double distance = Math.Sqrt(
                        Math.Pow(sensor.Position.X - emittingSensor.Position.X, 2) +

@@ -1,11 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Formats.Asn1;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace UWSN
 {
@@ -20,17 +13,17 @@ namespace UWSN
                 throw new FileNotFoundException("Не удалось найти указанный файл.");
             }
 
-            using StreamReader reader = new StreamReader(EnvFilePath);
+            using StreamReader reader = new(EnvFilePath);
 
             var env = JsonConvert.DeserializeObject<Model.Environment>(reader.ReadToEnd(), new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto
             });
 
-            return env; 
+            return env ?? throw new NullReferenceException("Не удалось создать окружение из файла");
         }
-        
-        public Loader(string envFilePath) 
+
+        public Loader(string envFilePath)
         {
             EnvFilePath = envFilePath;
         }

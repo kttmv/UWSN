@@ -1,9 +1,4 @@
 ﻿using CommandLine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UWSN.CommandLine
 {
@@ -11,7 +6,7 @@ namespace UWSN.CommandLine
     public class PlaceSensorsRandomStepOptions : BaseCommandLineOptions
     {
         [Value(0, Required = true, HelpText = "Вид функции распределения")]
-        public string DistrType { get; set; }
+        public DistributionType DistributionType { get; set; }
 
         [Value(0, Required = true, HelpText = "Шаг ортогональной сетки")]
         public float StepRange { get; set; }
@@ -24,5 +19,12 @@ namespace UWSN.CommandLine
 
         [Value(0, Required = true, HelpText = "Количество сенсоров")]
         public int SensorsCount { get; set; }
+    }
+
+    [Flags]
+    public enum DistributionType
+    {
+        Normal,
+        Uniform
     }
 }

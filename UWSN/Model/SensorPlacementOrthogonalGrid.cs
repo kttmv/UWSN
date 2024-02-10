@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UWSN.Model
+﻿namespace UWSN.Model
 {
     public class SensorPlacementOrthogonalGrid : ISensorPlacementModel
     {
-        private List<Sensor> Sensors { get; set; }
-        private float Step { get; set; }
+        private readonly List<Sensor> _sensors;
+        private readonly float _step;
 
         public List<Sensor> PlaceSensors()
         {
             int placedCount = 0;
-            int cubicEdge = (int)Math.Ceiling(Math.Pow(Sensors.Count, 1.0 / 3.0));
+            int cubicEdge = (int)Math.Ceiling(Math.Pow(_sensors.Count, 1.0 / 3.0));
 
             for (int i = 0; i < cubicEdge; i++)
             {
@@ -22,24 +16,24 @@ namespace UWSN.Model
                 {
                     for (int k = 0; k < cubicEdge; k++)
                     {
-                        if (placedCount >= Sensors.Count)
+                        if (placedCount >= _sensors.Count)
                         {
                             break;
                         }
 
-                        Sensors[placedCount].Position = new System.Numerics.Vector3(i * Step, j * Step, k * Step);
+                        _sensors[placedCount].Position = new System.Numerics.Vector3(i * _step, j * _step, k * _step);
                         placedCount++;
                     }
                 }
             }
 
-            return Sensors;
+            return _sensors;
         }
 
         public SensorPlacementOrthogonalGrid(List<Sensor> sensors, float step)
         {
-            Sensors = sensors;
-            Step = step;
+            _sensors = sensors;
+            _step = step;
         }
     }
 }
