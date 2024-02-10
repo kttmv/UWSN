@@ -57,7 +57,7 @@
 
                 Time = e.Key;
 
-                e.Value.Action.Invoke();
+                e.Value.Invoke();
                 EventScheduler.RemoveAt(0);
             }
         }

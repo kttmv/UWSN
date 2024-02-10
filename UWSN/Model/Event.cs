@@ -5,17 +5,22 @@
         /// <summary>
         /// Время
         /// </summary>
-        public DateTime Time { get; set; }
+        public DateTime Time { get; }
 
         /// <summary>
-        /// Действие событыя
+        /// Действие, вызываемое в момент исполнения события
         /// </summary>
-        public Action Action { get; set; }
+        private readonly Action _action;
 
         public Event(DateTime time, Action action)
         {
             Time = time;
-            Action = action;
+            _action = action;
+        }
+
+        public void Invoke()
+        {
+            _action.Invoke();
         }
     }
 }
