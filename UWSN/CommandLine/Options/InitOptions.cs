@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace UWSN.CommandLine
+namespace UWSN.CommandLine.Options
 {
     [Verb("init", HelpText = "Создать экземпляр среды")]
     public class InitOptions : BaseCommandLineOptions

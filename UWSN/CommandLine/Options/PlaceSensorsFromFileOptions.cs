@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace UWSN.CommandLine
+namespace UWSN.CommandLine.Options
 {
     [Verb("placeSensorsFile", HelpText = "Расположить сенсоры в акватории в виде ортогональной сетки")]
     public class PlaceSensorsFromFileOptions : BaseCommandLineOptions

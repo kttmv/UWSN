@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using Dew.Math;
-using UWSN.CommandLine;
+using UWSN.CommandLine.Options;
 
 namespace UWSN.Model
 {
