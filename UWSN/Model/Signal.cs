@@ -6,6 +6,11 @@
         {
             foreach (var sensor in Simulation.Instance.Environment.Sensors)
             {
+                if (sensor == emittingSensor)
+                {
+                    continue;
+                }
+
                 double distance = Math.Sqrt(
                        Math.Pow(sensor.Position.X - emittingSensor.Position.X, 2) +
                        Math.Pow(sensor.Position.Y - emittingSensor.Position.Y, 2) +
@@ -16,7 +21,7 @@
 
                 if (new Random().NextDouble() <= deliveryProb)
                 {
-                    //Simulation.instance.AddEvent(new Event(DateTime.MinValue, new Action(() => sensor.Physical.ReceivePacket(packetCopy))));
+                    Simulation.Instance.AddEvent(new Event(Simulation.Instance.Time.AddSeconds(Simulation.Instance.Environment.Sensors.IndexOf(sensor)), new Action(() => sensor.PhysicalLayer.ReceivePacket(packet, sensor))));
                 }
             }
         }
