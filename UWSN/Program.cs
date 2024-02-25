@@ -11,7 +11,7 @@ public class Program
 {
     private static readonly Dictionary<Type, Action<object>> handlers = new Dictionary<Type, Action<object>>
     {
-        { typeof(InitOptions), options => InitHandler.Handle((InitOptions)options) },
+        { typeof(SetAreaLimitsOptions), options => SetAreaLimitsHandler.Handle((SetAreaLimitsOptions)options) },
         { typeof(PlaceSensorsOrthOptions), options => PlaceSensorsOrthHandler.Handle((PlaceSensorsOrthOptions)options) },
         { typeof(PlaceSensorsRandomStepOptions), options => PlaceSensorsRandomStepHandler.Handle((PlaceSensorsRandomStepOptions)options) },
         { typeof(PlaceSensorsPoissonOptions), options => PlaceSensorsPoissonHandler.Handle((PlaceSensorsPoissonOptions)options) },

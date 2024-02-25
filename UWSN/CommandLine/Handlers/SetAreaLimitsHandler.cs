@@ -9,9 +9,9 @@ using UWSN.Model;
 
 namespace UWSN.CommandLine.Handlers;
 
-public class InitHandler
+public class SetAreaLimitsHandler
 {
-    public static void Handle(InitOptions o)
+    public static void Handle(SetAreaLimitsOptions o)
     {
         var areaLimits = o.AreaLimits.ToList();
         var v1 = new Vector3(areaLimits[0], areaLimits[1], areaLimits[2]);

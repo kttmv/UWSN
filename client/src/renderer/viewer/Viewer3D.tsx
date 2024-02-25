@@ -3,7 +3,7 @@ import { OrbitControls, Sky } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { IconCaretDown, IconCaretUp } from '@tabler/icons-react'
 import { useState } from 'react'
-import useApplicationStore from '../app/store'
+import useProjectStore from '../store/projectStore'
 import SensorNode from './SensorNode'
 
 export default function Viewer3D() {
@@ -14,7 +14,7 @@ export default function Viewer3D() {
         lg: 'rounded-l-md'
     })
 
-    const { sensorNodes } = useApplicationStore()
+    const { project } = useProjectStore()
 
     return (
         <Flex
@@ -41,13 +41,13 @@ export default function Viewer3D() {
                         intensity={Math.PI}
                     />
                     <OrbitControls makeDefault />
-                    {sensorNodes.map((node) => (
+                    {project?.Sensors.map((sensor) => (
                         <SensorNode
-                            key={node.Id}
+                            key={sensor.Id}
                             position={[
-                                node.Position.X,
-                                node.Position.Y,
-                                node.Position.Z
+                                sensor.Position.X,
+                                sensor.Position.Y,
+                                sensor.Position.Z
                             ]}
                         />
                     ))}
@@ -70,4 +70,8 @@ export default function Viewer3D() {
             </Button>
         </Flex>
     )
+}
+
+function useSensorNodes() {
+    const { project } = useProjectStore()
 }

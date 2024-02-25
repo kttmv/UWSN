@@ -9,13 +9,12 @@ import {
     useColorModeValue
 } from '@chakra-ui/react'
 import { runSimulatorShell } from '..'
-import useApplicationStore, { SensorNodeData } from '../app/store'
-import { readFile } from '../helpers/fsHelpers'
+import { readFile } from '../shared/helpers/fsHelpers'
+import useConsoleStore from '../store/consoleStore'
 import EnvironmentTab from './EnvironmentTab'
 
 export default function ApplicationTabs() {
-    const { addSensorNode, addLineToConsoleOutput, clearSensorsNodes } =
-        useApplicationStore()
+    const { addLineToConsoleOutput } = useConsoleStore()
 
     const bgColor = useColorModeValue('gray.50', 'gray.800')
 
@@ -35,25 +34,6 @@ export default function ApplicationTabs() {
         runSimulatorShell(
             'placeSensorsRndStep Uniform 5 0 1 64 -f D:\\Env.json'
         )
-    }
-
-    const clickedLoad = () => {
-        readFile('D:\\Env.json')
-            .then((content) => {
-                clearSensorsNodes()
-
-                const data = JSON.parse(content)
-
-                data.Sensors.forEach((sensor: SensorNodeData) => {
-                    addSensorNode(sensor)
-                })
-                addLineToConsoleOutput(
-                    `Успешно загружены сенсоры (${data.Sensors.length})`
-                )
-            })
-            .catch(() => {
-                console.log('Не удалось открыть файл')
-            })
     }
 
     return (
@@ -79,7 +59,6 @@ export default function ApplicationTabs() {
                         <Button onClick={clickedRandomStepUniform}>
                             Распределение со случайным шагом (непрерывное)
                         </Button>
-                        <Button onClick={clickedLoad}>Загрузить сенсоры</Button>
                     </Flex>
                 </TabPanel>
             </TabPanels>

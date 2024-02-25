@@ -1,10 +1,10 @@
 import { Button, Card, CardBody, Flex, Text } from '@chakra-ui/react'
 import { IconCaretDown, IconCaretUp } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
-import useApplicationStore from '../app/store'
+import useConsoleStore from '../store/consoleStore'
 
 export default function Console() {
-    const { consoleOutput, addLineToConsoleOutput } = useApplicationStore()
+    const { consoleOutput, addLineToConsoleOutput } = useConsoleStore()
     const [isOpen, setIsOpen] = useState(true)
 
     useEffect(() => {
