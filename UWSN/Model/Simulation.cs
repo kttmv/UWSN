@@ -60,7 +60,7 @@
 
             _instance = this;
             Environment = new Environment();
-            EventScheduler = new SortedList<DateTime, Event>();
+            EventScheduler = new SortedList<DateTime, Event>(new DuplicateKeyComparer<DateTime>());
             ChannelSortedEmits = new Event?[NumberOfChannels];
         }
 
