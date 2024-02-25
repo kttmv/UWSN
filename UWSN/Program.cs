@@ -15,7 +15,9 @@ public class Program
         { typeof(PlaceSensorsOrthOptions), options => PlaceSensorsOrthHandler.Handle((PlaceSensorsOrthOptions)options) },
         { typeof(PlaceSensorsRandomStepOptions), options => PlaceSensorsRandomStepHandler.Handle((PlaceSensorsRandomStepOptions)options) },
         { typeof(PlaceSensorsPoissonOptions), options => PlaceSensorsPoissonHandler.Handle((PlaceSensorsPoissonOptions)options) },
-        { typeof(PlaceSensorsFromFileOptions), options => PlaceSensorsFromFileHandler.Handle((PlaceSensorsFromFileOptions)options) }
+        { typeof(PlaceSensorsFromFileOptions), options => PlaceSensorsFromFileHandler.Handle((PlaceSensorsFromFileOptions)options) },
+        { typeof(RunSimulationOptions), options => RunSimulationHandler.Handle((RunSimulationOptions)options) }
+
     };
 
     private static void Main(string[] args)
