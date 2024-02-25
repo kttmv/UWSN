@@ -12,16 +12,18 @@ namespace UWSN.CommandLine.Handlers
     {
         public static void Handle(RunSimulationOptions o)
         {
-            var env = new Loader(o.FilePath).LoadEnv();
+            SerializationHelper.LoadSimulation(o.FilePath);
 
-            var sim = new Simulation(env);
+            var env = Simulation.Instance.Environment;
+
             var frame = new Frame
             {
                 IdSend = env.Sensors.First().Id,
                 IdReceive = env.Sensors.Last().Id
             };
+
             Signal.Emit(env.Sensors.First(), frame);
-            sim.Run();
+            Simulation.Instance.Run();
         }
     }
 }

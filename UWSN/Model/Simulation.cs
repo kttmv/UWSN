@@ -2,6 +2,8 @@
 {
     public class Simulation
     {
+        #region Singleton
+
         private static Simulation? _instance;
 
         public static Simulation Instance
@@ -12,12 +14,23 @@
                 {
                     throw new Exception("Экземпляр класса Simulation не был создан.");
                 }
+
                 return _instance;
             }
         }
 
+        #endregion Singleton
+
+        #region Properties
+
+        /// <summary>
+        /// Окружение симуляции
+        /// </summary>
         public Environment Environment { get; set; }
 
+        /// <summary>
+        /// Текущее время симуляции
+        /// </summary>
         public DateTime Time { get; set; }
 
         /// <summary>
@@ -30,7 +43,15 @@
         /// </summary>
         private SortedList<DateTime, Event> EventScheduler { get; set; }
 
-        public Simulation(Environment env)
+        // TODO: Не использовать дефолтное значение и выставлять его при инициализации (или вместе с протоколами)
+        /// <summary>
+        /// Количество доступных каналов
+        /// </summary>
+        public int NumberOfChannels { get; set; } = 1;
+
+        #endregion Properties
+
+        public Simulation()
         {
             if (_instance != null)
             {
@@ -38,9 +59,9 @@
             }
 
             _instance = this;
-            Environment = env;
+            Environment = new Environment();
             EventScheduler = new SortedList<DateTime, Event>();
-            ChannelSortedEmits = new Event?[4];
+            ChannelSortedEmits = new Event?[NumberOfChannels];
         }
 
         /// <summary>
@@ -66,11 +87,11 @@
             while (EventScheduler.Count > 0)
             {
                 var e = EventScheduler.First();
+                EventScheduler.RemoveAt(0);
 
                 Time = e.Key;
 
                 e.Value.Invoke();
-                EventScheduler.RemoveAt(0);
             }
         }
     }

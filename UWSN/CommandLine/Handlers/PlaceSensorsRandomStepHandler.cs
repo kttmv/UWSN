@@ -12,23 +12,23 @@ public class PlaceSensorsRandomStepHandler
 {
     public static void Handle(PlaceSensorsRandomStepOptions o)
     {
-        var loader = new Loader(o.FilePath);
-        var environment = loader.LoadEnv();
-        environment.Sensors.Clear();
+        SerializationHelper.LoadSimulation(o.FilePath);
+        var sensors = new List<Sensor>();
 
         for (int i = 0; i < o.SensorsCount; i++)
         {
-            environment.Sensors.Add(new Sensor(i));
+            sensors.Add(new Sensor(i));
         }
 
-        var placement = new SensorPlacementRandomStep(
-            environment.Sensors,
-            o.StepRange,
-            o.DistributionType,
-            o.UniParameterA,
-            o.UniParameterB);
+        var placement =
+            new SensorPlacementRandomStep(
+                sensors,
+                o.StepRange,
+                o.DistributionType,
+                o.UniParameterA,
+                o.UniParameterB);
 
-        environment.Sensors = placement.PlaceSensors();
+        Simulation.Instance.Environment.Sensors = placement.PlaceSensors();
 
         string distributionType = o.DistributionType switch
         {
@@ -39,6 +39,6 @@ public class PlaceSensorsRandomStepHandler
 
         Console.WriteLine($"Расстановка сенсоров ({o.SensorsCount}) по {distributionType} распределению прошла успешно.");
 
-        environment.SaveEnv(o.FilePath);
+        SerializationHelper.SaveSimulation(o.FilePath);
     }
 }

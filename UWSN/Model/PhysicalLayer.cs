@@ -1,29 +1,32 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace UWSN.Model
 {
-    public class PhysicalLayer
+    public class PhysicalLayer : BaseLayer
     {
-        [JsonIgnore]
-        public Sensor Sensor { get; set; }
+        //protected int SensorId { get; set; }
 
-        /// <summary>
-        /// ПОЧИНИТЬ ИСПРАВИТЬ НЕЛОМАТЬ ЗДЕЛАТЬ
-        /// </summary>
-        /// <param name="sensor">GIGA костыль</param>
-        public void ReceiveFrame(Frame frame, Sensor sensor)
+        //[JsonIgnore]
+        //public Sensor Sensor
+        //{
+        //    get
+        //    {
+        //        return Simulation.Instance.Environment.Sensors.FirstOrDefault(s => s.Id == SensorId)
+        //            ?? throw new Exception("Не удалось найти сенсор с указанным ID");
+        //    }
+        //}
+
+        public void ReceiveFrame(Frame frame)
         {
-            Sensor = sensor;
             Sensor.Buffer.Add(frame);
-            // Sensor.NertworkLayer.ReceiveFrame(frame);
             Console.WriteLine("Долбаёб №" + Sensor.Id + " получил пакет (PhL)");
 
-            sensor.NetworkLayer.ReceiveFrame(frame, sensor);
+            Sensor.NetworkLayer.ReceiveFrame(frame);
         }
 
         public void SendFrame(Frame frame)
@@ -31,9 +34,9 @@ namespace UWSN.Model
             Signal.Emit(Sensor, frame);
         }
 
-        public PhysicalLayer(Sensor sensor)
+        public PhysicalLayer(int id)
         {
-            Sensor = sensor;
+            SensorId = id;
         }
     }
 }

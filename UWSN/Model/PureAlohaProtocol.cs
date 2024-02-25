@@ -1,23 +1,24 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace UWSN.Model
 {
-    public class PureAlohaProtocol : INetworkLayer
+    public class PureAlohaProtocol : BaseLayer, INetworkLayer
     {
         [JsonIgnore]
-        public Sensor Sensor { get; set; }
-
         private Event? AckTimeoutEvent { get; set; }
 
-        public void ReceiveFrame(Frame frame, Sensor sensor)
+        public PureAlohaProtocol(int id)
         {
-            Sensor = sensor;
+            SensorId = id;
+        }
 
+        public void ReceiveFrame(Frame frame)
+        {
             if (frame.FrameType == Frame.Type.Ack && frame.IdReceive == Sensor.Id)
             {
                 AckTimeoutEvent = null;
@@ -39,17 +40,15 @@ namespace UWSN.Model
             }
         }
 
-        public void SendFrame(Frame frame, Sensor sensor)
+        public void SendFrame(Frame frame)
         {
-            Sensor = sensor;
-
             // если канал занят, то ждем 5.2с
             if (Simulation.Instance.ChannelSortedEmits[0] != null)
             {
                 var time = frame.TimeSend.AddSeconds(5.2);
                 var action = new Action(() =>
                 {
-                    SendFrame(frame, Sensor);
+                    SendFrame(frame);
                 });
 
                 var e = new Event(time, action);
@@ -64,14 +63,14 @@ namespace UWSN.Model
             CreateAckTimeout(frame, 3);
         }
 
-        private void ResendFrame(Frame frame, Sensor sensor, int attemptsLeft)
+        private void ResendFrame(Frame frame, int attemptsLeft)
         {
             if (attemptsLeft == 0)
             {
                 return;
             }
 
-            SendFrame(frame, sensor);
+            SendFrame(frame);
 
             CreateAckTimeout(frame, attemptsLeft - 1);
         }
@@ -86,18 +85,12 @@ namespace UWSN.Model
                     return;
                 }
 
-                ResendFrame(frame, Sensor, attemptsLeft);
+                ResendFrame(frame, attemptsLeft);
             });
 
             var e1 = new Event(time1, action1);
             Simulation.Instance.AddEvent(e1);
             AckTimeoutEvent = e1;
-        }
-
-        public PureAlohaProtocol(Sensor sensor)
-        {
-            Sensor = sensor;
-            AckTimeoutEvent = null;
         }
     }
 }

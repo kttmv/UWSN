@@ -4,7 +4,9 @@
     {
         public static void Emit(Sensor emittingSensor, Frame packet, int channelId = 0)
         {
-            foreach (var sensor in Simulation.Instance.Environment.Sensors)
+            var simulation = Simulation.Instance;
+
+            foreach (var sensor in simulation.Environment.Sensors)
             {
                 if (sensor == emittingSensor)
                 {
@@ -22,28 +24,28 @@
                 if (new Random().NextDouble() <= deliveryProb)
                 {
                     // создаем ивент получения сенсором кадра
-                    var time = Simulation.Instance.Time.AddSeconds(Simulation.Instance.Environment.Sensors.IndexOf(sensor) + (new Random()).NextDouble());
-                    var action = new Action(() => 
+                    var time = simulation.Time.AddSeconds(simulation.Environment.Sensors.IndexOf(sensor) + (new Random()).NextDouble());
+                    var action = new Action(() =>
                     {
                         // опустошаем канал
-                        Simulation.Instance.ChannelSortedEmits[channelId] = null;
-                        sensor.PhysicalLayer.ReceiveFrame(packet, sensor);
+                        simulation.ChannelSortedEmits[channelId] = null;
+                        sensor.PhysicalLayer.ReceiveFrame(packet);
                     });
 
                     var e = new Event(time, action);
 
                     // обработка коллизии
-                    if (Simulation.Instance.ChannelSortedEmits[channelId] != null)
+                    if (simulation.ChannelSortedEmits[channelId] != null)
                     {
-                        Simulation.Instance.ChannelSortedEmits[channelId] = null;
-                        Simulation.Instance.RemoveEvent(e);
-                        
+                        simulation.ChannelSortedEmits[channelId] = null;
+                        simulation.RemoveEvent(e);
+
                         continue;
                     }
 
                     // занимаем канал
-                    Simulation.Instance.ChannelSortedEmits[channelId] = e;
-                    Simulation.Instance.AddEvent(e);
+                    simulation.ChannelSortedEmits[channelId] = e;
+                    simulation.AddEvent(e);
                 }
             }
         }

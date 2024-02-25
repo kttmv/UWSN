@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Newtonsoft.Json;
 
 namespace UWSN.Model
 {
@@ -16,8 +17,8 @@ namespace UWSN.Model
         {
             Id = id;
             Position = new Vector3();
-            PhysicalLayer = new PhysicalLayer(this);
-            NetworkLayer = new PureAlohaProtocol(this);
+            PhysicalLayer = new PhysicalLayer(Id);
+            NetworkLayer = new PureAlohaProtocol(Id);
             Buffer = new List<Frame>();
         }
     }

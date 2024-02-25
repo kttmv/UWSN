@@ -12,19 +12,19 @@ public class PlaceSensorsOrthHandler
 {
     public static void Handle(PlaceSensorsOrthOptions o)
     {
-        var loader = new Loader(o.FilePath);
-        var environment = loader.LoadEnv();
+        SerializationHelper.LoadSimulation(o.FilePath);
+        var sensors = new List<Sensor>();
 
-        environment.Sensors.Clear();
         for (int i = 0; i < o.SensorsCount; i++)
         {
-            environment.Sensors.Add(new Sensor(i));
+            sensors.Add(new Sensor(i));
         }
 
-        environment.Sensors = new SensorPlacementOrthogonalGrid(environment.Sensors, o.OrthogonalStep).PlaceSensors();
+        Simulation.Instance.Environment.Sensors =
+            new SensorPlacementOrthogonalGrid(sensors, o.OrthogonalStep).PlaceSensors();
 
         Console.WriteLine($"Расстановка сенсоров ({o.SensorsCount}) на ортогональной сетке прошла успешно.");
 
-        environment.SaveEnv(o.FilePath);
+        SerializationHelper.SaveSimulation(o.FilePath);
     }
 }

@@ -13,25 +13,21 @@ public class PlaceSensorsPoissonHandler
 {
     public static void Handle(PlaceSensorsPoissonOptions o)
     {
-        var loader = new Loader(o.FilePath);
-        var environment = loader.LoadEnv();
-        environment.Sensors.Clear();
+        SerializationHelper.LoadSimulation(o.FilePath);
+        var sensors = new List<Sensor>();
 
         for (int i = 0; i < o.SensorsCount; i++)
         {
-            environment.Sensors.Add(new Sensor(i));
+            sensors.Add(new Sensor(i));
         }
 
-        Vector3[] areaLimits = new Vector3[2]
-        {
-            new Vector3(environment.AreaLimits.Item1.X, environment.AreaLimits.Item1.Y, environment.AreaLimits.Item1.Z),
-            new Vector3(environment.AreaLimits.Item2.X, environment.AreaLimits.Item2.Y, environment.AreaLimits.Item2.Z)
-        };
+        var areaLimits = Simulation.Instance.Environment.AreaLimits;
 
-        environment.Sensors = new SensorPlacementPoisson(environment.Sensors, o.LambdaParameter, areaLimits).PlaceSensors();
+        Simulation.Instance.Environment.Sensors =
+            new SensorPlacementPoisson(sensors, o.LambdaParameter, areaLimits).PlaceSensors();
 
         Console.WriteLine($"Расстановка сенсоров ({o.SensorsCount}) по закону Пуассона прошла успешно.");
 
-        environment.SaveEnv(o.FilePath);
+        SerializationHelper.SaveSimulation(o.FilePath);
     }
 }

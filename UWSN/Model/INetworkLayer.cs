@@ -8,8 +8,8 @@ namespace UWSN.Model
 {
     public interface INetworkLayer
     {
-        public void ReceiveFrame(Frame frame, Sensor sensor);
+        public void ReceiveFrame(Frame frame);
 
-        public void SendFrame(Frame frame, Sensor sensor); 
+        public void SendFrame(Frame frame);
     }
 }

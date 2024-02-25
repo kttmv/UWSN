@@ -9,18 +9,22 @@ using UWSN.Model;
 
 namespace UWSN.CommandLine.Handlers;
 
-public class SetAreaLimitsHandler
+public class InitializationHandler
 {
-    public static void Handle(SetAreaLimitsOptions o)
+    public static void Handle(InitializationOptions o)
     {
         var areaLimits = o.AreaLimits.ToList();
         var v1 = new Vector3(areaLimits[0], areaLimits[1], areaLimits[2]);
         var v2 = new Vector3(areaLimits[3], areaLimits[4], areaLimits[5]);
 
-        var environment = new Model.Environment(v1, v2, new List<Sensor>());
+        //environment.SaveEnv(o.FilePath);
 
-        Console.WriteLine("Инициализация окружения проведена успешно.");
+        _ = new Simulation();
+
+        Simulation.Instance.Environment.AreaLimits = new Tuple<Vector3, Vector3>(v1, v2);
+
         Console.WriteLine($"Границы окружения: {v1}, {v2}");
+        Console.WriteLine("Инициализация симуляции проведена успешно.");
 
         float length = Math.Abs(v1.X - v2.X);
         float width = Math.Abs(v1.Y - v2.Y);
@@ -29,6 +33,6 @@ public class SetAreaLimitsHandler
 
         Console.WriteLine($"Объем окружения: {volume} м³");
 
-        environment.SaveEnv(o.FilePath);
+        SerializationHelper.SaveSimulation(o.FilePath);
     }
 }

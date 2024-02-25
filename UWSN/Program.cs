@@ -9,15 +9,14 @@ namespace UWSN;
 
 public class Program
 {
-    private static readonly Dictionary<Type, Action<object>> handlers = new Dictionary<Type, Action<object>>
+    private static readonly Dictionary<Type, Action<object>> handlers = new()
     {
-        { typeof(SetAreaLimitsOptions), options => SetAreaLimitsHandler.Handle((SetAreaLimitsOptions)options) },
+        { typeof(InitializationOptions), options => InitializationHandler.Handle((InitializationOptions)options) },
         { typeof(PlaceSensorsOrthOptions), options => PlaceSensorsOrthHandler.Handle((PlaceSensorsOrthOptions)options) },
         { typeof(PlaceSensorsRandomStepOptions), options => PlaceSensorsRandomStepHandler.Handle((PlaceSensorsRandomStepOptions)options) },
         { typeof(PlaceSensorsPoissonOptions), options => PlaceSensorsPoissonHandler.Handle((PlaceSensorsPoissonOptions)options) },
         { typeof(PlaceSensorsFromFileOptions), options => PlaceSensorsFromFileHandler.Handle((PlaceSensorsFromFileOptions)options) },
         { typeof(RunSimulationOptions), options => RunSimulationHandler.Handle((RunSimulationOptions)options) }
-
     };
 
     private static void Main(string[] args)
