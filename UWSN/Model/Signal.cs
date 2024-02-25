@@ -2,7 +2,7 @@
 {
     public static class Signal
     {
-        public static void Emit(Sensor emittingSensor, Packet packet)
+        public static void Emit(Sensor emittingSensor, Frame packet, int channelId = 0)
         {
             foreach (var sensor in Simulation.Instance.Environment.Sensors)
             {
@@ -17,11 +17,33 @@
                        Math.Pow(sensor.Position.Z - emittingSensor.Position.Z, 2)
                                            );
 
-                double deliveryProb = 0.9; // здесь будет вычисление по формуле
+                double deliveryProb = 1d; // здесь будет вычисление по формуле
 
                 if (new Random().NextDouble() <= deliveryProb)
                 {
-                    Simulation.Instance.AddEvent(new Event(Simulation.Instance.Time.AddSeconds(Simulation.Instance.Environment.Sensors.IndexOf(sensor)), new Action(() => sensor.PhysicalLayer.ReceivePacket(packet, sensor))));
+                    // создаем ивент получения сенсором кадра
+                    var time = Simulation.Instance.Time.AddSeconds(Simulation.Instance.Environment.Sensors.IndexOf(sensor) + (new Random()).NextDouble());
+                    var action = new Action(() => 
+                    {
+                        // опустошаем канал
+                        Simulation.Instance.ChannelSortedEmits[channelId] = null;
+                        sensor.PhysicalLayer.ReceiveFrame(packet, sensor);
+                    });
+
+                    var e = new Event(time, action);
+
+                    // обработка коллизии
+                    if (Simulation.Instance.ChannelSortedEmits[channelId] != null)
+                    {
+                        Simulation.Instance.ChannelSortedEmits[channelId] = null;
+                        Simulation.Instance.RemoveEvent(e);
+                        
+                        continue;
+                    }
+
+                    // занимаем канал
+                    Simulation.Instance.ChannelSortedEmits[channelId] = e;
+                    Simulation.Instance.AddEvent(e);
                 }
             }
         }

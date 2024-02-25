@@ -16,16 +16,19 @@ namespace UWSN.Model
         /// ПОЧИНИТЬ ИСПРАВИТЬ НЕЛОМАТЬ ЗДЕЛАТЬ
         /// </summary>
         /// <param name="sensor">GIGA костыль</param>
-        public void ReceivePacket(Packet packet, Sensor sensor)
+        public void ReceiveFrame(Frame frame, Sensor sensor)
         {
             Sensor = sensor;
-            Sensor.Buffer.Add(packet);
-            Console.WriteLine("Долбаёб №" + Sensor.Id + " получил пакет");
+            Sensor.Buffer.Add(frame);
+            // Sensor.NertworkLayer.ReceiveFrame(frame);
+            Console.WriteLine("Долбаёб №" + Sensor.Id + " получил пакет (PhL)");
+
+            sensor.NetworkLayer.ReceiveFrame(frame, sensor);
         }
 
-        public void SendPacket(Packet packet)
+        public void SendFrame(Frame frame)
         {
-            Signal.Emit(Sensor, packet);
+            Signal.Emit(Sensor, frame);
         }
 
         public PhysicalLayer(Sensor sensor)

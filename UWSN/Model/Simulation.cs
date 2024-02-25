@@ -21,6 +21,11 @@
         public DateTime Time { get; set; }
 
         /// <summary>
+        /// Отсортированные по каналам эммиты
+        /// </summary>
+        public Event?[] ChannelSortedEmits { get; set; }
+
+        /// <summary>
         /// Отсортированный по времени список событый
         /// </summary>
         private SortedList<DateTime, Event> EventScheduler { get; set; }
@@ -35,6 +40,7 @@
             _instance = this;
             Environment = env;
             EventScheduler = new SortedList<DateTime, Event>();
+            ChannelSortedEmits = new Event?[4];
         }
 
         /// <summary>
@@ -44,6 +50,12 @@
         public void AddEvent(Event e)
         {
             EventScheduler.Add(e.Time, e);
+        }
+
+        public void RemoveEvent(Event e)
+        {
+            // todo СЛОМАЕЦА ЕСЛИ ВРЕМЯ НЕ РАЗНЫЕ
+            EventScheduler.Remove(e.Time);
         }
 
         /// <summary>

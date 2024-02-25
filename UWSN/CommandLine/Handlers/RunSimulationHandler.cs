@@ -15,7 +15,12 @@ namespace UWSN.CommandLine.Handlers
             var env = new Loader(o.FilePath).LoadEnv();
 
             var sim = new Simulation(env);
-            Signal.Emit(env.Sensors.First(), new Packet());
+            var frame = new Frame
+            {
+                IdSend = env.Sensors.First().Id,
+                IdReceive = env.Sensors.Last().Id
+            };
+            Signal.Emit(env.Sensors.First(), frame);
             sim.Run();
         }
     }
