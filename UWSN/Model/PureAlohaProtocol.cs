@@ -10,7 +10,7 @@ namespace UWSN.Model
     public class PureAlohaProtocol : BaseLayer, INetworkLayer
     {
         [JsonIgnore]
-        private Event? AckTimeoutEvent { get; set; }
+        private bool WaitingForAck { get; set; }
 
         public PureAlohaProtocol(int id)
         {
@@ -21,8 +21,9 @@ namespace UWSN.Model
         {
             if (frame.FrameType == Frame.Type.Ack && frame.IdReceive == Sensor.Id)
             {
-                AckTimeoutEvent = null;
-                Console.WriteLine("Долбаёб №" + Sensor.Id + $" получил ack от {frame.IdSend} (NL)");
+                WaitingForAck = false;
+                Sensor.PhysicalLayer.CurrentState = PhysicalLayer.State.Idle;
+                Logger.WriteSimulationLine($"(NetworkLayer)  Долбаёб №{Sensor.Id} получил пакет ACK от №{frame.IdSend}");
 
                 return;
             }
@@ -36,16 +37,17 @@ namespace UWSN.Model
                     IdReceive = frame.IdSend
                 };
 
-                Sensor.PhysicalLayer.SendFrame(ack);
+                Logger.WriteSimulationLine($"(NetworkLayer)  Долбаёб №{Sensor.Id} начал отправку ACK долбаёбу №{frame.IdReceive}");
+                Sensor.NetworkLayer.SendFrame(ack);
             }
         }
 
         public void SendFrame(Frame frame)
         {
-            // если канал занят, то ждем 5.2с
-            if (Simulation.Instance.ChannelSortedEmits[0] != null)
+            // если канал занят, то ждем 5с
+            if (Simulation.Instance.ChannelManager.IsChannelBusy(0))
             {
-                var time = frame.TimeSend.AddSeconds(5.2);
+                var time = frame.TimeSend.AddSeconds(5);
                 var action = new Action(() =>
                 {
                     SendFrame(frame);
@@ -57,9 +59,14 @@ namespace UWSN.Model
                 return;
             }
 
-            // если канал свободен, то отправляем кадр и ждем аск в течение 6.1с
-            Sensor.PhysicalLayer.SendFrame(frame);
+            Sensor.PhysicalLayer.StartSending(frame, 0);
 
+            if (frame.FrameType == Frame.Type.Ack)
+            {
+                return;
+            }
+
+            WaitingForAck = true;
             CreateAckTimeout(frame, 3);
         }
 
@@ -77,10 +84,10 @@ namespace UWSN.Model
 
         private void CreateAckTimeout(Frame frame, int attemptsLeft)
         {
-            var time1 = Simulation.Instance.Time.AddSeconds(6.1);
-            var action1 = new Action(() =>
+            var time = Simulation.Instance.Time.AddSeconds(10); // ждем 10 секунд
+            var action = new Action(() =>
             {
-                if (AckTimeoutEvent == null)
+                if (!WaitingForAck)
                 {
                     return;
                 }
@@ -88,9 +95,7 @@ namespace UWSN.Model
                 ResendFrame(frame, attemptsLeft);
             });
 
-            var e1 = new Event(time1, action1);
-            Simulation.Instance.AddEvent(e1);
-            AckTimeoutEvent = e1;
+            Simulation.Instance.AddEvent(new Event(time, action));
         }
     }
 }

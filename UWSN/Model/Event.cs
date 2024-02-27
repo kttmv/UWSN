@@ -10,17 +10,17 @@
         /// <summary>
         /// Действие, вызываемое в момент исполнения события
         /// </summary>
-        private readonly Action _action;
+        private Action Action { get; }
 
         public Event(DateTime time, Action action)
         {
             Time = time;
-            _action = action;
+            Action = action;
         }
 
         public void Invoke()
         {
-            _action.Invoke();
+            Action.Invoke();
         }
     }
 }

@@ -9,29 +9,60 @@ namespace UWSN.Model
 {
     public class PhysicalLayer : BaseLayer
     {
-        //protected int SensorId { get; set; }
-
-        //[JsonIgnore]
-        //public Sensor Sensor
-        //{
-        //    get
-        //    {
-        //        return Simulation.Instance.Environment.Sensors.FirstOrDefault(s => s.Id == SensorId)
-        //            ?? throw new Exception("Не удалось найти сенсор с указанным ID");
-        //    }
-        //}
-
-        public void ReceiveFrame(Frame frame)
+        public enum State
         {
-            Sensor.Buffer.Add(frame);
-            Console.WriteLine("Долбаёб №" + Sensor.Id + " получил пакет (PhL)");
+            Idle,
+            Listening,
+            Receiving,
+            Emitting
+        }
 
+        public State CurrentState { get; set; }
+
+        public void StartReceiving(Frame frame)
+        {
+            CurrentState = State.Receiving;
+
+            Logger.WriteSimulationLine($"(PhysicalLayer) Долбаёб №{Sensor.Id} начал " +
+                $"получать кадр от №{frame.IdSend}");
+        }
+
+        public void EndReceiving(Frame frame)
+        {
+            CurrentState = State.Listening;
+
+            Logger.WriteSimulationLine($"(PhysicalLayer) Долбаёб №{Sensor.Id} получил " +
+                $"кадр от №{frame.IdSend}");
+
+            Sensor.FrameBuffer.Add(frame);
             Sensor.NetworkLayer.ReceiveFrame(frame);
         }
 
-        public void SendFrame(Frame frame)
+        public void StartSending(Frame frame, int channelId)
         {
-            Signal.Emit(Sensor, frame);
+            CurrentState = State.Emitting;
+
+            Logger.WriteSimulationLine($"(PhysicalLayer) Долбаёб №{Sensor.Id} начал " +
+                $"отправку кадра долбаёбу №{frame.IdReceive}");
+
+            var signal = new Signal(Sensor, frame, channelId);
+            signal.Emit();
+        }
+
+        public void EndSending(Frame frame)
+        {
+            CurrentState = State.Listening;
+
+            Logger.WriteSimulationLine($"(PhysicalLayer) Долбаёб №{Sensor.Id} закончил " +
+                $"отправку кадра долбаёбу №{frame.IdReceive}");
+        }
+
+        public void DetectCollision()
+        {
+            CurrentState = State.Listening;
+
+            Logger.WriteSimulationLine($"(PhysicalLayer) Долбаёб №{Sensor.Id} обнаружил " +
+                $"коллизию и прекратил передачу/получение сообщения");
         }
 
         public PhysicalLayer(int id)

@@ -40,6 +40,6 @@ public class SerializationHelper
         using StreamReader reader = new(path);
 
         var sim = JsonConvert.DeserializeObject<Simulation>(reader.ReadToEnd(), SerializerSettings)
-            ?? throw new NullReferenceException("Не удалось создать окружение из файла");
+            ?? throw new NullReferenceException("Не удалось прочитать файл");
     }
 }

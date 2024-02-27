@@ -10,7 +10,7 @@ namespace UWSN.Model
     {
         private readonly List<Sensor> _sensors;
         private readonly double _lambdaParameter;
-        private readonly Tuple<Vector3, Vector3> _areaLimits;
+        private readonly Vector3Range _areaLimits;
 
         public List<Sensor> PlaceSensors()
         {
@@ -36,9 +36,9 @@ namespace UWSN.Model
 
             for (int i = 0; i < _sensors.Count; i++)
             {
-                float x = (float)PoissonDouble(dst.IValues[dstIndex + 0], _areaLimits.Item1.X, _areaLimits.Item2.X);
-                float y = (float)PoissonDouble(dst.IValues[dstIndex + 1], _areaLimits.Item1.Y, _areaLimits.Item2.Y);
-                float z = (float)PoissonDouble(dst.IValues[dstIndex + 2], _areaLimits.Item1.Z, _areaLimits.Item2.Z);
+                float x = (float)PoissonDouble(dst.IValues[dstIndex + 0], _areaLimits.Min.X, _areaLimits.Max.X);
+                float y = (float)PoissonDouble(dst.IValues[dstIndex + 1], _areaLimits.Min.Y, _areaLimits.Max.Y);
+                float z = (float)PoissonDouble(dst.IValues[dstIndex + 2], _areaLimits.Min.Z, _areaLimits.Max.Z);
 
                 _sensors[i].Position = new Vector3(x, y, z);
 
@@ -48,7 +48,7 @@ namespace UWSN.Model
             return _sensors;
         }
 
-        public SensorPlacementPoisson(List<Sensor> sensors, double lambdaParameter, Tuple<Vector3, Vector3> areaLimits)
+        public SensorPlacementPoisson(List<Sensor> sensors, double lambdaParameter, Vector3Range areaLimits)
         {
             _sensors = sensors;
             _lambdaParameter = lambdaParameter;

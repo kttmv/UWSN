@@ -1,27 +1,31 @@
-﻿namespace UWSN.Model
+﻿using System.Drawing;
+
+namespace UWSN.Model
 {
     public class Simulation
     {
-        #region Singleton
+        #region Simulation Singleton
 
-        private static Simulation? _instance;
+        private static Simulation? SimulationInstance { get; set; }
 
         public static Simulation Instance
         {
             get
             {
-                if (_instance == null)
+                if (SimulationInstance == null)
                 {
                     throw new Exception("Экземпляр класса Simulation не был создан.");
                 }
 
-                return _instance;
+                return SimulationInstance;
             }
         }
 
-        #endregion Singleton
+        #endregion Simulation Singleton
 
         #region Properties
+
+        public ChannelManager ChannelManager { get; set; }
 
         /// <summary>
         /// Окружение симуляции
@@ -34,34 +38,25 @@
         public DateTime Time { get; set; }
 
         /// <summary>
-        /// Отсортированные по каналам эммиты
-        /// </summary>
-        public Event?[] ChannelSortedEmits { get; set; }
-
-        /// <summary>
         /// Отсортированный по времени список событый
         /// </summary>
         private SortedList<DateTime, Event> EventScheduler { get; set; }
-
-        // TODO: Не использовать дефолтное значение и выставлять его при инициализации (или вместе с протоколами)
-        /// <summary>
-        /// Количество доступных каналов
-        /// </summary>
-        public int NumberOfChannels { get; set; } = 1;
 
         #endregion Properties
 
         public Simulation()
         {
-            if (_instance != null)
+            if (SimulationInstance != null)
             {
                 throw new Exception("Экземпляр класса Simulation уже создан.");
             }
 
-            _instance = this;
+            SimulationInstance = this;
+
+            ChannelManager = new ChannelManager();
+
             Environment = new Environment();
             EventScheduler = new SortedList<DateTime, Event>(new DuplicateKeyComparer<DateTime>());
-            ChannelSortedEmits = new Event?[NumberOfChannels];
         }
 
         /// <summary>

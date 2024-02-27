@@ -11,7 +11,7 @@ namespace UWSN.Model
         public int Id { get; set; }
         public Vector3 Position { get; set; }
 
-        public List<Frame> Buffer { get; set; }
+        public List<Frame> FrameBuffer { get; set; }
 
         public Sensor(int id)
         {
@@ -19,7 +19,7 @@ namespace UWSN.Model
             Position = new Vector3();
             PhysicalLayer = new PhysicalLayer(Id);
             NetworkLayer = new PureAlohaProtocol(Id);
-            Buffer = new List<Frame>();
+            FrameBuffer = new List<Frame>();
         }
     }
 }
