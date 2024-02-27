@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using UWSN.Utilities;
 
-namespace UWSN.Model
+namespace UWSN.Model.Network
 {
-    public class PhysicalLayer : BaseLayer
+    public class PhysicalProtocol : ProtocolBase
     {
         public enum State
         {
@@ -65,7 +66,7 @@ namespace UWSN.Model
                 $"коллизию и прекратил передачу/получение сообщения");
         }
 
-        public PhysicalLayer(int id)
+        public PhysicalProtocol(int id)
         {
             SensorId = id;
         }

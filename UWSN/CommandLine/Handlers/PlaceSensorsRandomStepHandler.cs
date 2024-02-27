@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Dew.Math;
 using UWSN.CommandLine.Options;
 using UWSN.Model;
+using UWSN.Model.Sim;
+using UWSN.Utilities;
 
 namespace UWSN.CommandLine.Handlers;
 

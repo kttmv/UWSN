@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UWSN.Model
+namespace UWSN.Model.Network
 {
     public interface INetworkLayer
     {

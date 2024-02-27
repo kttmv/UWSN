@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Dew.Math;
 using UWSN.CommandLine.Options;
 using UWSN.Model;
+using UWSN.Model.Sim;
+using UWSN.Utilities;
 
 namespace UWSN.CommandLine.Handlers;
 
@@ -22,7 +24,7 @@ public class PlaceSensorsPoissonHandler
             sensors.Add(new Sensor(i));
         }
 
-        var areaLimits = Simulation.Instance.Environment.AreaLimits;
+        var areaLimits = Simulation.Instance.AreaLimits;
 
         Simulation.Instance.Environment.Sensors = PlaceSensors(sensors, o.LambdaParameter, areaLimits);
 

@@ -1,6 +1,8 @@
 ﻿using System.Drawing;
+using System.Numerics;
+using UWSN.Utilities;
 
-namespace UWSN.Model
+namespace UWSN.Model.Sim
 {
     public class Simulation
     {
@@ -42,6 +44,8 @@ namespace UWSN.Model
         /// </summary>
         private SortedList<DateTime, Event> EventScheduler { get; set; }
 
+        public Vector3Range AreaLimits { get; set; }
+
         #endregion Properties
 
         public Simulation()
@@ -50,13 +54,13 @@ namespace UWSN.Model
             {
                 throw new Exception("Экземпляр класса Simulation уже создан.");
             }
-
             SimulationInstance = this;
 
             ChannelManager = new ChannelManager();
-
             Environment = new Environment();
             EventScheduler = new SortedList<DateTime, Event>(new DuplicateKeyComparer<DateTime>());
+
+            AreaLimits = new Vector3Range(new Vector3(), new Vector3());
         }
 
         /// <summary>

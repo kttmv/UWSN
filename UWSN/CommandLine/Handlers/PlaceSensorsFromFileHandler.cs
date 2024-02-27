@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UWSN.CommandLine.Options;
 using UWSN.Model;
+using UWSN.Model.Sim;
+using UWSN.Utilities;
 
 namespace UWSN.CommandLine.Handlers;
 
@@ -17,7 +19,8 @@ public class PlaceSensorsFromFileHandler
         var environment = Simulation.Instance.Environment;
 
         environment.Sensors = PlaceSensors(o.SensorsFilePath);
-        Console.WriteLine($"Расстановка сенсоров ({environment.Sensors.Count}) из пользовательского файла прошла успешно.");
+        Console.WriteLine($"Расстановка сенсоров ({environment.Sensors.Count}) " +
+            $"из пользовательского файла прошла успешно.");
 
         SerializationHelper.SaveSimulation(o.FilePath);
     }

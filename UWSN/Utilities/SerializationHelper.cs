@@ -5,8 +5,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using UWSN.Model.Sim;
 
-namespace UWSN.Model;
+namespace UWSN.Utilities;
 
 public class SerializationHelper
 {

@@ -1,11 +1,13 @@
 ﻿using System.Numerics;
 using Newtonsoft.Json;
+using UWSN.Model.Network;
+using UWSN.Model.Protocols.NetworkLayer;
 
 namespace UWSN.Model
 {
     public class Sensor
     {
-        public PhysicalLayer PhysicalLayer { get; set; }
+        public PhysicalProtocol PhysicalLayer { get; set; }
         public INetworkLayer NetworkLayer { get; set; }
 
         public int Id { get; set; }
@@ -17,7 +19,7 @@ namespace UWSN.Model
         {
             Id = id;
             Position = new Vector3();
-            PhysicalLayer = new PhysicalLayer(Id);
+            PhysicalLayer = new PhysicalProtocol(Id);
             NetworkLayer = new PureAlohaProtocol(Id);
             FrameBuffer = new List<Frame>();
         }

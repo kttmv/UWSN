@@ -5,7 +5,8 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using UWSN.CommandLine.Options;
-using UWSN.Model;
+using UWSN.Model.Sim;
+using UWSN.Utilities;
 
 namespace UWSN.CommandLine.Handlers;
 
@@ -21,7 +22,7 @@ public class InitializationHandler
 
         _ = new Simulation();
 
-        Simulation.Instance.Environment.AreaLimits = new Vector3Range(v1, v2);
+        Simulation.Instance.AreaLimits = new Vector3Range(v1, v2);
 
         Console.WriteLine($"Границы окружения: {v1}, {v2}");
         Console.WriteLine("Инициализация симуляции проведена успешно.");

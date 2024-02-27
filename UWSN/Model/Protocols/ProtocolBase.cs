@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using UWSN.Model.Sim;
 
-namespace UWSN.Model;
+namespace UWSN.Model.Network;
 
-public class BaseLayer
+public class ProtocolBase
 {
     public int SensorId { get; set; }
 

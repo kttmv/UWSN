@@ -1,4 +1,4 @@
-﻿namespace UWSN.Model
+﻿namespace UWSN.Model.Sim
 {
     public class Event
     {

@@ -4,10 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using UWSN.Model.Network;
+using UWSN.Model.Sim;
+using UWSN.Utilities;
 
-namespace UWSN.Model
+namespace UWSN.Model.Protocols.NetworkLayer
 {
-    public class PureAlohaProtocol : BaseLayer, INetworkLayer
+    public class PureAlohaProtocol : ProtocolBase, INetworkLayer
     {
         [JsonIgnore]
         private bool WaitingForAck { get; set; }
@@ -22,7 +25,7 @@ namespace UWSN.Model
             if (frame.FrameType == Frame.Type.Ack && frame.IdReceive == Sensor.Id)
             {
                 WaitingForAck = false;
-                Sensor.PhysicalLayer.CurrentState = PhysicalLayer.State.Idle;
+                Sensor.PhysicalLayer.CurrentState = PhysicalProtocol.State.Idle;
                 Logger.WriteSimulationLine($"(NetworkLayer)  Долбаёб №{Sensor.Id} получил пакет ACK от №{frame.IdSend}");
 
                 return;

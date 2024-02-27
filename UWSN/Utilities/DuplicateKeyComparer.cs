@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UWSN.Model;
+namespace UWSN.Utilities;
 
 public class DuplicateKeyComparer<TKey> : IComparer<TKey> where TKey : IComparable
 {

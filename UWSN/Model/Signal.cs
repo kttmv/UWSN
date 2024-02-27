@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Numerics;
 using System.Threading.Channels;
+using UWSN.Model.Network;
+using UWSN.Model.Sim;
 
 namespace UWSN.Model;
 
@@ -48,7 +50,7 @@ public class Signal
             // событие начала получения сенсором кадра
             var startReceiving = new Event(timeStartReceiving, new Action(() =>
             {
-                if (sensor.PhysicalLayer.CurrentState == PhysicalLayer.State.Listening)
+                if (sensor.PhysicalLayer.CurrentState == PhysicalProtocol.State.Listening)
                     sensor.PhysicalLayer.StartReceiving(Frame);
             }));
 
@@ -86,24 +88,24 @@ public class Signal
         Simulation.Instance.RemoveEvent(EndSending);
         Emitter.PhysicalLayer.DetectCollision();
 
-        foreach (var tuple in ReceivingEvents)
+        foreach (var (Receiver, StartReceiving, EndReceiving) in ReceivingEvents)
         {
-            var collisionDetectTime = tuple.StartReceiving.Time.AddMilliseconds(1);
+            var collisionDetectTime = StartReceiving.Time.AddMilliseconds(1);
             var collisionDetectEvent = new Event(collisionDetectTime, new Action(() =>
             {
-                tuple.Receiver.PhysicalLayer.DetectCollision();
+                Receiver.PhysicalLayer.DetectCollision();
             }));
 
             Simulation.Instance.AddEvent(collisionDetectEvent);
 
-            Simulation.Instance.RemoveEvent(tuple.EndReceiving);
+            Simulation.Instance.RemoveEvent(EndReceiving);
         }
     }
 
     private double CalculateDeliveryProbability(Sensor sensor)
     {
-        double distance = Vector3.Distance(sensor.Position, Emitter.Position);
         // здесь будет вычисление по формулам
-        return 1;
+        double distance = Vector3.Distance(sensor.Position, Emitter.Position);
+        return distance;
     }
 }
