@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Threading.Channels;
 using UWSN.Model.Network;
 using UWSN.Model.Sim;
+using UWSN.Utilities;
 
 namespace UWSN.Model;
 
@@ -107,5 +108,8 @@ public class Signal
         // здесь будет вычисление по формулам
         double distance = Vector3.Distance(sensor.Position, Emitter.Position);
         return distance;
+
+        // взяты значения параметров модели среды для тестового моделирования
+        return DeliveryProbabilityCalculator.Calculate(60.0, 12.8, sensor.Position, Emitter.Position, 25.0);
     }
 }
