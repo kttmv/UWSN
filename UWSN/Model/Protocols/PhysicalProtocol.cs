@@ -24,7 +24,7 @@ namespace UWSN.Model.Network
         {
             CurrentState = State.Receiving;
 
-            Logger.WriteSimulationLine($"(PhysicalLayer) Долбаёб №{Sensor.Id} начал " +
+            Logger.WriteSimulationLine($"(PhysicalLayer) Сенсор №{Sensor.Id} начал " +
                 $"получать кадр от №{frame.IdSend}");
         }
 
@@ -32,7 +32,7 @@ namespace UWSN.Model.Network
         {
             CurrentState = State.Listening;
 
-            Logger.WriteSimulationLine($"(PhysicalLayer) Долбаёб №{Sensor.Id} получил " +
+            Logger.WriteSimulationLine($"(PhysicalLayer) Сенсор №{Sensor.Id} получил " +
                 $"кадр от №{frame.IdSend}");
 
             Sensor.FrameBuffer.Add(frame);
@@ -43,8 +43,8 @@ namespace UWSN.Model.Network
         {
             CurrentState = State.Emitting;
 
-            Logger.WriteSimulationLine($"(PhysicalLayer) Долбаёб №{Sensor.Id} начал " +
-                $"отправку кадра долбаёбу №{frame.IdReceive}");
+            Logger.WriteSimulationLine($"(PhysicalLayer) Сенсор №{Sensor.Id} начал " +
+                $"отправку кадра Сенсору №{frame.IdReceive}");
 
             var signal = new Signal(Sensor, frame, channelId);
             signal.Emit();
@@ -54,15 +54,15 @@ namespace UWSN.Model.Network
         {
             CurrentState = State.Listening;
 
-            Logger.WriteSimulationLine($"(PhysicalLayer) Долбаёб №{Sensor.Id} закончил " +
-                $"отправку кадра долбаёбу №{frame.IdReceive}");
+            Logger.WriteSimulationLine($"(PhysicalLayer) Сенсор №{Sensor.Id} закончил " +
+                $"отправку кадра Сенсору №{frame.IdReceive}");
         }
 
         public void DetectCollision()
         {
             CurrentState = State.Listening;
 
-            Logger.WriteSimulationLine($"(PhysicalLayer) Долбаёб №{Sensor.Id} обнаружил " +
+            Logger.WriteSimulationLine($"(PhysicalLayer) Сенсор №{Sensor.Id} обнаружил " +
                 $"коллизию и прекратил передачу/получение сообщения");
         }
 

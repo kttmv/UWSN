@@ -26,7 +26,7 @@ namespace UWSN.Model.Protocols.NetworkLayer
             {
                 WaitingForAck = false;
                 Sensor.PhysicalLayer.CurrentState = PhysicalProtocol.State.Idle;
-                Logger.WriteSimulationLine($"(NetworkLayer)  Долбаёб №{Sensor.Id} получил пакет ACK от №{frame.IdSend}");
+                Logger.WriteSimulationLine($"(NetworkLayer)  Сенсор №{Sensor.Id} получил пакет ACK от №{frame.IdSend}");
 
                 return;
             }
@@ -40,7 +40,7 @@ namespace UWSN.Model.Protocols.NetworkLayer
                     IdReceive = frame.IdSend
                 };
 
-                Logger.WriteSimulationLine($"(NetworkLayer)  Долбаёб №{Sensor.Id} начал отправку ACK долбаёбу №{frame.IdReceive}");
+                Logger.WriteSimulationLine($"(NetworkLayer)  Сенсор №{Sensor.Id} начал отправку ACK Сенсору №{frame.IdReceive}");
                 Sensor.NetworkLayer.SendFrame(ack);
             }
         }
