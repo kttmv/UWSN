@@ -12,6 +12,10 @@ namespace UWSN.Model.Protocols.NetworkLayer
 {
     public class PureAlohaProtocol : ProtocolBase, INetworkLayer
     {
+        private const int CHANNEL_ID = 0;
+        private const int CHANNEL_TIMEOUT_IN_SECONDS = 5;
+        private const int ACK_TIMEOUT_IN_SECONDS = 10;
+
         [JsonIgnore]
         private bool WaitingForAck { get; set; }
 
@@ -26,7 +30,7 @@ namespace UWSN.Model.Protocols.NetworkLayer
             {
                 WaitingForAck = false;
                 Sensor.PhysicalLayer.CurrentState = PhysicalProtocol.State.Idle;
-                Logger.WriteSimulationLine($"(NetworkLayer)  Сенсор №{Sensor.Id} получил пакет ACK от №{frame.IdSend}");
+                Logger.WriteSensorLine(Sensor, $"(PureAloha) получил пакет ACK от №{frame.IdSend}");
 
                 return;
             }
@@ -40,17 +44,22 @@ namespace UWSN.Model.Protocols.NetworkLayer
                     IdReceive = frame.IdSend
                 };
 
-                Logger.WriteSimulationLine($"(NetworkLayer)  Сенсор №{Sensor.Id} начал отправку ACK Сенсору №{frame.IdReceive}");
+                Logger.WriteSensorLine(Sensor, $"(PureAloha) начал отправку ACK cенсору №{frame.IdReceive}");
                 Sensor.NetworkLayer.SendFrame(ack);
             }
         }
 
         public void SendFrame(Frame frame)
         {
-            // если канал занят, то ждем 5с
-            if (Simulation.Instance.ChannelManager.IsChannelBusy(0))
+            Logger.WriteSensorLine(Sensor, $"(PureAloha) пытается отправить кадр сенсору №{frame.IdReceive}");
+
+            // если канал занят, то ждем и повторяем попытку
+            if (Simulation.Instance.ChannelManager.IsChannelBusy(CHANNEL_ID))
             {
-                var time = frame.TimeSend.AddSeconds(5);
+                Logger.WriteSensorLine(Sensor, $"(PureAloha) Канал {CHANNEL_ID} занят, " +
+                    $"начинается ожидание {CHANNEL_TIMEOUT_IN_SECONDS} сек.");
+
+                var time = Simulation.Instance.Time.AddSeconds(CHANNEL_TIMEOUT_IN_SECONDS);
                 var action = new Action(() =>
                 {
                     SendFrame(frame);
@@ -69,6 +78,8 @@ namespace UWSN.Model.Protocols.NetworkLayer
                 return;
             }
 
+            Logger.WriteSensorLine(Sensor, $"(PureAloha) начинает ожидать ACK от №{frame.IdReceive}");
+
             WaitingForAck = true;
             CreateAckTimeout(frame, 3);
         }
@@ -77,8 +88,12 @@ namespace UWSN.Model.Protocols.NetworkLayer
         {
             if (attemptsLeft == 0)
             {
+                Logger.WriteSensorLine(Sensor, $"(PureAloha) не получил ACK от №{frame.IdReceive}.");
                 return;
             }
+
+            Logger.WriteSensorLine(Sensor, $"(PureAloha) пытается повторно отправить кадр сенсору №{frame.IdReceive}. " +
+                $"Попыток осталось: {attemptsLeft}");
 
             SendFrame(frame);
 
@@ -87,7 +102,8 @@ namespace UWSN.Model.Protocols.NetworkLayer
 
         private void CreateAckTimeout(Frame frame, int attemptsLeft)
         {
-            var time = Simulation.Instance.Time.AddSeconds(10); // ждем 10 секунд
+            Logger.WriteSensorLine(Sensor, $"(PureAloha) ждет ACK от №{frame.IdReceive} в течение {ACK_TIMEOUT_IN_SECONDS} сек.");
+            var time = Simulation.Instance.Time.AddSeconds(ACK_TIMEOUT_IN_SECONDS);
             var action = new Action(() =>
             {
                 if (!WaitingForAck)

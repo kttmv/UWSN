@@ -24,11 +24,11 @@ namespace UWSN.CommandLine.Handlers
                 IdReceive = env.Sensors[1].Id
             };
 
-            //var frame2 = new Frame
-            //{
-            //    IdSend = env.Sensors[2].Id,
-            //    IdReceive = env.Sensors[1].Id
-            //};
+            var frame2 = new Frame
+            {
+                IdSend = env.Sensors[2].Id,
+                IdReceive = env.Sensors[1].Id
+            };
 
             //var frame3 = new Frame
             //{
@@ -36,9 +36,14 @@ namespace UWSN.CommandLine.Handlers
             //    IdReceive = env.Sensors[4].Id
             //};
 
-            env.Sensors[0].NetworkLayer.SendFrame(frame1);
-            //env.Sensors[1].NetworkLayer.SendFrame(frame2);
-            //env.Sensors[3].NetworkLayer.SendFrame(frame3);
+            Simulation.Instance.EventManager.AddEvent(new Event(default(DateTime), () =>
+            {
+                env.Sensors[0].NetworkLayer.SendFrame(frame1);
+            }));
+            Simulation.Instance.EventManager.AddEvent(new Event(default(DateTime), () =>
+            {
+                env.Sensors[1].NetworkLayer.SendFrame(frame2);
+            }));
             Simulation.Instance.Run();
         }
     }

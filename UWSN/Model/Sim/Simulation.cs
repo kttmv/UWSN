@@ -70,10 +70,17 @@ namespace UWSN.Model.Sim
                 var e = EventManager.RemoveFirst();
 
                 if (e == null)
+                {
+                    Logger.WriteLine("Больше событий нет. Симуляция окончена.");
                     break;
+                }
+
+                Logger.WriteLine("Начата обработка события", true);
 
                 Time = e.Time;
                 e.Invoke();
+
+                Logger.WriteLine("\n\n");
             }
         }
     }

@@ -9,7 +9,7 @@ namespace UWSN.Model;
 
 public class Signal
 {
-    private Sensor Emitter { get; }
+    public Sensor Emitter { get; }
     private Frame Frame { get; }
     private int ChannelId { get; }
 
