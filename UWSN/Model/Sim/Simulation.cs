@@ -66,9 +66,10 @@ namespace UWSN.Model.Sim
         public void Run()
         {
             int i = 1;
-            while (true)
+            while (i < 100)
             {
                 var e = EventManager.RemoveFirst();
+                Time = e.Time;
 
                 if (e == null)
                 {
@@ -76,14 +77,18 @@ namespace UWSN.Model.Sim
                     break;
                 }
 
-                Logger.WriteLine($"Событие №{i}. {e.Description}", true);
+                Logger.WriteLine($"Событие #{i}. {e.Description}", true);
 
-                Time = e.Time;
                 e.Invoke();
 
-                Logger.WriteLine("\n");
+                Logger.WriteLine("");
 
                 i++;
+            }
+
+            if (i == 100)
+            {
+                Logger.WriteLine("Достигнут лимит событий. Симуляция остановлена");
             }
         }
     }
