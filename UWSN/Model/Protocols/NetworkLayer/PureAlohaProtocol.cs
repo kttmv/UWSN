@@ -57,7 +57,7 @@ namespace UWSN.Model.Protocols.NetworkLayer
                 });
 
                 var e = new Event(time, action);
-                Simulation.Instance.AddEvent(e);
+                Simulation.Instance.EventManager.AddEvent(e);
 
                 return;
             }
@@ -98,7 +98,7 @@ namespace UWSN.Model.Protocols.NetworkLayer
                 ResendFrame(frame, attemptsLeft);
             });
 
-            Simulation.Instance.AddEvent(new Event(time, action));
+            Simulation.Instance.EventManager.AddEvent(new Event(time, action));
         }
     }
 }

@@ -62,11 +62,11 @@ public class Signal
             }));
 
             ReceivingEvents.Add(new(sensor, startReceiving, endReceiving));
-            Simulation.Instance.AddEvent(startReceiving);
-            Simulation.Instance.AddEvent(endReceiving);
+            Simulation.Instance.EventManager.AddEvent(startReceiving);
+            Simulation.Instance.EventManager.AddEvent(endReceiving);
         }
 
-        Simulation.Instance.AddEvent(EndSending);
+        Simulation.Instance.EventManager.AddEvent(EndSending);
 
         // TODO: уточнить когда освобождать
         // возможно когда сигнал выходит за границы окружения?
@@ -76,7 +76,7 @@ public class Signal
             Simulation.Instance.ChannelManager.FreeChannel(ChannelId);
         }));
 
-        Simulation.Instance.AddEvent(signalRemoval);
+        Simulation.Instance.EventManager.AddEvent(signalRemoval);
     }
 
     public void Emit()
@@ -86,7 +86,7 @@ public class Signal
 
     public void DetectCollision()
     {
-        Simulation.Instance.RemoveEvent(EndSending);
+        Simulation.Instance.EventManager.RemoveEvent(EndSending);
         Emitter.PhysicalLayer.DetectCollision();
 
         foreach (var (Receiver, StartReceiving, EndReceiving) in ReceivingEvents)
@@ -97,17 +97,15 @@ public class Signal
                 Receiver.PhysicalLayer.DetectCollision();
             }));
 
-            Simulation.Instance.AddEvent(collisionDetectEvent);
+            Simulation.Instance.EventManager.AddEvent(collisionDetectEvent);
 
-            Simulation.Instance.RemoveEvent(EndReceiving);
+            Simulation.Instance.EventManager.RemoveEvent(EndReceiving);
         }
     }
 
     private double CalculateDeliveryProbability(Sensor sensor)
     {
-        // здесь будет вычисление по формулам
-        double distance = Vector3.Distance(sensor.Position, Emitter.Position);
-        return distance;
+        return 1;
 
         // взяты значения параметров модели среды для тестового моделирования
         return DeliveryProbabilityCalculator.Calculate(60.0, 12.8, sensor.Position, Emitter.Position, 25.0);
