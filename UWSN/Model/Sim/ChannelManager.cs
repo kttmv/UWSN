@@ -58,7 +58,7 @@ public class ChannelManager
 
     public void OccupyChannel(int channelId, Signal signal)
     {
-        Logger.WriteLine($"Менеджер сигналов: Канал {channelId} был занят сенсором №{signal.Emitter.Id}");
+        Logger.WriteLine($"Менеджер сигналов: Сенсор #{signal.Emitter.Id} занял канал {channelId}");
 
         // обработка коллизии
         if (Channels[channelId] != null)

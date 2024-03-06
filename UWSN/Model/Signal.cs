@@ -27,7 +27,7 @@ public class Signal
 
         EndSending = new Event(
             Simulation.Instance.Time.AddSeconds(transmissionTime),
-            $"Событие окончания отправки кадра сенсором №{Emitter.Id}",
+            $"Событие окончания отправки кадра сенсором #{Emitter.Id}",
             () => Emitter.PhysicalLayer.EndSending(Frame));
 
         var timeEndReceivingMax = default(DateTime);
@@ -48,18 +48,18 @@ public class Signal
 
             var startReceiving = new Event(
                 timeStartReceiving,
-                $"Событие начала получения сенсором №{sensor.Id} кадра от сенсора {Emitter.Id}",
+                $"Событие начала получения сенсором #{sensor.Id} кадра от сенсора {Emitter.Id}",
                 () =>
                 {
                     if (sensor.PhysicalLayer.CurrentState == PhysicalProtocol.State.Listening)
                         sensor.PhysicalLayer.StartReceiving(Frame);
                     else
-                        Logger.WriteLine($"Менеджер сигналов: Сенсор №{sensor.Id} находится не в состоянии прослушивания.");
+                        Logger.WriteLine($"Менеджер сигналов: Сенсор #{sensor.Id} находится не в состоянии прослушивания.");
                 });
 
             var endReceiving = new Event(
                 timeEndReceiving,
-                $"Событие окончания получения сенсором №{sensor.Id} кадра от сенсора {Emitter.Id}",
+                $"Событие окончания получения сенсором #{sensor.Id} кадра от сенсора {Emitter.Id}",
                 () => sensor.PhysicalLayer.EndReceiving(Frame));
 
             ReceivingEvents.Add(new(sensor, startReceiving, endReceiving));

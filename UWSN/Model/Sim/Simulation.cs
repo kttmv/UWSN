@@ -6,6 +6,8 @@ namespace UWSN.Model.Sim
 {
     public class Simulation
     {
+        private const int MAX_PROCESSED_EVENTS = 200;
+
         #region Simulation Singleton
 
         private static Simulation? SimulationInstance { get; set; }
@@ -66,16 +68,17 @@ namespace UWSN.Model.Sim
         public void Run()
         {
             int i = 1;
-            while (i < 100)
+            while (i < MAX_PROCESSED_EVENTS)
             {
                 var e = EventManager.RemoveFirst();
-                Time = e.Time;
 
                 if (e == null)
                 {
                     Logger.WriteLine("Больше событий нет. Симуляция окончена.");
                     break;
                 }
+
+                Time = e.Time;
 
                 Logger.WriteLine($"Событие #{i}. {e.Description}", true);
 

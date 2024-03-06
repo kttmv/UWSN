@@ -18,20 +18,21 @@ namespace UWSN.Model.Network
             Emitting
         }
 
-        public State CurrentState { get; set; }
+        [JsonIgnore]
+        public State CurrentState { get; set; } = State.Listening;
 
         public void StartReceiving(Frame frame)
         {
             CurrentState = State.Receiving;
 
-            Logger.WriteSensorLine(Sensor, $"(Physical) начал получать кадр от №{frame.IdSend}");
+            Logger.WriteSensorLine(Sensor, $"(Physical) начал принимать кадр от #{frame.IdSend}");
         }
 
         public void EndReceiving(Frame frame)
         {
             CurrentState = State.Listening;
 
-            Logger.WriteSensorLine(Sensor, $"(Physical) получил кадр от №{frame.IdSend}");
+            Logger.WriteSensorLine(Sensor, $"(Physical) принял кадр от #{frame.IdSend}");
 
             Sensor.FrameBuffer.Add(frame);
             Sensor.NetworkLayer.ReceiveFrame(frame);
@@ -41,7 +42,7 @@ namespace UWSN.Model.Network
         {
             CurrentState = State.Emitting;
 
-            Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра Сенсору №{frame.IdReceive}");
+            Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра, адресованного #{frame.IdReceive}");
 
             var signal = new Signal(Sensor, frame, channelId);
             signal.Emit();
@@ -51,14 +52,14 @@ namespace UWSN.Model.Network
         {
             CurrentState = State.Listening;
 
-            Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра Сенсору №{frame.IdReceive}");
+            Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра, адресованного #{frame.IdReceive}");
         }
 
         public void DetectCollision()
         {
             CurrentState = State.Listening;
 
-            Logger.WriteSensorLine(Sensor, $"(Physical) обнаружил коллизию и прекратил передачу/получение сообщения");
+            Logger.WriteSensorLine(Sensor, $"(Physical) обнаружил коллизию и прекратил отправку/принятие кадра");
         }
 
         public PhysicalProtocol(int id)

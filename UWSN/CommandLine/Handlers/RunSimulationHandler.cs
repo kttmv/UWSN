@@ -30,21 +30,26 @@ namespace UWSN.CommandLine.Handlers
                 IdReceive = env.Sensors[1].Id
             };
 
-            //var frame3 = new Frame
-            //{
-            //    IdSend = env.Sensors[3].Id,
-            //    IdReceive = env.Sensors[4].Id
-            //};
+            var frame3 = new Frame
+            {
+                IdSend = env.Sensors[3].Id,
+                IdReceive = env.Sensors[4].Id
+            };
 
             Simulation.Instance.EventManager.AddEvent(new Event(
                 default,
-                $"Отправка кадра от сенсора {frame1.IdSend} сенсору {frame1.IdReceive}",
+                $"Отправка кадра от #{frame1.IdSend} для #{frame1.IdReceive}",
                 () => env.Sensors[0].NetworkLayer.SendFrame(frame1)));
 
             Simulation.Instance.EventManager.AddEvent(new Event(
                 default,
-                $"Отправка кадра от сенсора {frame2.IdSend} сенсору {frame2.IdReceive}",
-                () => env.Sensors[1].NetworkLayer.SendFrame(frame2)));
+                $"Отправка кадра от #{frame2.IdSend} для #{frame2.IdReceive}",
+                () => env.Sensors[2].NetworkLayer.SendFrame(frame2)));
+
+            Simulation.Instance.EventManager.AddEvent(new Event(
+                default,
+                $"Отправка кадра от #{frame3.IdSend} для #{frame3.IdReceive}",
+                () => env.Sensors[3].NetworkLayer.SendFrame(frame3)));
 
             Simulation.Instance.Run();
         }

@@ -13,6 +13,7 @@ namespace UWSN.Model
         public int Id { get; set; }
         public Vector3 Position { get; set; }
 
+        [JsonIgnore]
         public List<Frame> FrameBuffer { get; set; }
 
         public Sensor(int id)

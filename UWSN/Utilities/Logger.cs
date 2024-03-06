@@ -12,7 +12,7 @@ public class Logger
 {
     public static void WriteLine(string value, bool withTime = false)
     {
-        string str = withTime ? $"[{Simulation.Instance.Time.ToString("dd.MM.yyyy HH:mm:ss.fff")}] " : "";
+        string str = withTime ? $"[{Simulation.Instance.Time:dd.MM.yyyy HH:mm:ss.fff}] " : "";
 
         str += value;
 
@@ -21,6 +21,6 @@ public class Logger
 
     public static void WriteSensorLine(Sensor sensor, string value)
     {
-        WriteLine($"Сенсор №{sensor.Id}: {value}");
+        WriteLine($"Сенсор #{sensor.Id}: {value}");
     }
 }
