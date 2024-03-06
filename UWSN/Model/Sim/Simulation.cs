@@ -80,7 +80,7 @@ namespace UWSN.Model.Sim
 
                 Time = e.Time;
 
-                Logger.WriteLine($"Событие #{i}. {e.Description}", true);
+                Logger.WriteLine($"Событие №{i}. {e.Description}", true);
 
                 e.Invoke();
 

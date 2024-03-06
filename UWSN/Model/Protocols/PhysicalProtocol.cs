@@ -42,7 +42,7 @@ namespace UWSN.Model.Network
         {
             CurrentState = State.Emitting;
 
-            Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра, адресованного #{frame.IdReceive}");
+            Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра для #{frame.IdReceive}");
 
             var signal = new Signal(Sensor, frame, channelId);
             signal.Emit();
@@ -52,7 +52,7 @@ namespace UWSN.Model.Network
         {
             CurrentState = State.Listening;
 
-            Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра, адресованного #{frame.IdReceive}");
+            Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра для #{frame.IdReceive}");
         }
 
         public void DetectCollision()

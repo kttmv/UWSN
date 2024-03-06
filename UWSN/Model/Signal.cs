@@ -27,7 +27,7 @@ public class Signal
 
         EndSending = new Event(
             Simulation.Instance.Time.AddSeconds(transmissionTime),
-            $"Событие окончания отправки кадра сенсором #{Emitter.Id}",
+            $"Окончание отправки кадра сенсором #{Emitter.Id}",
             () => Emitter.PhysicalLayer.EndSending(Frame));
 
         var timeEndReceivingMax = default(DateTime);
@@ -48,7 +48,7 @@ public class Signal
 
             var startReceiving = new Event(
                 timeStartReceiving,
-                $"Событие начала получения сенсором #{sensor.Id} кадра от сенсора {Emitter.Id}",
+                $"Начало получения сенсором #{sensor.Id} кадра от #{Emitter.Id}",
                 () =>
                 {
                     if (sensor.PhysicalLayer.CurrentState == PhysicalProtocol.State.Listening)
@@ -59,7 +59,7 @@ public class Signal
 
             var endReceiving = new Event(
                 timeEndReceiving,
-                $"Событие окончания получения сенсором #{sensor.Id} кадра от сенсора {Emitter.Id}",
+                $"Окончание получения сенсором #{sensor.Id} кадра от #{Emitter.Id}",
                 () => sensor.PhysicalLayer.EndReceiving(Frame));
 
             ReceivingEvents.Add(new(sensor, startReceiving, endReceiving));
@@ -73,7 +73,7 @@ public class Signal
         // возможно когда сигнал выходит за границы окружения?
         Simulation.Instance.EventManager.AddEvent(new Event(
             timeEndReceivingMax.AddSeconds(1),
-            $"Событие удаления сигнала из среды",
+            $"Удаление сигнала из среды",
             () => Simulation.Instance.ChannelManager.FreeChannel(ChannelId)));
     }
 
@@ -91,7 +91,7 @@ public class Signal
         {
             Simulation.Instance.EventManager.AddEvent(new Event(
                 StartReceiving.Time.AddMilliseconds(1),
-                $"Событие обнаружения коллизии сенсором {Receiver.Id}",
+                $"Обнаружение коллизии сенсором {Receiver.Id}",
                 Receiver.PhysicalLayer.DetectCollision));
 
             Simulation.Instance.EventManager.RemoveEvent(EndReceiving);
