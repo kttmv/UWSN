@@ -65,6 +65,7 @@ namespace UWSN.Model.Sim
         /// </summary>
         public void Run()
         {
+            int i = 1;
             while (true)
             {
                 var e = EventManager.RemoveFirst();
@@ -75,12 +76,14 @@ namespace UWSN.Model.Sim
                     break;
                 }
 
-                Logger.WriteLine("Начата обработка события", true);
+                Logger.WriteLine($"Событие №{i}. {e.Description}", true);
 
                 Time = e.Time;
                 e.Invoke();
 
-                Logger.WriteLine("\n\n");
+                Logger.WriteLine("\n");
+
+                i++;
             }
         }
     }

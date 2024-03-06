@@ -59,14 +59,10 @@ namespace UWSN.Model.Protocols.NetworkLayer
                 Logger.WriteSensorLine(Sensor, $"(PureAloha) Канал {CHANNEL_ID} занят, " +
                     $"начинается ожидание {CHANNEL_TIMEOUT_IN_SECONDS} сек.");
 
-                var time = Simulation.Instance.Time.AddSeconds(CHANNEL_TIMEOUT_IN_SECONDS);
-                var action = new Action(() =>
-                {
-                    SendFrame(frame);
-                });
-
-                var e = new Event(time, action);
-                Simulation.Instance.EventManager.AddEvent(e);
+                Simulation.Instance.EventManager.AddEvent(new Event(
+                    Simulation.Instance.Time.AddSeconds(CHANNEL_TIMEOUT_IN_SECONDS),
+                    $"Событие повторной попытки отправки кадра сенсором №{Sensor.Id}",
+                    () => SendFrame(frame)));
 
                 return;
             }
@@ -103,18 +99,20 @@ namespace UWSN.Model.Protocols.NetworkLayer
         private void CreateAckTimeout(Frame frame, int attemptsLeft)
         {
             Logger.WriteSensorLine(Sensor, $"(PureAloha) ждет ACK от №{frame.IdReceive} в течение {ACK_TIMEOUT_IN_SECONDS} сек.");
-            var time = Simulation.Instance.Time.AddSeconds(ACK_TIMEOUT_IN_SECONDS);
-            var action = new Action(() =>
-            {
-                if (!WaitingForAck)
+
+            Simulation.Instance.EventManager.AddEvent(new Event(
+                Simulation.Instance.Time.AddSeconds(ACK_TIMEOUT_IN_SECONDS),
+                $"Событие проверки получения ACK сенсором №{Sensor.Id}",
+                () =>
                 {
-                    return;
-                }
+                    if (!WaitingForAck)
+                    {
+                        Logger.WriteSensorLine(Sensor, "ACK уже был получен");
+                        return;
+                    }
 
-                ResendFrame(frame, attemptsLeft);
-            });
-
-            Simulation.Instance.EventManager.AddEvent(new Event(time, action));
+                    ResendFrame(frame, attemptsLeft);
+                }));
         }
     }
 }

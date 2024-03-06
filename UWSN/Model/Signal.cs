@@ -25,12 +25,10 @@ public class Signal
 
         double transmissionTime = 1; // TODO: добавить вычисление времени передачи
 
-        // событие окончания отправки кадра
-        var timeEndSending = Simulation.Instance.Time.AddSeconds(transmissionTime);
-        EndSending = new Event(timeEndSending, new Action(() =>
-        {
-            Emitter.PhysicalLayer.EndSending(Frame);
-        }));
+        EndSending = new Event(
+            Simulation.Instance.Time.AddSeconds(transmissionTime),
+            $"Событие окончания отправки кадра сенсором №{Emitter.Id}",
+            () => Emitter.PhysicalLayer.EndSending(Frame));
 
         var timeEndReceivingMax = default(DateTime);
 
@@ -48,18 +46,21 @@ public class Signal
                 timeEndReceivingMax = timeEndReceiving;
             }
 
-            // событие начала получения сенсором кадра
-            var startReceiving = new Event(timeStartReceiving, new Action(() =>
-            {
-                if (sensor.PhysicalLayer.CurrentState == PhysicalProtocol.State.Listening)
-                    sensor.PhysicalLayer.StartReceiving(Frame);
-            }));
+            var startReceiving = new Event(
+                timeStartReceiving,
+                $"Событие начала получения сенсором №{sensor.Id} кадра от сенсора {Emitter.Id}",
+                () =>
+                {
+                    if (sensor.PhysicalLayer.CurrentState == PhysicalProtocol.State.Listening)
+                        sensor.PhysicalLayer.StartReceiving(Frame);
+                    else
+                        Logger.WriteLine($"Менеджер сигналов: Сенсор №{sensor.Id} находится не в состоянии прослушивания.");
+                });
 
-            // событие окончания получения сенсором кадра
-            var endReceiving = new Event(timeEndReceiving, new Action(() =>
-            {
-                sensor.PhysicalLayer.EndReceiving(Frame);
-            }));
+            var endReceiving = new Event(
+                timeEndReceiving,
+                $"Событие окончания получения сенсором №{sensor.Id} кадра от сенсора {Emitter.Id}",
+                () => sensor.PhysicalLayer.EndReceiving(Frame));
 
             ReceivingEvents.Add(new(sensor, startReceiving, endReceiving));
             Simulation.Instance.EventManager.AddEvent(startReceiving);
@@ -70,13 +71,10 @@ public class Signal
 
         // TODO: уточнить когда освобождать
         // возможно когда сигнал выходит за границы окружения?
-        var timeSignalRemoval = timeEndReceivingMax.AddSeconds(1);
-        var signalRemoval = new Event(timeSignalRemoval, new Action(() =>
-        {
-            Simulation.Instance.ChannelManager.FreeChannel(ChannelId);
-        }));
-
-        Simulation.Instance.EventManager.AddEvent(signalRemoval);
+        Simulation.Instance.EventManager.AddEvent(new Event(
+            timeEndReceivingMax.AddSeconds(1),
+            $"Событие удаления сигнала из среды",
+            () => Simulation.Instance.ChannelManager.FreeChannel(ChannelId)));
     }
 
     public void Emit()
@@ -91,13 +89,10 @@ public class Signal
 
         foreach (var (Receiver, StartReceiving, EndReceiving) in ReceivingEvents)
         {
-            var collisionDetectTime = StartReceiving.Time.AddMilliseconds(1);
-            var collisionDetectEvent = new Event(collisionDetectTime, new Action(() =>
-            {
-                Receiver.PhysicalLayer.DetectCollision();
-            }));
-
-            Simulation.Instance.EventManager.AddEvent(collisionDetectEvent);
+            Simulation.Instance.EventManager.AddEvent(new Event(
+                StartReceiving.Time.AddMilliseconds(1),
+                $"Событие обнаружения коллизии сенсором {Receiver.Id}",
+                Receiver.PhysicalLayer.DetectCollision));
 
             Simulation.Instance.EventManager.RemoveEvent(EndReceiving);
         }
