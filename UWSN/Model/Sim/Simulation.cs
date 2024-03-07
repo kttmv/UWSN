@@ -6,7 +6,7 @@ namespace UWSN.Model.Sim
 {
     public class Simulation
     {
-        private const int MAX_PROCESSED_EVENTS = 200;
+        private const int MAX_PROCESSED_EVENTS = 800;
 
         #region Simulation Singleton
 
@@ -89,7 +89,7 @@ namespace UWSN.Model.Sim
                 i++;
             }
 
-            if (i == 100)
+            if (i >= MAX_PROCESSED_EVENTS)
             {
                 Logger.WriteLine("Достигнут лимит событий. Симуляция остановлена");
             }
