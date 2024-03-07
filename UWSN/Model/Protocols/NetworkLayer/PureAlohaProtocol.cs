@@ -13,15 +13,19 @@ namespace UWSN.Model.Protocols.NetworkLayer
     public class PureAlohaProtocol : ProtocolBase, INetworkLayer
     {
         private const int CHANNEL_ID = 0;
-        private const int CHANNEL_TIMEOUT_IN_SECONDS = 2;
+        private const int CHANNEL_TIMEOUT_IN_SECONDS = 4;
         private const int ACK_TIMEOUT_IN_SECONDS = 20;
 
         [JsonIgnore]
         private Event? WaitingForAckEvent { get; set; }
 
+        [JsonIgnore]
+        private List<int> SensorsAwaitingAck { get; set; }
+
         public PureAlohaProtocol(int id)
         {
             SensorId = id;
+            SensorsAwaitingAck = new List<int>();
         }
 
         public void ReceiveFrame(Frame frame)
@@ -48,6 +52,9 @@ namespace UWSN.Model.Protocols.NetworkLayer
                 };
 
                 Logger.WriteSensorLine(Sensor, $"(PureAloha) начинаю отправку ACK для #{ack.IdReceive}");
+
+                SensorsAwaitingAck.Add(ack.IdReceive);
+
                 Sensor.NetworkLayer.SendFrame(ack);
             }
         }
@@ -60,15 +67,23 @@ namespace UWSN.Model.Protocols.NetworkLayer
         public void SendFrame(Frame frame, bool firstTime)
         {
             if (firstTime)
-                Logger.WriteSensorLine(Sensor, $"(PureAloha) пытаюсь отправить кадр для #{frame.IdReceive}");
+                Logger.WriteSensorLine(Sensor, $"(PureAloha) отправляю кадр для #{frame.IdReceive}");
             else
-                Logger.WriteSensorLine(Sensor, $"(PureAloha) пытаюсь повторно отправить кадр для #{frame.IdReceive}");
+                Logger.WriteSensorLine(Sensor, $"(PureAloha) повторно отправляю кадр для #{frame.IdReceive}");
 
-            // если канал занят, то ждем и повторяем попытку
-            if (Simulation.Instance.ChannelManager.IsChannelBusy(CHANNEL_ID))
+            bool ackIsBlocking = SensorsAwaitingAck.Count > 0 && frame.FrameType != Frame.Type.Ack;
+
+            // если канал занят или необходимо отправить ACK, то ждем и повторяем попытку
+            if (Simulation.Instance.ChannelManager.IsChannelBusy(CHANNEL_ID) ||
+                ackIsBlocking)
             {
-                Logger.WriteSensorLine(Sensor, $"(PureAloha) Канал {CHANNEL_ID} занят, " +
-                    $"начинаю ожидание в {CHANNEL_TIMEOUT_IN_SECONDS} сек.");
+                if (ackIsBlocking)
+                    Logger.WriteSensorLine(Sensor, "(PureAloha) невозможно совершить отправку, " +
+                        "так как есть неотправленные пакеты ACK. " +
+                        $"начинаю ожидание в {CHANNEL_TIMEOUT_IN_SECONDS} сек.");
+                else
+                    Logger.WriteSensorLine(Sensor, $"(PureAloha) Канал {CHANNEL_ID} занят, " +
+                        $"начинаю ожидание в {CHANNEL_TIMEOUT_IN_SECONDS} сек.");
 
                 Simulation.Instance.EventManager.AddEvent(new Event(
                     Simulation.Instance.Time.AddSeconds(CHANNEL_TIMEOUT_IN_SECONDS),
@@ -79,6 +94,9 @@ namespace UWSN.Model.Protocols.NetworkLayer
             }
 
             Sensor.PhysicalLayer.StartSending(frame, 0);
+
+            if (frame.FrameType == Frame.Type.Ack)
+                SensorsAwaitingAck.Remove(frame.IdReceive);
 
             // не ждем ответа на отправленный нами ACK
             if (frame.FrameType == Frame.Type.Ack)
@@ -99,7 +117,7 @@ namespace UWSN.Model.Protocols.NetworkLayer
                 return;
             }
 
-            Logger.WriteSensorLine(Sensor, $"(PureAloha) пытается повторно отправить кадр сенсору #{frame.IdReceive}. " +
+            Logger.WriteSensorLine(Sensor, $"(PureAloha) ACK не был получен. Повторно отправляю кадр сенсору #{frame.IdReceive}. " +
                 $"Попыток осталось: {attemptsLeft}");
 
             SendFrame(frame, false);
