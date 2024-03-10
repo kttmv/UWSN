@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using UWSN.Model.Network;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
 
-namespace UWSN.Model.Protocols.NetworkLayer
+namespace UWSN.Model.Protocols.Network
 {
-    public class PureAlohaProtocol : ProtocolBase, INetworkLayer
+    public class PureAlohaProtocol : NetworkProtocol
     {
         private const int CHANNEL_ID = 0;
         private const int CHANNEL_TIMEOUT_IN_SECONDS = 4;
@@ -22,13 +17,12 @@ namespace UWSN.Model.Protocols.NetworkLayer
         [JsonIgnore]
         private List<int> SensorsAwaitingAck { get; set; }
 
-        public PureAlohaProtocol(int id)
+        public PureAlohaProtocol()
         {
-            SensorId = id;
             SensorsAwaitingAck = new List<int>();
         }
 
-        public void ReceiveFrame(Frame frame)
+        public override void ReceiveFrame(Frame frame)
         {
             if (WaitingForAckEvent != null
                 && frame.FrameType == Frame.Type.Ack
@@ -36,7 +30,7 @@ namespace UWSN.Model.Protocols.NetworkLayer
             {
                 Simulation.Instance.EventManager.RemoveEvent(WaitingForAckEvent);
                 WaitingForAckEvent = null;
-                Sensor.PhysicalLayer.CurrentState = PhysicalProtocol.State.Idle;
+                Sensor.Physical.CurrentState = PhysicalProtocol.State.Idle;
                 Logger.WriteSensorLine(Sensor, $"(PureAloha) получил ACK от #{frame.IdSend}");
 
                 return;
@@ -55,11 +49,11 @@ namespace UWSN.Model.Protocols.NetworkLayer
 
                 SensorsAwaitingAck.Add(ack.IdReceive);
 
-                Sensor.NetworkLayer.SendFrame(ack);
+                Sensor.Network.SendFrame(ack);
             }
         }
 
-        public void SendFrame(Frame frame)
+        public override void SendFrame(Frame frame)
         {
             SendFrame(frame, true);
         }
@@ -93,7 +87,7 @@ namespace UWSN.Model.Protocols.NetworkLayer
                 return;
             }
 
-            Sensor.PhysicalLayer.StartSending(frame, 0);
+            Sensor.Physical.StartSending(frame, 0);
 
             if (frame.FrameType == Frame.Type.Ack)
                 SensorsAwaitingAck.Remove(frame.IdReceive);

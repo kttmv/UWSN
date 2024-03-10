@@ -35,7 +35,7 @@ namespace UWSN.Model.Network
             Logger.WriteSensorLine(Sensor, $"(Physical) принял кадр от #{frame.IdSend}");
 
             Sensor.FrameBuffer.Add(frame);
-            Sensor.NetworkLayer.ReceiveFrame(frame);
+            Sensor.Network.ReceiveFrame(frame);
         }
 
         public void StartSending(Frame frame, int channelId)
@@ -60,11 +60,6 @@ namespace UWSN.Model.Network
             CurrentState = State.Listening;
 
             Logger.WriteSensorLine(Sensor, $"(Physical) обнаружил коллизию и прекратил отправку/принятие кадра");
-        }
-
-        public PhysicalProtocol(int id)
-        {
-            SensorId = id;
         }
     }
 }

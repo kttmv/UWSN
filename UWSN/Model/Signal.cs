@@ -28,7 +28,7 @@ public class Signal
         EndSending = new Event(
             Simulation.Instance.Time.AddSeconds(transmissionTime),
             $"Окончание отправки кадра сенсором #{Emitter.Id}",
-            () => Emitter.PhysicalLayer.EndSending(Frame));
+            () => Emitter.Physical.EndSending(Frame));
 
         var timeEndReceivingMax = default(DateTime);
 
@@ -51,8 +51,8 @@ public class Signal
                 $"Начало получения сенсором #{sensor.Id} кадра от #{Emitter.Id}",
                 () =>
                 {
-                    if (sensor.PhysicalLayer.CurrentState == PhysicalProtocol.State.Listening)
-                        sensor.PhysicalLayer.StartReceiving(Frame);
+                    if (sensor.Physical.CurrentState == PhysicalProtocol.State.Listening)
+                        sensor.Physical.StartReceiving(Frame);
                     else
                         Logger.WriteLine($"Менеджер сигналов: Сенсор #{sensor.Id} находится не в состоянии прослушивания.");
                 });
@@ -60,7 +60,7 @@ public class Signal
             var endReceiving = new Event(
                 timeEndReceiving,
                 $"Окончание получения сенсором #{sensor.Id} кадра от #{Emitter.Id}",
-                () => sensor.PhysicalLayer.EndReceiving(Frame));
+                () => sensor.Physical.EndReceiving(Frame));
 
             ReceivingEvents.Add(new(sensor, startReceiving, endReceiving));
             Simulation.Instance.EventManager.AddEvent(startReceiving);
@@ -85,14 +85,14 @@ public class Signal
     public void DetectCollision()
     {
         Simulation.Instance.EventManager.RemoveEvent(EndSending);
-        Emitter.PhysicalLayer.DetectCollision();
+        Emitter.Physical.DetectCollision();
 
         foreach (var (Receiver, StartReceiving, EndReceiving) in ReceivingEvents)
         {
             Simulation.Instance.EventManager.AddEvent(new Event(
                 StartReceiving.Time.AddMilliseconds(1),
                 $"Обнаружение коллизии сенсором {Receiver.Id}",
-                Receiver.PhysicalLayer.DetectCollision));
+                Receiver.Physical.DetectCollision));
 
             Simulation.Instance.EventManager.RemoveEvent(EndReceiving);
         }

@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UWSN.Utilities;
+﻿using UWSN.Utilities;
+using Newtonsoft.Json;
 
 namespace UWSN.Model.Sim;
 
 public class ChannelManager
 {
-    // TODO: Не использовать дефолтное значение и выставлять его при инициализации (или вместе с протоколами)
+    // TODO: Не использовать дефолтное значение и выставлять 
+    // его при инициализации (или вместе с протоколами)
     /// <summary>
     /// Количество доступных каналов
     /// </summary>
@@ -20,6 +17,7 @@ public class ChannelManager
     /// </summary>
     private Signal?[] Channels { get; set; }
 
+    [JsonIgnore]
     public List<int> FreeChannels
     {
         get
@@ -33,6 +31,7 @@ public class ChannelManager
         }
     }
 
+    [JsonIgnore]
     public List<int> BusyChannels
     {
         get

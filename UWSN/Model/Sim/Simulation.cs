@@ -1,5 +1,6 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
+using Newtonsoft.Json;
+using UWSN.Model.Protocols.Network;
 using UWSN.Utilities;
 
 namespace UWSN.Model.Sim
@@ -29,6 +30,10 @@ namespace UWSN.Model.Sim
 
         #region Properties
 
+        public Type NetworkProtocolType { get; set; }
+
+        public Vector3Range AreaLimits { get; set; }
+
         public ChannelManager ChannelManager { get; set; }
 
         /// <summary>
@@ -36,14 +41,14 @@ namespace UWSN.Model.Sim
         /// </summary>
         public Environment Environment { get; set; }
 
+        [JsonIgnore]
         public EventManager EventManager { get; set; }
 
         /// <summary>
         /// Текущее время симуляции
         /// </summary>
+        [JsonIgnore]
         public DateTime Time { get; set; }
-
-        public Vector3Range AreaLimits { get; set; }
 
         #endregion Properties
 
@@ -60,6 +65,8 @@ namespace UWSN.Model.Sim
             Environment = new Environment();
 
             AreaLimits = new Vector3Range(new Vector3(), new Vector3());
+
+            NetworkProtocolType = typeof(PureAlohaProtocol);
         }
 
         /// <summary>
