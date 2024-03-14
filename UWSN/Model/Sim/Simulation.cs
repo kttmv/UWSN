@@ -74,7 +74,6 @@ namespace UWSN.Model.Sim
 
         public void RemoveEvent(Event e)
         {
-            // todo СЛОМАЕЦА ЕСЛИ ВРЕМЯ НЕ РАЗНЫЕ
             EventScheduler.Remove(e.Time);
         }
 

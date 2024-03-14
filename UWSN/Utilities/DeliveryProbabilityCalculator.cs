@@ -45,17 +45,17 @@ namespace UWSN.Utilities
 
             double beta;
 
-            double beta0 = 0.1 * Math.Pow(f, 2)/(1 + Math.Pow(f, 1)) + 40 * Math.Pow(f, 2)/(4100 + Math.Pow(f, 2))
+            double beta0 = 0.1 * Math.Pow(f, 2)/(1 + Math.Pow(f, 2)) + 40 * Math.Pow(f, 2)/(4100 + Math.Pow(f, 2))
                             + 2.75 * 0.0001 * Math.Pow(f, 2) + 0.0003;
             
             // ??? ГЛУБИНА ИЗЛУЧАЕМОГО СИГНАЛА ???
-            double h = (tx.Y + rx.Y) / 2;
+            double h = (tx.Z + rx.Z) / 2;
 
             double alpha = 1 - 6.54 * Math.Pow(10, -5) * h;
 
             beta = beta0 * alpha;
 
-            x = Math.Sqrt(f / fbit) * Math.Pow(10, 0.05 * (snr - beta) * r);
+            x = Math.Sqrt(f / fbit) * Math.Pow(10, 0.05 * (snr - beta * r / 1000));
 
             if (x > 3)
             {
@@ -65,7 +65,7 @@ namespace UWSN.Utilities
             {
                 Func<double, double> function = u => Math.Exp(-Math.Pow(u, 2) / 2);
 
-                double integral = Integrate(function, x, 1000d, 10000);
+                double integral = Integrate(function, x, 100000d, 10000);
 
                 pbit = 1 - 1 / Math.Sqrt(2 * pi) * integral;
             }
