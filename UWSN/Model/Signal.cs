@@ -100,12 +100,10 @@ public class Signal
 
     private double CalculateDeliveryProbability(Sensor sensor)
     {
-        return 1;
+        return 1.0;
 
         // взяты значения параметров модели среды для тестового моделирования
         //return DeliveryProbabilityCalculator.Calculate(60.0, 12.8, sensor.Position, Emitter.Position, 25.0);
-
-        return 1d;
 
         //return DeliveryProbabilityCalculator.Calculate(60.0, 12.8, new Vector3(0, 0, 0), new Vector3(0, 0, 300), 25.0);
     }

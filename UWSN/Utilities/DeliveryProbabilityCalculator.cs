@@ -43,6 +43,8 @@ namespace UWSN.Utilities
             // в тестовых задачах положим p0/n0 = 6.71∙10^3
             snr = 20 * Math.Log10(6.71 * 1000 / r);
 
+           double snr1 = CalculatePassiveSonarEq(f, ps, r); 
+
             double beta;
 
             double beta0 = 0.1 * Math.Pow(f, 2)/(1 + Math.Pow(f, 2)) + 40 * Math.Pow(f, 2)/(4100 + Math.Pow(f, 2))
@@ -71,6 +73,58 @@ namespace UWSN.Utilities
             }
 
             return pbit;
+        }
+
+        /// <summary>
+        /// Вычисление отношения сигнал-шум SNR через уравнение пассивного сонара
+        /// </summary>
+        private static double CalculatePassiveSonarEq(double f, double ps, double r, double s = 0.5, double w = 0.0, double k = 2.0)
+        {
+            // искомое отношение сигнал-шум
+            double snr = double.MinValue;
+
+            double sl = 10 * Math.Log10(ps) + 170.8;
+
+            double logAlpha = double.MinValue;
+
+            if (f >= 0.4)
+            {
+                logAlpha = 0.11 * Math.Pow(f, 2) / (1 + Math.Pow(f, 2)) + 44 * Math.Pow(f, 2) / (4100 + Math.Pow(f, 2))
+                    + 2.75 * 0.0001 * Math.Pow(f, 2) + 0.0003;
+            }
+            else
+            {
+                logAlpha = 0.002 + 0.11 * f / (1 + f) + 0.011 * f;            
+            }
+
+            double tl = k * 10 * Math.Log10(r) + r / 1000 * logAlpha;
+
+            double logNt = 17 - 30 * Math.Log10(f);
+            double nt = Math.Pow(10.0, logNt) / 10;
+
+            double logNs = 40 + 20 * (s - 0.5) + 26 * Math.Log10(f) - 60 * Math.Log10(f + 0.03);
+            double ns = Math.Pow(10.0, logNs) / 10;
+
+            double logNw = 50 + 7.5 * Math.Sqrt(w) + 20 * Math.Log10(f) -40 * Math.Log10(f + 0.4);
+            double nw = Math.Pow(10.0, logNw) / 10;
+
+            double logNth = -15 + 20 * Math.Log10(f);
+            double nth = Math.Pow(10.0, logNth) / 10;
+
+            double nLinTotal = logNt + logNs + logNw +  logNth;
+            double nTotal = 10 * Math.Log10(nLinTotal);
+
+            if (double.IsNaN(nTotal))
+            {
+                nTotal = 0.0;
+            }
+
+            // кто сказал?
+            double di = 0.0;
+
+            snr = sl - tl - (nTotal - di);
+
+            return snr;
         }
 
         /// <summary>
