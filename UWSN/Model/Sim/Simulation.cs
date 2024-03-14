@@ -1,11 +1,14 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
+using Newtonsoft.Json;
+using UWSN.Model.Protocols.Network;
 using UWSN.Utilities;
 
 namespace UWSN.Model.Sim
 {
     public class Simulation
     {
+        private const int MAX_PROCESSED_EVENTS = 200;
+
         #region Simulation Singleton
 
         private static Simulation? SimulationInstance { get; set; }
@@ -27,6 +30,10 @@ namespace UWSN.Model.Sim
 
         #region Properties
 
+        public Type NetworkProtocolType { get; set; }
+
+        public Vector3Range AreaLimits { get; set; }
+
         public ChannelManager ChannelManager { get; set; }
 
         /// <summary>
@@ -34,47 +41,32 @@ namespace UWSN.Model.Sim
         /// </summary>
         public Environment Environment { get; set; }
 
+        [JsonIgnore]
+        public EventManager EventManager { get; set; }
+
         /// <summary>
         /// Текущее время симуляции
         /// </summary>
+        [JsonIgnore]
         public DateTime Time { get; set; }
-
-        /// <summary>
-        /// Отсортированный по времени список событый
-        /// </summary>
-        private SortedList<DateTime, Event> EventScheduler { get; set; }
-
-        public Vector3Range AreaLimits { get; set; }
 
         #endregion Properties
 
         public Simulation()
         {
             if (SimulationInstance != null)
-            {
                 throw new Exception("Экземпляр класса Simulation уже создан.");
-            }
+
             SimulationInstance = this;
 
             ChannelManager = new ChannelManager();
+            EventManager = new EventManager();
+
             Environment = new Environment();
-            EventScheduler = new SortedList<DateTime, Event>(new DuplicateKeyComparer<DateTime>());
 
             AreaLimits = new Vector3Range(new Vector3(), new Vector3());
-        }
 
-        /// <summary>
-        /// Добавить событие
-        /// </summary>
-        /// <param name="e">Событие</param>
-        public void AddEvent(Event e)
-        {
-            EventScheduler.Add(e.Time, e);
-        }
-
-        public void RemoveEvent(Event e)
-        {
-            EventScheduler.Remove(e.Time);
+            NetworkProtocolType = typeof(PureAlohaProtocol);
         }
 
         /// <summary>
@@ -82,14 +74,31 @@ namespace UWSN.Model.Sim
         /// </summary>
         public void Run()
         {
-            while (EventScheduler.Count > 0)
+            int i = 1;
+            while (i < MAX_PROCESSED_EVENTS)
             {
-                var e = EventScheduler.First();
-                EventScheduler.RemoveAt(0);
+                var e = EventManager.RemoveFirst();
 
-                Time = e.Key;
+                if (e == null)
+                {
+                    Logger.WriteLine("Больше событий нет. Симуляция окончена.");
+                    break;
+                }
 
-                e.Value.Invoke();
+                Time = e.Time;
+
+                Logger.WriteLine($"Событие №{i}. {e.Description}", true);
+
+                e.Invoke();
+
+                Logger.WriteLine("");
+
+                i++;
+            }
+
+            if (i >= MAX_PROCESSED_EVENTS)
+            {
+                Logger.WriteLine("Достигнут лимит событий. Симуляция остановлена");
             }
         }
     }

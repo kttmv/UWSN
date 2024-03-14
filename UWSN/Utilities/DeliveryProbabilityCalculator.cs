@@ -47,7 +47,7 @@ namespace UWSN.Utilities
 
             double beta0 = 0.1 * Math.Pow(f, 2)/(1 + Math.Pow(f, 2)) + 40 * Math.Pow(f, 2)/(4100 + Math.Pow(f, 2))
                             + 2.75 * 0.0001 * Math.Pow(f, 2) + 0.0003;
-            
+
             // ??? ГЛУБИНА ИЗЛУЧАЕМОГО СИГНАЛА ???
             double h = (tx.Z + rx.Z) / 2;
 
@@ -59,7 +59,7 @@ namespace UWSN.Utilities
 
             if (x > 3)
             {
-                pbit = 1 - 1 / Math.Sqrt(2*pi) * Math.Exp(-Math.Pow(x, 2) / 2);
+                pbit = 1 - 1 / Math.Sqrt(2 * pi) * Math.Exp(-Math.Pow(x, 2) / 2);
             }
             else
             {

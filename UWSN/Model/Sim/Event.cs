@@ -12,10 +12,16 @@
         /// </summary>
         private Action Action { get; }
 
-        public Event(DateTime time, Action action)
+        /// <summary>
+        /// Описание события
+        /// </summary>
+        public string Description { get; }
+
+        public Event(DateTime time, string description, Action action)
         {
             Time = time;
             Action = action;
+            Description = description;
         }
 
         public void Invoke()

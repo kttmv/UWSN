@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UWSN.Model.Network
+﻿namespace UWSN.Model.Network
 {
-    public interface INetworkLayer
+    public abstract class NetworkProtocol: ProtocolBase
     {
-        public void ReceiveFrame(Frame frame);
+        public abstract void ReceiveFrame(Frame frame);
 
-        public void SendFrame(Frame frame);
+        public abstract void SendFrame(Frame frame);
     }
 }

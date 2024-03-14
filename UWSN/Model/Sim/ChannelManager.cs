@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UWSN.Utilities;
+﻿using UWSN.Utilities;
+using Newtonsoft.Json;
 
 namespace UWSN.Model.Sim;
 
 public class ChannelManager
 {
-    // TODO: Не использовать дефолтное значение и выставлять его при инициализации (или вместе с протоколами)
+    // TODO: Не использовать дефолтное значение и выставлять 
+    // его при инициализации (или вместе с протоколами)
     /// <summary>
     /// Количество доступных каналов
     /// </summary>
@@ -20,6 +17,7 @@ public class ChannelManager
     /// </summary>
     private Signal?[] Channels { get; set; }
 
+    [JsonIgnore]
     public List<int> FreeChannels
     {
         get
@@ -33,6 +31,7 @@ public class ChannelManager
         }
     }
 
+    [JsonIgnore]
     public List<int> BusyChannels
     {
         get
@@ -58,10 +57,12 @@ public class ChannelManager
 
     public void OccupyChannel(int channelId, Signal signal)
     {
+        Logger.WriteLine($"Менеджер сигналов: Сенсор #{signal.Emitter.Id} занял канал {channelId}");
+
         // обработка коллизии
         if (Channels[channelId] != null)
         {
-            Logger.WriteSimulationLine($"Обнаружена коллизия на канале {channelId}");
+            Logger.WriteLine($"Обнаружена коллизия на канале {channelId}");
             Channels[channelId]!.DetectCollision();
             signal.DetectCollision();
             return;
@@ -72,6 +73,7 @@ public class ChannelManager
 
     public void FreeChannel(int channelId)
     {
+        Logger.WriteLine($"Менеджер сигналов: Канал {channelId} освобожден");
         Channels[channelId] = null;
     }
 }
