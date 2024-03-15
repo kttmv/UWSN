@@ -43,7 +43,7 @@ namespace UWSN.Utilities
             // в тестовых задачах положим p0/n0 = 6.71∙10^3
             snr = 20 * Math.Log10(6.71 * 1000 / r);
 
-           double snr1 = CalculatePassiveSonarEq(f, ps, r); 
+            double snr1 = CalculatePassiveSonarEq(f, ps, r); 
 
             double beta;
 
@@ -100,16 +100,12 @@ namespace UWSN.Utilities
             double tl = k * 10 * Math.Log10(r) + r / 1000 * logAlpha;
 
             double logNt = 17 - 30 * Math.Log10(f);
-            double nt = Math.Pow(10.0, logNt) / 10;
 
             double logNs = 40 + 20 * (s - 0.5) + 26 * Math.Log10(f) - 60 * Math.Log10(f + 0.03);
-            double ns = Math.Pow(10.0, logNs) / 10;
 
             double logNw = 50 + 7.5 * Math.Sqrt(w) + 20 * Math.Log10(f) -40 * Math.Log10(f + 0.4);
-            double nw = Math.Pow(10.0, logNw) / 10;
 
             double logNth = -15 + 20 * Math.Log10(f);
-            double nth = Math.Pow(10.0, logNth) / 10;
 
             double nLinTotal = logNt + logNs + logNw +  logNth;
             double nTotal = 10 * Math.Log10(nLinTotal);
@@ -119,7 +115,7 @@ namespace UWSN.Utilities
                 nTotal = 0.0;
             }
 
-            // кто сказал?
+            // кто сказал? Рыжов сказал
             double di = 0.0;
 
             snr = sl - tl - (nTotal - di);
