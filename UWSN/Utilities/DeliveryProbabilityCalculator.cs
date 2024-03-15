@@ -22,7 +22,7 @@ namespace UWSN.Utilities
         /// <param name="tx">Координата передающего модема</param>
         /// <param name="rx">Координата принимающего модема</param>
         /// <param name="ps">Мощность модема</param>
-        public static double Calculate(double f, double fbit, Vector3 tx, Vector3 rx, double ps)
+        public static double Calculate(double f, double fbit, Vector3 tx, Vector3 rx, double ps, bool isPassiveEq = true)
         {
             // искомая вероятность доставки одного бита сообщения
             double pbit;
@@ -41,9 +41,7 @@ namespace UWSN.Utilities
             //snr = 20 * Math.Log10(p0 / n0 * r);
 
             // в тестовых задачах положим p0/n0 = 6.71∙10^3
-            snr = 20 * Math.Log10(6.71 * 1000 / r);
-
-            double snr1 = CalculatePassiveSonarEq(f, ps, r); 
+            snr = isPassiveEq ? CalculatePassiveSonarEq(f, ps, r) : 20 * Math.Log10(6.71 * 1000 / r);
 
             double beta;
 
@@ -51,7 +49,7 @@ namespace UWSN.Utilities
                             + 2.75 * 0.0001 * Math.Pow(f, 2) + 0.0003;
 
             // ??? ГЛУБИНА ИЗЛУЧАЕМОГО СИГНАЛА ???
-            double h = (tx.Z + rx.Z) / 2;
+            double h = (tx.Y + rx.Y) / 2;
 
             double alpha = 1 - 6.54 * Math.Pow(10, -5) * h;
 
@@ -67,7 +65,7 @@ namespace UWSN.Utilities
             {
                 Func<double, double> function = u => Math.Exp(-Math.Pow(u, 2) / 2);
 
-                double integral = Integrate(function, x, 100000d, 10000);
+                double integral = Integrate(function, x, 5d, 1000);
 
                 pbit = 1 - 1 / Math.Sqrt(2 * pi) * integral;
             }
@@ -84,6 +82,8 @@ namespace UWSN.Utilities
             double snr = double.MinValue;
 
             double sl = 10 * Math.Log10(ps) + 170.8;
+
+            //double sl = 190.8;
 
             double logAlpha = double.MinValue;
 
@@ -107,18 +107,15 @@ namespace UWSN.Utilities
 
             double logNth = -15 + 20 * Math.Log10(f);
 
-            double nLinTotal = logNt + logNs + logNw +  logNth;
-            double nTotal = 10 * Math.Log10(nLinTotal);
 
-            if (double.IsNaN(nTotal))
-            {
-                nTotal = 0.0;
-            }
+            double nTotal = Math.Pow(10.0, logNt / 10.0) + Math.Pow(10.0, logNs / 10.0) + Math.Pow(10.0, logNw / 10.0)
+                            + Math.Pow(10.0, logNth / 10.0);
 
-            // кто сказал? Рыжов сказал
+            double nl = 10 * Math.Log10(nTotal);
+
             double di = 0.0;
 
-            snr = sl - tl - (nTotal - di);
+            snr = sl - tl - (nl - di);
 
             return snr;
         }
