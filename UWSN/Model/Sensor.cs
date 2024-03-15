@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using Newtonsoft.Json;
-using UWSN.Model.Network;
+using UWSN.Model.DataLink;
 using UWSN.Model.Sim;
 
 namespace UWSN.Model
@@ -10,7 +10,7 @@ namespace UWSN.Model
         [JsonIgnore]
         public PhysicalProtocol Physical { get; set; }
         [JsonIgnore]
-        public NetworkProtocol Network { get; set; }
+        public DataLinkProtocol DataLink { get; set; }
 
         private int _id;
         public int Id 
@@ -24,7 +24,7 @@ namespace UWSN.Model
                 // свойства. получается, что на момент создания объекта мы не 
                 // знаем какой у него id, поэтому приходится делать так
                 Physical.SensorId = Id;
-                Network.SensorId = Id;
+                DataLink.SensorId = Id;
             }
         }
         public Vector3 Position { get; set; }
@@ -35,8 +35,8 @@ namespace UWSN.Model
         public Sensor(int id)
         {
             Physical = new PhysicalProtocol();
-            Network = (NetworkProtocol)(
-                Activator.CreateInstance(Simulation.Instance.NetworkProtocolType) ?? 
+            DataLink = (DataLinkProtocol)(
+                Activator.CreateInstance(Simulation.Instance.DataLinkProtocolType) ?? 
                 throw new NullReferenceException("Тип сетевого протокола не определен"));
             Id = id;
         }
@@ -44,8 +44,8 @@ namespace UWSN.Model
         public Sensor()
         {
             Physical = new PhysicalProtocol();
-            Network = (NetworkProtocol)(
-                Activator.CreateInstance(Simulation.Instance.NetworkProtocolType) ?? 
+            DataLink = (DataLinkProtocol)(
+                Activator.CreateInstance(Simulation.Instance.DataLinkProtocolType) ?? 
                 throw new NullReferenceException("Тип сетевого протокола не определен"));
         }
 
@@ -60,7 +60,7 @@ namespace UWSN.Model
             Simulation.Instance.EventManager.AddEvent(new Event(
                 default,
                 $"Отправка кадра от #{frame.IdSend} для #{frame.IdReceive}",
-                () => Network.SendFrame(frame)));
+                () => DataLink.SendFrame(frame)));
 
         }
     }

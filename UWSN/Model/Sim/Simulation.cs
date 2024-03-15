@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using Newtonsoft.Json;
-using UWSN.Model.Protocols.Network;
+using UWSN.Model.Protocols.DataLink;
 using UWSN.Utilities;
 
 namespace UWSN.Model.Sim
@@ -30,7 +30,7 @@ namespace UWSN.Model.Sim
 
         #region Properties
 
-        public Type NetworkProtocolType { get; set; }
+        public Type DataLinkProtocolType { get; set; }
 
         public Vector3Range AreaLimits { get; set; }
 
@@ -66,7 +66,7 @@ namespace UWSN.Model.Sim
 
             AreaLimits = new Vector3Range(new Vector3(), new Vector3());
 
-            NetworkProtocolType = typeof(PureAlohaProtocol);
+            DataLinkProtocolType = typeof(PureAlohaProtocol);
         }
 
         /// <summary>

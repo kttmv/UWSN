@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using UWSN.Model.Sim;
 
-namespace UWSN.Model.Network;
+namespace UWSN.Model.DataLink;
 
 public abstract class ProtocolBase
 {

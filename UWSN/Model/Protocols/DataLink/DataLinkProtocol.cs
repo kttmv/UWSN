@@ -1,6 +1,6 @@
-﻿namespace UWSN.Model.Network
+﻿namespace UWSN.Model.DataLink
 {
-    public abstract class NetworkProtocol: ProtocolBase
+    public abstract class DataLinkProtocol: ProtocolBase
     {
         public abstract void ReceiveFrame(Frame frame);
 
