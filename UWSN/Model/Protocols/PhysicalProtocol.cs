@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UWSN.Utilities;
 
-namespace UWSN.Model.Network
+namespace UWSN.Model.DataLink
 {
     public class PhysicalProtocol : ProtocolBase
     {
@@ -35,7 +35,7 @@ namespace UWSN.Model.Network
             Logger.WriteSensorLine(Sensor, $"(Physical) принял кадр от #{frame.IdSend}");
 
             Sensor.FrameBuffer.Add(frame);
-            Sensor.Network.ReceiveFrame(frame);
+            Sensor.DataLink.ReceiveFrame(frame);
         }
 
         public void StartSending(Frame frame, int channelId)
