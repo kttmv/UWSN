@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using UWSN.CommandLine.Options;
@@ -22,6 +23,13 @@ namespace UWSN.CommandLine.Handlers
             }
 
             Simulation.Instance.Run();
+
+            //for (int i = 0; i < 4000; i += 100)
+            //{
+            //    var prob = DeliveryProbabilityCalculator.Calculate(60.0, 12.8, new Vector3(0, 0, 0), new Vector3(0, 0, i), 25);
+            //    Console.Write(Math.Pow(prob, 256.0) + ",");
+            //}
+
         }
     }
 }
