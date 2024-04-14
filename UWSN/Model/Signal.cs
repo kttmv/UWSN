@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using UWSN.Model.DataLink;
+using UWSN.Model.Modems;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
 
@@ -101,8 +102,12 @@ public class Signal
         //return 1.0;
 
         // взяты значения параметров модели среды для тестового моделирования
-        return DeliveryProbabilityCalculator.Calculate(60.0, 12.8, sensor.Position, Emitter.Position, 25.0);
+        //return DeliveryProbabilityCalculator.Calculate(60.0, 12.8, sensor.Position, Emitter.Position, 25.0);
 
+        return DeliveryProbabilityCalculator.CaulculateSensorDistance(new AquaModem1000(),
+             new Vector3Range(new Vector3(-10000, -10000, -10000), new Vector3(10000, 10000, 10000)));
+
+        //return DeliveryProbabilityCalculator.CalculatePassiveSonarEq(20.0, 0, 18000);
         //return DeliveryProbabilityCalculator.Calculate(60.0, 12.8, new Vector3(0, 0, 0), new Vector3(0, 0, 2225), 25.0, true);
     }
 }
