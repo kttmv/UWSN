@@ -9,7 +9,6 @@ import {
     useColorModeValue
 } from '@chakra-ui/react'
 import { runSimulatorShell } from '..'
-import { readFile } from '../shared/helpers/fsHelpers'
 import useConsoleStore from '../store/consoleStore'
 import EnvironmentTab from './EnvironmentTab'
 

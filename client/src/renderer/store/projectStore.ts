@@ -19,7 +19,7 @@ const useProjectStore = create<State>((set) => ({
             set(() => ({ projectFilePath: value, project }))
         } catch (error) {
             // todo: показывать ошибку в модальном окне
-            console.error('Failed to read file:', error)
+            console.error('Не удалось прочитать файл.', error)
         }
     }
 }))

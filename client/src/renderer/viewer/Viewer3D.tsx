@@ -41,13 +41,13 @@ export default function Viewer3D() {
                         intensity={Math.PI}
                     />
                     <OrbitControls makeDefault />
-                    {project?.Sensors.map((sensor) => (
+                    {project?.Environment.Sensors.map((sensor) => (
                         <SensorNode
                             key={sensor.Id}
                             position={[
-                                sensor.Position.X,
-                                sensor.Position.Y,
-                                sensor.Position.Z
+                                sensor.Position.X / 1000,
+                                sensor.Position.Y / 1000,
+                                sensor.Position.Z / 1000
                             ]}
                         />
                     ))}

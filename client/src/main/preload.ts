@@ -2,11 +2,19 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron'
 
-export type Channels = 'run-simulator' | 'simulator-reply' | 'read-file' | 'read-file-reply'
+export type Channels =
+    | 'run-simulator'
+    | 'simulator-reply'
+    | 'read-file'
+    | 'read-file-reply'
+    | 'open-file'
+    | 'open-file-reply'
+    | 'save-file'
+    | 'save-file-reply'
 
 const electronHandler = {
     ipcRenderer: {
-        sendMessage(channel: Channels, ...args: unknown[]) {
+        send(channel: Channels, ...args: unknown[]) {
             ipcRenderer.send(channel, ...args)
         },
         on(channel: Channels, func: (...args: unknown[]) => void) {

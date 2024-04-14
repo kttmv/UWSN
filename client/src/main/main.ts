@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import { spawn } from 'child_process'
-import { BrowserWindow, app, ipcMain, shell } from 'electron'
+import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron'
 import log from 'electron-log'
 import { autoUpdater } from 'electron-updater'
 import fs from 'fs'
@@ -79,6 +79,7 @@ const createWindow = async () => {
         minHeight: 600,
         icon: getAssetPath('icon.png'),
         webPreferences: {
+            nodeIntegration: true,
             preload: app.isPackaged
                 ? path.join(__dirname, 'preload.js')
                 : path.join(__dirname, '../../.erb/dll/preload.js')
@@ -165,14 +166,61 @@ ipcMain.on('run-simulator', (event, args) => {
     })
 })
 
+export type ReadFileReply = {
+    success: boolean
+    data: string
+}
+
 ipcMain.on('read-file', (event, path) => {
+    if (!path) {
+        event.reply('read-file-reply', {
+            success: false,
+            data: 'Путь к файлу пуст.'
+        } as ReadFileReply)
+
+        return
+    }
+
+    fs.stat(path, function (err, stat) {
+        if (err) {
+            if (err.code === 'ENOENT') {
+                event.reply('read-file-reply', {
+                    success: false,
+                    data: 'Указанный файл не существует.'
+                } as ReadFileReply)
+            } else {
+                event.reply('read-file-reply', {
+                    success: false,
+                    data: `Ошибка при чтении файла: ${err.message}`
+                } as ReadFileReply)
+            }
+
+            return
+        }
+    })
+
     fs.readFile(path, 'utf8', (err, data) => {
         if (err) {
-            console.error('An error occurred:', err)
-            event.reply('read-file-reply', { success: false, data: err })
+            event.reply('read-file-reply', {
+                success: false,
+                data: `Ошибка при чтении файла: ${err.message}`
+            } as ReadFileReply)
+
             return
         }
 
-        event.reply('read-file-reply', { success: true, data })
+        event.reply('read-file-reply', { success: true, data } as ReadFileReply)
+    })
+})
+
+ipcMain.on('open-file', (event, data) => {
+    dialog.showOpenDialog(data).then((result) => {
+        event.reply('open-file-reply', result)
+    })
+})
+
+ipcMain.on('save-file', (event, data) => {
+    dialog.showSaveDialog(data).then((filePath) => {
+        event.reply('save-file-reply', filePath)
     })
 })
