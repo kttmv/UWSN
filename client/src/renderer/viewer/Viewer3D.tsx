@@ -1,7 +1,7 @@
 import { Button, Flex, useBreakpointValue } from '@chakra-ui/react'
 import { OrbitControls, Sky } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { IconCaretDown, IconCaretUp } from '@tabler/icons-react'
+import { IconCaretDown, IconCaretUp, IconSettings } from '@tabler/icons-react'
 import { useState } from 'react'
 import useProjectStore from '../store/projectStore'
 import SensorNode from './SensorNode'
@@ -23,6 +23,7 @@ export default function Viewer3D() {
             flexGrow={1}
             minW={0}
             minH={0}
+            position='relative'
         >
             {isOpen && (
                 <Canvas className={canvasClassName}>
@@ -53,6 +54,7 @@ export default function Viewer3D() {
                     ))}
                 </Canvas>
             )}
+
             <Button
                 borderTopRightRadius={{ base: 0, lg: 'md' }}
                 borderTopLeftRadius={{ base: 0, lg: 0 }}
@@ -67,6 +69,10 @@ export default function Viewer3D() {
                     {isOpen ? 'Скрыть ' : 'Показать '}
                     3D просмотр
                 </Flex>
+            </Button>
+
+            <Button position='absolute' top='20px'>
+                <IconSettings />
             </Button>
         </Flex>
     )

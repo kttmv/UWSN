@@ -8,7 +8,7 @@ import {
     Tabs,
     useColorModeValue
 } from '@chakra-ui/react'
-import { runSimulatorShell } from '..'
+import { runSimulatorShell } from '../simulator/simulatorHelper'
 import useConsoleStore from '../store/consoleStore'
 import EnvironmentTab from './EnvironmentTab'
 

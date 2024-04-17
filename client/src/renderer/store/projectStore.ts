@@ -11,15 +11,15 @@ type State = {
 const useProjectStore = create<State>((set) => ({
     projectFilePath: '',
     project: undefined,
-    setProjectFilePath: async (value: string) => {
+    setProjectFilePath: async (path: string) => {
         try {
-            const content = await readFile(value)
+            const content = await readFile(path)
             const project = JSON.parse(content)
 
-            set(() => ({ projectFilePath: value, project }))
+            set(() => ({ projectFilePath: path, project }))
         } catch (error) {
             // todo: показывать ошибку в модальном окне
-            console.error('Не удалось прочитать файл.', error)
+            console.error(`Не удалось прочитать файл ${path}.`, error)
         }
     }
 }))
