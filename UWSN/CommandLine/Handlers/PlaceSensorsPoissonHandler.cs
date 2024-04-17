@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using CommandLine;
 using Dew.Math;
 using UWSN.CommandLine.Options;
 using UWSN.Model;
@@ -37,7 +38,7 @@ public class PlaceSensorsPoissonHandler
     {
         int d = 3;
         int n = 50;
-        double seed = 100.0;
+        double seed = 0.5;
         double g = Phi(d);
         double[] alpha = new double[d];
         double[,] R = new double[n, d];
@@ -57,11 +58,37 @@ public class PlaceSensorsPoissonHandler
 
         R = MinMaxStandardize(R);
 
+        var xVals = new List<double>();
+        for (int i = 0; i < R.GetLength(0); i++)
+        {
+            xVals.Add(R[i, 0]);
+        }
+        var yVals = new List<double>();
+        for (int i = 0; i < R.GetLength(0); i++)
+        {
+            yVals.Add(R[i, 1]);
+        }
+        var zVals = new List<double>();
+        for (int i = 0; i < R.GetLength(0); i++)
+        {
+            zVals.Add(R[i, 2]);
+        }
+
+        Random rnd = new Random();
+
         for (int i = 0; i < sensors.Count; i++)
         {
-            float x = (float)PoissonDouble(R[i, 0], areaLimits.Min.X, areaLimits.Max.X);
-            float y = (float)PoissonDouble(R[i, 1], areaLimits.Min.Y, areaLimits.Max.Y);
-            float z = (float)PoissonDouble(R[i, 2], areaLimits.Min.Z, areaLimits.Max.Z);
+            int xInd = (int)rnd.NextInt64(0, n - i - 1);
+            int yInd = (int)rnd.NextInt64(0, n - i - 1);
+            int zInd = (int)rnd.NextInt64(0, n - i - 1);
+
+            float x = (float)PoissonDouble(xVals[xInd], areaLimits.Min.X, areaLimits.Max.X);
+            float y = (float)PoissonDouble(yVals[yInd], areaLimits.Min.Y, areaLimits.Max.Y);
+            float z = (float)PoissonDouble(zVals[zInd], areaLimits.Min.Z, areaLimits.Max.Z);
+
+            xVals.RemoveAt(xInd);
+            yVals.RemoveAt(yInd);
+            zVals.RemoveAt(zInd);
 
             sensors[i].Position = new Vector3(x, y, z);
         }
