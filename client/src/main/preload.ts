@@ -34,6 +34,6 @@ const electronHandler = {
     }
 }
 
-contextBridge.exposeInMainWorld('electron', electronHandler)
+contextBridge.exposeInMainWorld('electronAPI', electronHandler)
 
 export type ElectronHandler = typeof electronHandler

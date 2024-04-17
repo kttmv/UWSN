@@ -8,7 +8,7 @@ export default function Console() {
     const [isOpen, setIsOpen] = useState(true)
 
     useEffect(() => {
-        const removeListener = window.electron.ipcRenderer.on(
+        const removeListener = window.electronAPI.ipcRenderer.on(
             'simulator-reply',
             (data) => {
                 addLineToConsoleOutput(data as string)
@@ -36,8 +36,8 @@ export default function Console() {
                 )}
             </Button>
             {isOpen && (
-                <Card h='100%' borderTopRadius={0}>
-                    <CardBody fontFamily='monospace' overflowY='scroll'>
+                <Card h='100%' overflowY='scroll' borderTopRadius={0}>
+                    <CardBody fontFamily='monospace'>
                         {consoleOutput.length === 0
                             ? 'Пусто...'
                             : consoleOutput.map((value, index) => (
