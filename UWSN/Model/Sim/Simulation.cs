@@ -30,6 +30,8 @@ namespace UWSN.Model.Sim
 
         #region Properties
 
+        public TimeSpan SensorSampleInterval { get; set; }
+
         public Type DataLinkProtocolType { get; set; }
 
         public Vector3Range AreaLimits { get; set; }
@@ -67,6 +69,8 @@ namespace UWSN.Model.Sim
             AreaLimits = new Vector3Range(new Vector3(), new Vector3());
 
             DataLinkProtocolType = typeof(PureAlohaProtocol);
+
+            SensorSampleInterval = new TimeSpan(0, 30, 0);
         }
 
         /// <summary>
