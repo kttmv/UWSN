@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using UWSN.Model.DataLink;
+using UWSN.Model.Protocols;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
 
@@ -25,32 +25,37 @@ namespace UWSN.Model.Protocols.DataLink
         public override void ReceiveFrame(Frame frame)
         {
             if (WaitingForAckEvent != null
-                && frame.FrameType == Frame.Type.Ack
-                && frame.IdReceive == Sensor.Id)
+                && frame.Type == Frame.FrameType.Ack
+                && frame.ReceiverId == Sensor.Id)
             {
                 Simulation.Instance.EventManager.RemoveEvent(WaitingForAckEvent);
                 WaitingForAckEvent = null;
                 Sensor.Physical.CurrentState = PhysicalProtocol.State.Idle;
-                Logger.WriteSensorLine(Sensor, $"(PureAloha) получил ACK от #{frame.IdSend}");
+                Logger.WriteSensorLine(Sensor, $"(PureAloha) получил ACK от #{frame.SenderId}");
 
                 return;
             }
 
-            if (frame.IdReceive == Sensor.Id)
+            if (frame.ReceiverId == Sensor.Id && frame.AckIsNeeded)
             {
                 var ack = new Frame
                 {
-                    FrameType = Frame.Type.Ack,
-                    IdSend = Sensor.Id,
-                    IdReceive = frame.IdSend
+                    SenderId = Sensor.Id,
+                    SenderPosition = Sensor.Position,
+                    ReceiverId = frame.SenderId,
+                    Type = Frame.FrameType.Ack,
+                    TimeSend = Simulation.Instance.Time,
+                    AckIsNeeded = false
                 };
 
-                Logger.WriteSensorLine(Sensor, $"(PureAloha) начинаю отправку ACK для #{ack.IdReceive}");
+                Logger.WriteSensorLine(Sensor, $"(PureAloha) начинаю отправку ACK для #{ack.ReceiverId}");
 
-                SensorsAwaitingAck.Add(ack.IdReceive);
+                SensorsAwaitingAck.Add(ack.ReceiverId);
 
                 Sensor.DataLink.SendFrame(ack);
             }
+
+            Sensor.Network.ReceiveFrame(frame);
         }
 
         public override void SendFrame(Frame frame)
@@ -61,11 +66,11 @@ namespace UWSN.Model.Protocols.DataLink
         public void SendFrame(Frame frame, bool firstTime)
         {
             if (firstTime)
-                Logger.WriteSensorLine(Sensor, $"(PureAloha) отправляю кадр для #{frame.IdReceive}");
+                Logger.WriteSensorLine(Sensor, $"(PureAloha) отправляю кадр для #{frame.ReceiverId}");
             else
-                Logger.WriteSensorLine(Sensor, $"(PureAloha) повторно отправляю кадр для #{frame.IdReceive}");
+                Logger.WriteSensorLine(Sensor, $"(PureAloha) повторно отправляю кадр для #{frame.ReceiverId}");
 
-            bool ackIsBlocking = SensorsAwaitingAck.Count > 0 && frame.FrameType != Frame.Type.Ack;
+            bool ackIsBlocking = SensorsAwaitingAck.Count > 0 && frame.Type != Frame.FrameType.Ack;
 
             // если канал занят или необходимо отправить ACK, то ждем и повторяем попытку
             if (Simulation.Instance.ChannelManager.IsChannelBusy(CHANNEL_ID) ||
@@ -87,18 +92,19 @@ namespace UWSN.Model.Protocols.DataLink
                 return;
             }
 
-            Sensor.Physical.StartSending(frame, 0);
+            Sensor.Physical.StartSending(frame, CHANNEL_ID);
 
-            if (frame.FrameType == Frame.Type.Ack)
-                SensorsAwaitingAck.Remove(frame.IdReceive);
-
-            // не ждем ответа на отправленный нами ACK
-            if (frame.FrameType == Frame.Type.Ack)
-                return;
-
-            if (firstTime)
+            if (frame.Type == Frame.FrameType.Ack)
             {
-                Logger.WriteSensorLine(Sensor, $"(PureAloha) начинаю ожидать ACK от #{frame.IdReceive}");
+                SensorsAwaitingAck.Remove(frame.ReceiverId);
+
+                // не ждем ответа на отправленный нами ACK
+                return;
+            }
+
+            if (firstTime && frame.AckIsNeeded)
+            {
+                Logger.WriteSensorLine(Sensor, $"(PureAloha) начинаю ожидать ACK от #{frame.ReceiverId}");
                 CreateAckTimeout(frame, 3);
             }
         }
@@ -107,11 +113,11 @@ namespace UWSN.Model.Protocols.DataLink
         {
             if (attemptsLeft == 0)
             {
-                Logger.WriteSensorLine(Sensor, $"(PureAloha) не получил ACK от #{frame.IdReceive}. Ожидание прекращено.");
+                Logger.WriteSensorLine(Sensor, $"(PureAloha) не получил ACK от #{frame.ReceiverId}. Ожидание прекращено.");
                 return;
             }
 
-            Logger.WriteSensorLine(Sensor, $"(PureAloha) ACK не был получен. Повторно отправляю кадр сенсору #{frame.IdReceive}. " +
+            Logger.WriteSensorLine(Sensor, $"(PureAloha) ACK не был получен. Повторно отправляю кадр сенсору #{frame.ReceiverId}. " +
                 $"Попыток осталось: {attemptsLeft}");
 
             SendFrame(frame, false);
@@ -121,7 +127,7 @@ namespace UWSN.Model.Protocols.DataLink
 
         private void CreateAckTimeout(Frame frame, int attemptsLeft)
         {
-            Logger.WriteSensorLine(Sensor, $"(PureAloha) жду ACK от #{frame.IdReceive} в течение {ACK_TIMEOUT_IN_SECONDS} сек.");
+            Logger.WriteSensorLine(Sensor, $"(PureAloha) жду ACK от #{frame.ReceiverId} в течение {ACK_TIMEOUT_IN_SECONDS} сек.");
 
             WaitingForAckEvent = new Event(
                 Simulation.Instance.Time.AddSeconds(ACK_TIMEOUT_IN_SECONDS),

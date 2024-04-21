@@ -104,6 +104,15 @@ namespace UWSN.Model.Sim
             {
                 Logger.WriteLine("Достигнут лимит событий. Симуляция остановлена");
             }
+            foreach (var sensor in Environment.Sensors)
+            {
+                Logger.WriteLine($"Sensor: {sensor.Id}");
+
+                foreach (var neighbour in sensor.Network.Neighbours)
+                {
+                    Logger.WriteLine($"Neighbour: {neighbour.Id}");
+                }
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using Newtonsoft.Json;
-using UWSN.Model.DataLink;
+using UWSN.Model.Protocols;
+using UWSN.Model.Protocols.DataLink;
 using UWSN.Model.Sim;
 
 namespace UWSN.Model
@@ -15,7 +16,11 @@ namespace UWSN.Model
         [JsonIgnore]
         public DataLinkProtocol DataLink { get; set; }
 
+        [JsonIgnore]
+        public NetworkProtocol Network { get; set; }
+
         private int _id;
+
         public int Id
         {
             get { return _id; }
@@ -24,12 +29,13 @@ namespace UWSN.Model
                 _id = value;
                 // костыль. при десериализации всегда вызывается конструктор
                 // без параметров (Sensor()), после чего заполняются все его
-                // свойства. получается, что на момент создания объекта мы не 
+                // свойства. получается, что на момент создания объекта мы не
                 // знаем какой у него id, поэтому приходится делать так
                 Physical.SensorId = Id;
                 DataLink.SensorId = Id;
             }
         }
+
         public Vector3 Position { get; set; }
 
         [JsonIgnore]
@@ -43,6 +49,7 @@ namespace UWSN.Model
             DataLink = (DataLinkProtocol)(
                 Activator.CreateInstance(Simulation.Instance.DataLinkProtocolType) ??
                 throw new NullReferenceException("Тип сетевого протокола не определен"));
+            Network = new NetworkProtocol();
             Id = id;
         }
 
@@ -52,21 +59,25 @@ namespace UWSN.Model
             DataLink = (DataLinkProtocol)(
                 Activator.CreateInstance(Simulation.Instance.DataLinkProtocolType) ??
                 throw new NullReferenceException("Тип сетевого протокола не определен"));
+            Network = new NetworkProtocol();
         }
 
         public void WakeUp()
         {
             var frame = new Frame
             {
-                IdSend = Id,
-                IdReceive = Id + 1
+                SenderId = Id,
+                SenderPosition = Position,
+                ReceiverId = 0,
+                Type = Frame.FrameType.Hello,
+                TimeSend = Simulation.Instance.Time,
+                AckIsNeeded = false
             };
 
             Simulation.Instance.EventManager.AddEvent(new Event(
                 default,
-                $"Отправка кадра от #{frame.IdSend} для #{frame.IdReceive}",
+                $"Отправка HELLO от #{frame.SenderId}",
                 () => DataLink.SendFrame(frame)));
-
         }
     }
 }

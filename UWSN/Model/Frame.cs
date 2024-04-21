@@ -1,17 +1,22 @@
-﻿namespace UWSN.Model
+﻿using System.Numerics;
+
+namespace UWSN.Model
 {
     public class Frame
     {
-        public Type FrameType { get; set; }
-        public int IdSend { get; set; }
-        public int IdReceive { get; set; }
-        public DateTime TimeSend { get; set; }
-
-        public enum Type
+        public enum FrameType
         {
             RegularFrame,
             Ack,
-            Data
+            Data,
+            Hello
         }
+
+        public required FrameType Type { get; set; }
+        public required int SenderId { get; set; }
+        public required Vector3 SenderPosition { get; set; }
+        public required int ReceiverId { get; set; }
+        public required DateTime TimeSend { get; set; }
+        public required bool AckIsNeeded { get; set; }
     }
 }

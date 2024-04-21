@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using UWSN.Model.DataLink;
+using UWSN.Model.Protocols;
 using UWSN.Model.Modems;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
