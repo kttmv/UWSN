@@ -1,15 +1,19 @@
-import { ReadFileReply } from '../../../main/index'
+function log(data: unknown) {
+    console.log(`IPC REPLY:\n${JSON.stringify(data)}`)
+}
 
 export function readFile(path: string): Promise<string> {
     return new Promise((resolve, reject) => {
-        console.log(window.electronAPI.ipcRenderer)
-        window.electronAPI.ipcRenderer.once('read-file-reply', (data) => {
-            const arg = data as ReadFileReply
+        window.electronAPI.ipcRenderer.once('read-file-reply', (arg) => {
+            const data = arg as ReadFileReply
 
-            if (arg.success) {
-                resolve(arg.data)
+            log(data)
+
+            if (data.error) {
+                reject(data.error)
             } else {
-                reject(arg.data)
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                resolve(data.content!)
             }
         })
 
@@ -17,30 +21,60 @@ export function readFile(path: string): Promise<string> {
     })
 }
 
-export function openFile(
-    properties: Electron.OpenDialogOptions
-): Promise<Electron.OpenDialogReturnValue> {
-    return new Promise((resolve) => {
-        window.electronAPI.ipcRenderer.once('open-file-reply', (data) => {
-            const arg = data as Electron.OpenDialogReturnValue
+export function writeFile(
+    path: string,
+    content: string
+): Promise<WriteFileReply> {
+    return new Promise((resolve, reject) => {
+        window.electronAPI.ipcRenderer.once('write-file-reply', (arg) => {
+            const data = arg as WriteFileReply
 
-            resolve(arg)
+            log(data)
+
+            if (data.error) {
+                reject(data.error)
+            } else {
+                resolve(data)
+            }
         })
 
-        window.electronAPI.ipcRenderer.send('open-file', properties)
+        const data: WriteFileData = {
+            path,
+            content
+        }
+
+        window.electronAPI.ipcRenderer.send('write-file', data)
     })
 }
 
-export function saveFile(
+export function showOpenFileDialog(
+    properties: Electron.OpenDialogOptions
+): Promise<Electron.OpenDialogReturnValue> {
+    return new Promise((resolve) => {
+        window.electronAPI.ipcRenderer.once('open-file-dialog-reply', (arg) => {
+            const data = arg as Electron.OpenDialogReturnValue
+
+            log(data)
+
+            resolve(data)
+        })
+
+        window.electronAPI.ipcRenderer.send('open-file-dialog', properties)
+    })
+}
+
+export function showSaveFileDialog(
     properties: Electron.SaveDialogOptions
 ): Promise<Electron.SaveDialogReturnValue> {
     return new Promise((resolve) => {
-        window.electronAPI.ipcRenderer.once('save-file-reply', (data) => {
-            const arg = data as Electron.OpenDialogReturnValue
+        window.electronAPI.ipcRenderer.once('save-file-dialog-reply', (arg) => {
+            const data = arg as Electron.OpenDialogReturnValue
 
-            resolve(arg)
+            log(data)
+
+            resolve(data)
         })
 
-        window.electronAPI.ipcRenderer.send('save-file', properties)
+        window.electronAPI.ipcRenderer.send('save-file-dialog', properties)
     })
 }

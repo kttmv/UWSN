@@ -1,6 +1,5 @@
-import { spawn } from 'child_process'
-import { app, BrowserWindow, dialog, ipcMain } from 'electron'
-import fs from 'fs'
+import { app, BrowserWindow } from 'electron'
+import './ipc'
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string
@@ -47,89 +46,16 @@ app.on('activate', () => {
     }
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
-ipcMain.on('run-simulator', (event, args) => {
-    const path = app.isPackaged
-        ? '.\\'
-        : '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe'
+// https://stackoverflow.com/questions/45119526/electron-dying-without-any-information-what-now
+// handle crashes and kill events
+process.on('uncaughtException', function (err) {
+    // log the message and stack trace
+    // fs.writeFileSync('crash.log', err + '\n' + err.stack)
+    console.error(err + '\n' + err.stack)
 
-    const child = spawn(`${path} ${args}`, [], {
-        shell: true
-    })
+    // do any cleanup like shutting down servers, etc
 
-    child.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`)
-        // event.reply('shell-reply', { isError: false, reply: data.toString() })
-        event.reply('simulator-reply', data.toString())
-    })
-
-    child.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`)
-        // event.reply('shell-reply', { isError: true, reply: data.toString() })
-        event.reply('simulator-reply', data.toString())
-    })
-
-    child.on('close', (code) => {
-        console.log(`child process exited with code ${code}`)
-    })
-})
-
-export type ReadFileReply = {
-    success: boolean
-    data: string
-}
-
-ipcMain.on('read-file', (event, path) => {
-    if (!path) {
-        event.reply('read-file-reply', {
-            success: false,
-            data: 'Путь к файлу пуст.'
-        } as ReadFileReply)
-
-        return
-    }
-
-    fs.stat(path, function (err, stat) {
-        if (err) {
-            if (err.code === 'ENOENT') {
-                event.reply('read-file-reply', {
-                    success: false,
-                    data: 'Указанный файл не существует.'
-                } as ReadFileReply)
-            } else {
-                event.reply('read-file-reply', {
-                    success: false,
-                    data: `Ошибка при чтении файла: ${err.message}`
-                } as ReadFileReply)
-            }
-
-            return
-        }
-    })
-
-    fs.readFile(path, 'utf8', (err, data) => {
-        if (err) {
-            event.reply('read-file-reply', {
-                success: false,
-                data: `Ошибка при чтении файла: ${err.message}`
-            } as ReadFileReply)
-
-            return
-        }
-
-        event.reply('read-file-reply', { success: true, data } as ReadFileReply)
-    })
-})
-
-ipcMain.on('open-file', (event, data) => {
-    dialog.showOpenDialog(data).then((result) => {
-        event.reply('open-file-reply', result)
-    })
-})
-
-ipcMain.on('save-file', (event, data) => {
-    dialog.showSaveDialog(data).then((filePath) => {
-        event.reply('save-file-reply', filePath)
-    })
+    // relaunch the app (if you want)
+    // app.relaunch({ args: [] })
+    // app.exit(0)
 })

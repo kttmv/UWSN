@@ -1,25 +1,33 @@
 import { Button, Card, Tooltip } from '@chakra-ui/react'
 import { IconFile, IconFolderOpen } from '@tabler/icons-react'
-import { openFile, saveFile } from '../shared/helpers/fsHelpers'
+import {
+    showOpenFileDialog,
+    showSaveFileDialog,
+    writeFile
+} from '../shared/helpers/fsHelpers'
 import useProjectStore from '../store/projectStore'
+import { createDefaultProject } from './createDefaultProject'
 
 export default function Toolbar() {
     const { setProjectFilePath } = useProjectStore()
 
     const onCreateNewClick = async () => {
-        const result = await saveFile({
+        const result = await showSaveFileDialog({
             title: 'Укажите название файла создаваемой симуляции',
             filters: [{ name: '', extensions: ['json'] }]
         })
 
         if (!result.canceled && result.filePath) {
-            console.log(result.filePath)
+            const project = createDefaultProject()
+
+            await writeFile(result.filePath, JSON.stringify(project))
+
             setProjectFilePath(result.filePath)
         }
     }
 
     const onOpenClick = async () => {
-        const result = await openFile({
+        const result = await showOpenFileDialog({
             title: 'Выберите существующий файл симуляции',
             filters: [{ name: '', extensions: ['json'] }]
         })

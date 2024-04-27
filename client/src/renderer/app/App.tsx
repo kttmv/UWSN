@@ -1,13 +1,13 @@
 import { Flex, Heading } from '@chakra-ui/react'
 import Console from '../console/Console'
+import useProjectStore from '../store/projectStore'
 import ApplicationTabs from '../tabs/ApplicationTabs'
 import Toolbar from '../toolbar/Toolbar'
 import Viewer3D from '../viewer/Viewer3D'
-import useProjectStore from '../store/projectStore'
 
 export default function App() {
     const { project } = useProjectStore()
-    
+
     return (
         <Flex direction='column' h='100vh' minW={0} minH={0}>
             <Toolbar />

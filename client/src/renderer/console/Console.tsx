@@ -9,7 +9,7 @@ export default function Console() {
 
     useEffect(() => {
         const removeListener = window.electronAPI.ipcRenderer.on(
-            'simulator-reply',
+            'run-simulator-reply',
             (data) => {
                 addLineToConsoleOutput(data as string)
             }

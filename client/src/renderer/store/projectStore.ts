@@ -1,17 +1,19 @@
 import { create } from 'zustand'
 import { readFile } from '../shared/helpers/fsHelpers'
-import { ProjectData } from './projectTypeDefinition'
+import { ProjectData } from '../shared/types/projectData'
 
 type State = {
     projectFilePath: string
     setProjectFilePath: (value: string) => void
-    project: ProjectData
+    project: ProjectData | undefined
 }
 
 const useProjectStore = create<State>((set) => ({
     projectFilePath: '',
     project: undefined,
     setProjectFilePath: async (path: string) => {
+        console.log(`setProjectPath: ${path}`)
+
         try {
             const content = await readFile(path)
             const project = JSON.parse(content)
