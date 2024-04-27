@@ -5,11 +5,14 @@
     "description": "My Electron application description",
     "main": ".webpack/main",
     "scripts": {
-        "dev": "electron-forge start",
+        "dev": "chcp 65001 && electron-forge start",
         "package": "electron-forge package",
         "make": "electron-forge make",
         "publish": "electron-forge publish",
         "lint": "eslint --ext .ts,.tsx ."
+    },
+    "scriptsComments": {
+        "dev": "chcp 65001 используется для того, чтобы русские символы нормально отображались в консоли"
     },
     "devDependencies": {
         "@electron-forge/cli": "^7.4.0",
