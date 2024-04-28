@@ -1,14 +1,15 @@
 import { create } from 'zustand'
-import { readFile } from '../shared/helpers/fsHelpers'
+import { readFile, writeFile } from '../shared/helpers/fsHelpers'
 import { ProjectData } from '../shared/types/projectData'
 
 type State = {
     projectFilePath: string
     setProjectFilePath: (value: string) => void
     project: ProjectData | undefined
+    setProject: (value: ProjectData) => void
 }
 
-const useProjectStore = create<State>((set) => ({
+const useProjectStore = create<State>((set, get) => ({
     projectFilePath: '',
     project: undefined,
     setProjectFilePath: async (path: string) => {
@@ -22,6 +23,20 @@ const useProjectStore = create<State>((set) => ({
         } catch (error) {
             // todo: показывать ошибку в модальном окне
             console.error(`Не удалось прочитать файл ${path}.`, error)
+        }
+    },
+    setProject: async (newProject: ProjectData) => {
+        const path = get().projectFilePath
+
+        try {
+            writeFile(path, JSON.stringify(newProject, null, 4))
+
+            set(() => ({ project: newProject }))
+        } catch (error) {
+            console.error(
+                `Не удалось записать изменения в файл ${path}.`,
+                error
+            )
         }
     }
 }))
