@@ -1,5 +1,6 @@
 import { Button, Flex, TabPanel, Text } from '@chakra-ui/react'
 import { IconBox } from '@tabler/icons-react'
+import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { Vector3Data } from '../shared/types/vector3Data'
 import useProjectStore from '../store/projectStore'
@@ -13,15 +14,22 @@ export interface EnvironmentInputs {
 export default function EnvironmentTab() {
     const { register, handleSubmit, reset, formState } =
         useForm<EnvironmentInputs>({
-            defaultValues: {
-                v1: { X: 0, Y: 0, Z: 0 },
-                v2: { X: 0, Y: 0, Z: 0 }
-            },
             reValidateMode: 'onBlur',
             mode: 'all'
         })
 
     const { project, setProject } = useProjectStore()
+
+    useEffect(() => {
+        if (project) {
+            reset({
+                v1: project.AreaLimits.Min,
+                v2: project.AreaLimits.Max
+            })
+        } else {
+            reset()
+        }
+    }, [project])
 
     const onSubmit: SubmitHandler<EnvironmentInputs> = (data) => {
         const newProject = structuredClone(project)
