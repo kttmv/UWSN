@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Newtonsoft.Json;
+using UWSN.Model.Modems;
 using UWSN.Model.Protocols.DataLink;
 using UWSN.Utilities;
 
@@ -29,6 +30,8 @@ namespace UWSN.Model.Sim
         #endregion Simulation Singleton
 
         #region Properties
+        
+        public ModemBase Modem { get; set; }
 
         public TimeSpan SensorSampleInterval { get; set; }
 
@@ -71,6 +74,8 @@ namespace UWSN.Model.Sim
             DataLinkProtocolType = typeof(PureAlohaProtocol);
 
             SensorSampleInterval = new TimeSpan(0, 30, 0);
+
+            Modem = new AquaModem1000();
         }
 
         /// <summary>

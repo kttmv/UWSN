@@ -22,7 +22,7 @@ public class Signal
         ChannelId = channelId;
         ReceivingEvents = new();
 
-        double transmissionTime = 1; // TODO: добавить вычисление времени передачи
+        double transmissionTime = Frame.FRAME_SIZE_IN_BITS / Simulation.Instance.Modem.Bitrate * 1024.0; // TODO: добавить вычисление времени передачи
 
         EndSending = new Event(
             Simulation.Instance.Time.AddSeconds(transmissionTime),
