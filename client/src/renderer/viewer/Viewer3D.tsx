@@ -5,6 +5,7 @@ import { IconCaretDown, IconCaretUp } from '@tabler/icons-react'
 import { useState } from 'react'
 import useProjectStore from '../store/projectStore'
 import useViewerSettingsStore from '../store/viewerSettingsStore'
+import GridRectangle from './GridRectangle'
 import SensorNode from './SensorNode'
 import Viewer3DSettings from './Viewer3DSettings'
 
@@ -47,16 +48,29 @@ export default function Viewer3D() {
                             intensity={Math.PI}
                         />
                         <OrbitControls makeDefault />
-                        {project?.Environment.Sensors.map((sensor) => (
-                            <SensorNode
-                                key={sensor.Id}
-                                position={[
-                                    sensor.Position.X / scale,
-                                    sensor.Position.Y / scale,
-                                    sensor.Position.Z / scale
-                                ]}
-                            />
-                        ))}
+                        {project && (
+                            <>
+                                {project.Environment.Sensors.map((sensor) => (
+                                    <SensorNode
+                                        key={sensor.Id}
+                                        position={[
+                                            sensor.Position.X / scale,
+                                            sensor.Position.Y / scale,
+                                            sensor.Position.Z / scale
+                                        ]}
+                                    />
+                                ))}
+                                {/* <AreaLimits
+                                    v1={project.AreaLimits.Min}
+                                    v2={project.AreaLimits.Max}
+                                /> */}
+                                <GridRectangle
+                                    v1={project.AreaLimits.Min}
+                                    v2={project.AreaLimits.Max}
+                                    segments={30}
+                                />
+                            </>
+                        )}
                     </Canvas>
 
                     <Viewer3DSettings />
