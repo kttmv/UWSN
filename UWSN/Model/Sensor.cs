@@ -19,6 +19,8 @@ namespace UWSN.Model
         [JsonIgnore]
         public NetworkProtocol Network { get; set; }
 
+        public double Battery { get; set; }
+
         private int _id;
 
         public int Id
@@ -52,6 +54,7 @@ namespace UWSN.Model
                 throw new NullReferenceException("Тип сетевого протокола не определен"));
             Network = new NetworkProtocol();
             Id = id;
+            Battery = 100.0;
         }
 
         public Sensor()
@@ -61,6 +64,7 @@ namespace UWSN.Model
                 Activator.CreateInstance(Simulation.Instance.DataLinkProtocolType) ??
                 throw new NullReferenceException("Тип сетевого протокола не определен"));
             Network = new NetworkProtocol();
+            Battery = 100.0;
         }
 
         public void WakeUp()

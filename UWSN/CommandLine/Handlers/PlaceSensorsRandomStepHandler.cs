@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -19,14 +20,18 @@ public class PlaceSensorsRandomStepHandler
         SerializationHelper.LoadSimulation(o.FilePath);
         var sensors = new List<Sensor>();
 
-        for (int i = 0; i < o.SensorsCount; i++)
+        int sensorsCount = o.Count_X * o.Count_Y * o.Count_Z;
+
+        for (int i = 0; i < sensorsCount; i++)
         {
             sensors.Add(new Sensor(i));
         }
 
         Simulation.Instance.Environment.Sensors =
             PlaceSensors(sensors,
-                o.StepRange,
+                o.Count_X,
+                o.Count_Y,
+                o.Count_Z,
                 o.DistributionType,
                 o.UniParameterA,
                 o.UniParameterB);
@@ -45,7 +50,9 @@ public class PlaceSensorsRandomStepHandler
 
     private static List<Sensor> PlaceSensors(
         List<Sensor> sensors,
-        float stepRange,
+        int countX,
+        int countY,
+        int countZ,
         DistributionType distrType,
         double uniParameterA = 0,
         double uniParameterB = 1)
@@ -53,11 +60,11 @@ public class PlaceSensorsRandomStepHandler
         switch (distrType)
         {
             case DistributionType.Normal:
-                PlaceNormal(sensors, stepRange);
+                PlaceNormal(sensors, countX, countY, countZ);
                 break;
 
             case DistributionType.Uniform:
-                PlaceUniform(sensors, stepRange, uniParameterA, uniParameterB);
+                //PlaceUniform(sensors, countX, countY, countZ, uniParameterA, uniParameterB);
                 break;
 
             default:
@@ -67,27 +74,33 @@ public class PlaceSensorsRandomStepHandler
         return sensors;
     }
 
-    private static List<Sensor> PlaceNormal(List<Sensor> sensors, float stepRange)
+    private static List<Sensor> PlaceNormal(List<Sensor> sensors, int countX, int countY, int countZ)
     {
+        var al = Simulation.Instance.AreaLimits;
+
+        double stepRangeX = (al.Max.X - al.Min.X) / countX;
+        double stepRangeY = (al.Max.Y - al.Min.Y) / countY;
+        double stepRangeZ = (al.Max.Z - al.Min.Z) / countZ;
+
         var rnd = new Random();
 
         int placedCount = 0;
-        int cubicEdge = (int)(Math.Ceiling(Math.Pow(sensors.Count, 1.0 / 3.0)));
+        //int cubicEdge = (int)(Math.Ceiling(Math.Pow(sensors.Count, 1.0 / 3.0)));
 
-        for (int i = 0; i < cubicEdge; i++)
+        for (int i = 0; i < countX; i++)
         {
-            for (int j = 0; j < cubicEdge; j++)
+            for (int j = 0; j < countY; j++)
             {
-                for (int k = 0; k < cubicEdge; k++)
+                for (int k = 0; k < countZ; k++)
                 {
-                    if (placedCount >= sensors.Count)
-                    {
-                        break;
-                    }
+                    //if (placedCount >= sensors.Count)
+                    //{
+                    //    break;
+                    //}
 
-                    var x = (float)((i * stepRange) + NextDouble(rnd, -stepRange / 2, stepRange / 2));
-                    var y = (float)((j * stepRange) + NextDouble(rnd, -stepRange / 2, stepRange / 2));
-                    var z = (float)((k * stepRange) + NextDouble(rnd, -stepRange / 2, stepRange / 2));
+                    var x = al.Min.X + (float)((i * stepRangeX) + NextDouble(rnd, -stepRangeX / 2, stepRangeX / 2));
+                    var y = al.Min.Y + (float)((j * stepRangeY) + NextDouble(rnd, -stepRangeY / 2, stepRangeY / 2));
+                    var z = al.Min.Z + (float)((k * stepRangeZ) + NextDouble(rnd, -stepRangeZ / 2, stepRangeZ / 2));
 
                     sensors[placedCount].Position = new Vector3(x, y, z);
 

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UWSN.CommandLine.Options;
 using UWSN.Model;
+using UWSN.Model.Clusterization;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
 
@@ -21,6 +22,9 @@ namespace UWSN.CommandLine.Handlers
             {
                 sensor.WakeUp();
             }
+
+            //var clust = new RetardedClusterization(4);
+            //clust.Clusterize()
 
             Simulation.Instance.Run();
 

@@ -25,6 +25,8 @@ namespace UWSN.Model.Protocols
         {
             CurrentState = State.Receiving;
 
+            Sensor.Battery -= 0.1;
+
             Logger.WriteSensorLine(Sensor, $"(Physical) начал принимать кадр от #{frame.SenderId}");
         }
 
@@ -41,6 +43,8 @@ namespace UWSN.Model.Protocols
         public void StartSending(Frame frame, int channelId)
         {
             CurrentState = State.Emitting;
+
+            Sensor.Battery -= 0.15;
 
             Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра для #{frame.ReceiverId}");
 
