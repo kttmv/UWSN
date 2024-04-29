@@ -12,10 +12,16 @@ namespace UWSN.Model.Protocols;
 public class NetworkProtocol : ProtocolBase
 {
     public List<(int Id, Vector3 Position)> Neighbours;
+    
+    public int ClusterId;
+
+    public bool IsReference;
 
     public NetworkProtocol()
     {
         Neighbours = new();
+        ClusterId = -1;
+        IsReference = false;
     }
 
     public void ReceiveFrame(Frame frame)

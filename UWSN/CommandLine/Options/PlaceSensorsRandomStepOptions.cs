@@ -8,8 +8,14 @@ namespace UWSN.CommandLine.Options
         [Value(0, Required = true, HelpText = "Вид функции распределения")]
         public DistributionType DistributionType { get; set; }
 
-        [Value(0, Required = true, HelpText = "Шаг ортогональной сетки")]
-        public float StepRange { get; set; }
+        [Value(0, Required = true, HelpText = "Количество сенсоров по Х")]
+        public int Count_X { get; set; }
+
+        [Value(0, Required = true, HelpText = "Количество сенсоров по У")]
+        public int Count_Y { get; set; }
+
+        [Value(0, Required = true, HelpText = "Количество сенсоров по Z")]
+        public int Count_Z { get; set; }
 
         [Value(0, Required = true, HelpText = "Параметр А равномерного распределения")]
         public double UniParameterA { get; set; }
