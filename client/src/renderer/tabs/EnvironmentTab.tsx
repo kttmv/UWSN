@@ -1,31 +1,58 @@
 import { Button, Flex, TabPanel, Text } from '@chakra-ui/react'
 import { IconBox } from '@tabler/icons-react'
+import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Vector3 } from 'three'
-import { runInitialization } from '../simulator/simulatorHelper'
+import { Vector3Data } from '../shared/types/vector3Data'
+import useProjectStore from '../store/projectStore'
 import EnvironmentBoundaries from './EnvironmentBoundaries'
 
 export interface EnvironmentInputs {
-    v1: Vector3
-    v2: Vector3
+    v1: Vector3Data
+    v2: Vector3Data
 }
+
 export default function EnvironmentTab() {
-    const {
-        register,
-        handleSubmit,
-        watch,
-        formState: { errors, isValid },
-        setValue
-    } = useForm<EnvironmentInputs>({
-        defaultValues: {
-            v1: new Vector3(),
-            v2: new Vector3()
-        },
-        reValidateMode: 'onBlur',
-        mode: 'all'
-    })
+    const { register, handleSubmit, reset, formState } =
+        useForm<EnvironmentInputs>({
+            reValidateMode: 'onBlur',
+            mode: 'all'
+        })
+
+    const { project, setProject } = useProjectStore()
+
+    useEffect(() => {
+        if (project) {
+            reset({
+                v1: project.AreaLimits.Min,
+                v2: project.AreaLimits.Max
+            })
+        } else {
+            reset()
+        }
+    }, [project])
+
     const onSubmit: SubmitHandler<EnvironmentInputs> = (data) => {
-        runInitialization(data.v1, data.v2)
+        const newProject = structuredClone(project)
+
+        if (!newProject) {
+            throw new Error()
+        }
+
+        newProject.AreaLimits = {
+            Min: {
+                X: Number(data.v1.X),
+                Y: Number(data.v1.Y),
+                Z: Number(data.v1.Z)
+            },
+            Max: {
+                X: Number(data.v2.X),
+                Y: Number(data.v2.Y),
+                Z: Number(data.v2.Z)
+            }
+        }
+
+        setProject(newProject)
+        reset(data)
     }
 
     return (
@@ -33,12 +60,15 @@ export default function EnvironmentTab() {
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Flex direction='column' gap={4}>
                     <EnvironmentBoundaries
-                        errors={errors}
                         register={register}
+                        formState={formState}
                     />
-                    <Button type='submit' isDisabled={!isValid}>
+                    <Button
+                        type='submit'
+                        isDisabled={!formState.isValid || !formState.isDirty}
+                    >
                         <IconBox />
-                        <Text m={1}>Инициализировать окружение</Text>
+                        <Text m={1}>Применить</Text>
                     </Button>
                 </Flex>
             </form>

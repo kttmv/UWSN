@@ -31,7 +31,7 @@ on('run-simulator', (event, args) => {
     console.log(args)
 
     const path = app.isPackaged
-        ? '.\\'
+        ? 'simulator\\UWSN.exe'
         : '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe'
 
     const child = spawn(`${path} ${args}`, [], {
