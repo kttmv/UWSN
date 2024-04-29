@@ -45,7 +45,8 @@ namespace UWSN.Model.Protocols.DataLink
                     ReceiverId = frame.SenderId,
                     Type = Frame.FrameType.Ack,
                     TimeSend = Simulation.Instance.Time,
-                    AckIsNeeded = false
+                    AckIsNeeded = false,
+                    Data = null
                 };
 
                 Logger.WriteSensorLine(Sensor, $"(PureAloha) начинаю отправку ACK для #{ack.ReceiverId}");
@@ -63,6 +64,11 @@ namespace UWSN.Model.Protocols.DataLink
             SendFrame(frame, true);
         }
 
+        /// <summary>
+        /// УЧЕСТЬ РЕСИВЕР АЙДИ -1
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="firstTime"></param>
         public void SendFrame(Frame frame, bool firstTime)
         {
             if (firstTime)

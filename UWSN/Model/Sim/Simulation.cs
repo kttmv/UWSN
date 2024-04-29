@@ -7,7 +7,7 @@ namespace UWSN.Model.Sim
 {
     public class Simulation
     {
-        private const int MAX_PROCESSED_EVENTS = 200;
+        private const int MAX_PROCESSED_EVENTS = 1000000;
 
         #region Simulation Singleton
 
@@ -112,6 +112,8 @@ namespace UWSN.Model.Sim
                 {
                     Logger.WriteLine($"Neighbour: {neighbour.Id}");
                 }
+
+                break;
             }
         }
     }
