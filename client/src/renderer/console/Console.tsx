@@ -5,7 +5,7 @@ import useConsoleStore from '../store/consoleStore'
 
 export default function Console() {
     const { consoleOutput, addLineToConsoleOutput } = useConsoleStore()
-    const [isOpen, setIsOpen] = useState(true)
+    const [isOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
         const removeListener = window.electronAPI.ipcRenderer.on(
