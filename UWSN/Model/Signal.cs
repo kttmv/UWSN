@@ -22,7 +22,7 @@ public class Signal
         ChannelId = channelId;
         ReceivingEvents = new();
 
-        double transmissionTime = 1; // TODO: добавить вычисление времени передачи
+        double transmissionTime = Frame.FRAME_SIZE_IN_BITS / Simulation.Instance.Modem.Bitrate * 1024.0; // TODO: добавить вычисление времени передачи
 
         EndSending = new Event(
             Simulation.Instance.Time.AddSeconds(transmissionTime),
@@ -31,10 +31,16 @@ public class Signal
 
         var timeEndReceivingMax = default(DateTime);
 
+        int receiversCount = 0;
         foreach (var sensor in Simulation.Instance.Environment.Sensors)
         {
-            if (sensor == Emitter || new Random().NextDouble() > CalculateDeliveryProbability(sensor))
+            if (sensor == Emitter)
                 continue;
+
+            if (new Random().NextDouble() > CalculateDeliveryProbability(sensor))
+            {
+                continue;
+            }
 
             double distance = Vector3.Distance(sensor.Position, Emitter.Position);
             var timeStartReceiving = Simulation.Instance.Time.AddSeconds(distance / 1500); // TODO: уточнить скорость звука
@@ -64,12 +70,24 @@ public class Signal
             ReceivingEvents.Add(new(sensor, startReceiving, endReceiving));
             Simulation.Instance.EventManager.AddEvent(startReceiving);
             Simulation.Instance.EventManager.AddEvent(endReceiving);
+
+            receiversCount++;
         }
 
         Simulation.Instance.EventManager.AddEvent(EndSending);
 
+        if (receiversCount == 0)
+        {
+            Simulation.Instance.EventManager.AddEvent(new Event(
+                Simulation.Instance.Time.AddMilliseconds(1),
+                $"Удаление сигнала из среды",
+                () => Simulation.Instance.ChannelManager.FreeChannel(ChannelId)));
+
+            return;
+        }
+
         // TODO: уточнить когда освобождать
-        // возможно когда сигнал выходит за границы окружения?
+        // возможно когда сигнал выходит за границы окружения
         Simulation.Instance.EventManager.AddEvent(new Event(
             timeEndReceivingMax.AddSeconds(1),
             $"Удаление сигнала из среды",
@@ -102,10 +120,10 @@ public class Signal
         //return 1.0;
 
         // взяты значения параметров модели среды для тестового моделирования
-        //return DeliveryProbabilityCalculator.Calculate(60.0, 12.8, sensor.Position, Emitter.Position, 25.0);
+        return DeliveryProbabilityCalculator.Calculate(60.0, 12.8, sensor.Position, Emitter.Position, 25.0);
 
-        return DeliveryProbabilityCalculator.CaulculateSensorDistance(new AquaModem1000(),
-             new Vector3Range(new Vector3(-10000, -10000, -10000), new Vector3(10000, 10000, 10000)));
+        //return DeliveryProbabilityCalculator.CaulculateSensorDistance(new AquaModem1000(),
+        //     new Vector3Range(new Vector3(-10000, -10000, -10000), new Vector3(10000, 10000, 10000)));
 
         //return DeliveryProbabilityCalculator.CalculatePassiveSonarEq(20.0, 0, 18000);
         //return DeliveryProbabilityCalculator.Calculate(60.0, 12.8, new Vector3(0, 0, 0), new Vector3(0, 0, 2225), 25.0, true);

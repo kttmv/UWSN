@@ -8,7 +8,7 @@ namespace UWSN.Model.Protocols.DataLink
     public class PureAlohaProtocol : DataLinkProtocol
     {
         private const int CHANNEL_ID = 0;
-        private const int CHANNEL_TIMEOUT_IN_SECONDS = 4;
+        private const int CHANNEL_TIMEOUT_IN_SECONDS = 1;
         private const int ACK_TIMEOUT_IN_SECONDS = 20;
 
         [JsonIgnore]
@@ -45,7 +45,8 @@ namespace UWSN.Model.Protocols.DataLink
                     ReceiverId = frame.SenderId,
                     Type = Frame.FrameType.Ack,
                     TimeSend = Simulation.Instance.Time,
-                    AckIsNeeded = false
+                    AckIsNeeded = false,
+                    Data = null
                 };
 
                 Logger.WriteSensorLine(Sensor, $"(PureAloha) начинаю отправку ACK для #{ack.ReceiverId}");
@@ -63,6 +64,11 @@ namespace UWSN.Model.Protocols.DataLink
             SendFrame(frame, true);
         }
 
+        /// <summary>
+        /// УЧЕСТЬ РЕСИВЕР АЙДИ -1
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="firstTime"></param>
         public void SendFrame(Frame frame, bool firstTime)
         {
             if (firstTime)
@@ -76,16 +82,20 @@ namespace UWSN.Model.Protocols.DataLink
             if (Simulation.Instance.ChannelManager.IsChannelBusy(CHANNEL_ID) ||
                 ackIsBlocking)
             {
+                var rngTimeout = new Random().NextDouble() * 0.1;
+
+                double timeout = CHANNEL_TIMEOUT_IN_SECONDS + rngTimeout;
+
                 if (ackIsBlocking)
                     Logger.WriteSensorLine(Sensor, "(PureAloha) невозможно совершить отправку, " +
                         "так как есть неотправленные пакеты ACK. " +
-                        $"начинаю ожидание в {CHANNEL_TIMEOUT_IN_SECONDS} сек.");
+                        $"начинаю ожидание в {timeout} сек.");
                 else
                     Logger.WriteSensorLine(Sensor, $"(PureAloha) Канал {CHANNEL_ID} занят, " +
-                        $"начинаю ожидание в {CHANNEL_TIMEOUT_IN_SECONDS} сек.");
+                        $"начинаю ожидание в {timeout} сек.");
 
                 Simulation.Instance.EventManager.AddEvent(new Event(
-                    Simulation.Instance.Time.AddSeconds(CHANNEL_TIMEOUT_IN_SECONDS),
+                    Simulation.Instance.Time.AddSeconds(timeout),
                     $"Повторная попытка отправки кадра сенсором #{Sensor.Id}",
                     () => SendFrame(frame, firstTime)));
 
