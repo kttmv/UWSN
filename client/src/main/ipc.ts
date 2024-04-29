@@ -23,6 +23,7 @@ function on(
 }
 
 function reply(event: IpcMainEvent, channel: ReplyChannels, arg: unknown) {
+    console.log(`IPC REPLY (${channel}):\n${JSON.stringify(arg)}`)
     event.reply(channel, arg)
 }
 // -----------------------------------------------------------------------------
@@ -51,6 +52,7 @@ on('run-simulator', (event, args) => {
 
     child.on('close', (code) => {
         console.log(`child process exited with code ${code}`)
+        reply(event, 'run-simulator-close', code)
     })
 })
 

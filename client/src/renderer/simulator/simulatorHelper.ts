@@ -1,7 +1,13 @@
 import { SensorPlacementDistributionType } from '../tabs/SensorPlacement'
 
-export function runSimulatorShell(args: string) {
-    window.electronAPI.ipcRenderer.send('run-simulator', args)
+export function runSimulatorShell(args: string): Promise<void> {
+    return new Promise((resolve) => {
+        window.electronAPI.ipcRenderer.once('run-simulator-close', () => {
+            resolve()
+        })
+
+        window.electronAPI.ipcRenderer.send('run-simulator', args)
+    })
 }
 
 export function runPlaceSensorsRandomStep(
@@ -12,28 +18,29 @@ export function runPlaceSensorsRandomStep(
     uniformA: number,
     uniformB: number,
     projectPath: string
-) {
+): Promise<void> {
     const distr = SensorPlacementDistributionType[distributionType]
+    let args = ''
 
     switch (Number(distributionType)) {
         case SensorPlacementDistributionType.Normal: {
-            runSimulatorShell(
+            args +=
                 `placeSensorsRndStep ${distr} ` +
-                    `${countX} ${countY} ${countZ} ` +
-                    `-f "${projectPath}"`
-            )
+                `${countX} ${countY} ${countZ} ` +
+                `-f "${projectPath}"`
             break
         }
         case SensorPlacementDistributionType.Uniform: {
-            runSimulatorShell(
+            args +=
                 `placeSensorsRndStep ${distr} ` +
-                    `${countX} ${countY} ${countZ} ${uniformA} ${uniformB} 32 ` +
-                    `-f "${projectPath}"`
-            )
+                `${countX} ${countY} ${countZ} ${uniformA} ${uniformB} 32 ` +
+                `-f "${projectPath}"`
             break
         }
         default: {
             throw new Error('Что-то пошло не так')
         }
     }
+
+    return runSimulatorShell(args)
 }

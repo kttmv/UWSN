@@ -16,6 +16,7 @@ declare global {
 
     type ReplyChannels =
         | 'run-simulator-reply'
+        | 'run-simulator-close'
         | 'read-file-reply'
         | 'open-file-dialog-reply'
         | 'save-file-dialog-reply'

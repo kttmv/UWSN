@@ -7,6 +7,7 @@ type State = {
     setProjectFilePath: (value: string) => void
     project: ProjectData | undefined
     setProject: (value: ProjectData) => void
+    updateProject: () => void
 }
 
 const useProjectStore = create<State>((set, get) => ({
@@ -37,6 +38,18 @@ const useProjectStore = create<State>((set, get) => ({
                 `Не удалось записать изменения в файл ${path}.`,
                 error
             )
+        }
+    },
+    updateProject: async () => {
+        const path = get().projectFilePath
+
+        try {
+            const content = await readFile(path)
+            const project = JSON.parse(content)
+
+            set(() => ({ project }))
+        } catch (error) {
+            console.error(`Не удалось прочитать файл ${path}.`, error)
         }
     }
 }))

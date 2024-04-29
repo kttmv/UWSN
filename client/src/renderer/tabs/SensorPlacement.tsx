@@ -33,7 +33,7 @@ export type SensorPlacementInputs = {
 }
 
 export default function SensorPlacement() {
-    const { projectFilePath } = useProjectStore()
+    const { projectFilePath, updateProject } = useProjectStore()
 
     const { register, handleSubmit, watch, formState } =
         useForm<SensorPlacementInputs>({
@@ -41,7 +41,7 @@ export default function SensorPlacement() {
             mode: 'all'
         })
 
-    const onSubmit: SubmitHandler<SensorPlacementInputs> = (data) => {
+    const onSubmit: SubmitHandler<SensorPlacementInputs> = async (data) => {
         const type = Number(data.selectedType)
 
         switch (type) {
@@ -54,7 +54,13 @@ export default function SensorPlacement() {
                     data.uniformA,
                     data.uniformB,
                     projectFilePath
-                )
+                ).then(() => {
+                    updateProject()
+                })
+                break
+            }
+            default: {
+                throw new Error('Что-то пошло не так')
             }
         }
     }
