@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using UWSN.Model.Sim;
 using UWSN.Utilities;
 
 namespace UWSN.Model.Protocols
@@ -36,6 +37,8 @@ namespace UWSN.Model.Protocols
 
             Sensor.FrameBuffer.Add(frame);
             Sensor.DataLink.ReceiveFrame(frame);
+
+            Simulation.Instance.Result!.TotalReceives += 1;
         }
 
         public void StartSending(Frame frame, int channelId)
@@ -58,6 +61,8 @@ namespace UWSN.Model.Protocols
                 Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра для всех");
             else
                 Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра для #{frame.ReceiverId}");
+
+            Simulation.Instance.Result!.TotalSends += 1;
         }
 
         public void DetectCollision()

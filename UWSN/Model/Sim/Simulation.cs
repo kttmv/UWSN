@@ -8,7 +8,7 @@ namespace UWSN.Model.Sim
 {
     public class Simulation
     {
-        private const int MAX_PROCESSED_EVENTS = 100_000;
+        private const int MAX_PROCESSED_EVENTS = 1_000_000;
 
         #region Simulation Singleton
 
@@ -45,6 +45,8 @@ namespace UWSN.Model.Sim
         /// Окружение симуляции
         /// </summary>
         public Environment Environment { get; set; }
+
+        public SimulationResult? Result { get; set; }
 
         [JsonIgnore]
         public EventManager EventManager { get; set; }
@@ -83,6 +85,8 @@ namespace UWSN.Model.Sim
         /// </summary>
         public void Run()
         {
+            Result = new SimulationResult();
+
             int i = 1;
             while (i < MAX_PROCESSED_EVENTS)
             {
@@ -109,16 +113,23 @@ namespace UWSN.Model.Sim
             {
                 Logger.WriteLine("Достигнут лимит событий. Симуляция остановлена");
             }
-            foreach (var sensor in Environment.Sensors)
-            {
-                Logger.WriteLine($"Sensor: {sensor.Id}");
-                foreach (var (Id, _) in sensor.Network.Neighbours)
-                {
-                    Logger.WriteLine($"Neighbour: {Id}");
-                }
 
-                break;
-            }
+            //foreach (var sensor in Environment.Sensors)
+            //{
+            //    Logger.WriteLine($"Sensor: {sensor.Id}");
+            //    foreach (var (Id, _) in sensor.Network.Neighbours)
+            //    {
+            //        Logger.WriteLine($"Neighbour: {Id}");
+            //    }
+
+            //    break;
+            //}
+
+            Logger.WriteLine("");
+            Logger.WriteLine("Результаты симуляции:");
+            Logger.WriteLine($"\tКоличество отправленных сообщений: {Result.TotalSends}");
+            Logger.WriteLine($"\tКоличество полученных сообщений: {Result.TotalReceives}");
+            Logger.WriteLine($"\tКоличество коллизий: {Result.TotalCollisions}");
         }
     }
 }

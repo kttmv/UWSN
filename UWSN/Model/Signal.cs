@@ -114,6 +114,8 @@ public class Signal
 
             Simulation.Instance.EventManager.RemoveEvent(EndReceiving);
         }
+
+        Simulation.Instance.Result!.TotalCollisions += 1;
     }
 
     private double CalculateDeliveryProbability(Sensor sensor)
