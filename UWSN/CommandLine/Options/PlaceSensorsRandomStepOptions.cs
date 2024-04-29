@@ -17,13 +17,13 @@ namespace UWSN.CommandLine.Options
         [Value(0, Required = true, HelpText = "Количество сенсоров по Z")]
         public int Count_Z { get; set; }
 
-        [Value(0, Required = true, HelpText = "Параметр А равномерного распределения")]
+        [Value(0, Required = false, HelpText = "Параметр А равномерного распределения")]
         public double UniParameterA { get; set; }
 
-        [Value(0, Required = true, HelpText = "Параметр B равномерного распределения")]
+        [Value(0, Required = false, HelpText = "Параметр B равномерного распределения")]
         public double UniParameterB { get; set; }
 
-        [Value(0, Required = true, HelpText = "Количество сенсоров")]
+        [Value(0, Required = false, HelpText = "Количество сенсоров")]
         public int SensorsCount { get; set; }
     }
 

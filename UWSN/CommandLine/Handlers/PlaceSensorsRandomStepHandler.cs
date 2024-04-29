@@ -36,15 +36,6 @@ public class PlaceSensorsRandomStepHandler
                 o.UniParameterA,
                 o.UniParameterB);
 
-        string distributionTypeString = o.DistributionType switch
-        {
-            (DistributionType.Normal) => "нормальному",
-            (DistributionType.Uniform) => "непрерывному равномерному",
-            _ => throw new NotImplementedException(),
-        };
-
-        Console.WriteLine($"Расстановка сенсоров ({o.SensorsCount}) по {distributionTypeString} распределению прошла успешно.");
-
         SerializationHelper.SaveSimulation(o.FilePath);
     }
 
@@ -108,6 +99,8 @@ public class PlaceSensorsRandomStepHandler
                 }
             }
         }
+		
+        Console.WriteLine($"Расстановка сенсоров ({countX * countY * countZ}) по нормальному распределению прошла успешно.");
 
         return sensors;
     }
@@ -161,6 +154,10 @@ public class PlaceSensorsRandomStepHandler
                 }
             }
         }
+		
+		
+
+        Console.WriteLine($"Расстановка сенсоров ({o.SensorsCount}) по непрерывному распределению прошла успешно.");
 
         return sensors;
     }

@@ -1,12 +1,10 @@
-import { Flex, TabPanel } from '@chakra-ui/react'
-import EnvironmentBoundaries from './EnvironmentBoundaries'
+import { TabPanel } from '@chakra-ui/react'
+import AreaLimits from './AreaLimits'
 
 export default function EnvironmentTab() {
     return (
         <TabPanel>
-            <Flex direction='column' gap={4}>
-                <EnvironmentBoundaries />
-            </Flex>
+            <AreaLimits />
         </TabPanel>
     )
 }

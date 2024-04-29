@@ -28,7 +28,8 @@ function reply(event: IpcMainEvent, channel: ReplyChannels, arg: unknown) {
 // -----------------------------------------------------------------------------
 
 on('run-simulator', (event, args) => {
-    console.log(args)
+    console.log('\nRUN SIMULATOR')
+    console.log('ARGS: ', args)
 
     const path = app.isPackaged
         ? 'simulator\\UWSN.exe'

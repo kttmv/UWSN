@@ -60,14 +60,9 @@ export default function Viewer3D() {
                                         ]}
                                     />
                                 ))}
-                                {/* <AreaLimits
-                                    v1={project.AreaLimits.Min}
-                                    v2={project.AreaLimits.Max}
-                                /> */}
                                 <GridRectangle
                                     v1={project.AreaLimits.Min}
                                     v2={project.AreaLimits.Max}
-                                    segments={30}
                                 />
                             </>
                         )}
@@ -94,8 +89,4 @@ export default function Viewer3D() {
             </Button>
         </Flex>
     )
-}
-
-function useSensorNodes() {
-    const { project } = useProjectStore()
 }

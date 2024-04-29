@@ -19,7 +19,7 @@ interface EnvironmentInputs {
     v2: Vector3Data
 }
 
-export default function EnvironmentBoundaries() {
+export default function AreaLimits() {
     const { register, handleSubmit, reset, formState } =
         useForm<EnvironmentInputs>({
             reValidateMode: 'onBlur',
@@ -168,6 +168,7 @@ export default function EnvironmentBoundaries() {
                         Необходимо ввести все значения
                     </FormErrorMessage>
                 </FormControl>
+
                 <Button
                     type='submit'
                     isDisabled={!formState.isValid || !formState.isDirty}
