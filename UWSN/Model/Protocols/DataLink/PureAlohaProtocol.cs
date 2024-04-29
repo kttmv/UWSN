@@ -8,7 +8,8 @@ namespace UWSN.Model.Protocols.DataLink
     public class PureAlohaProtocol : DataLinkProtocol
     {
         private const int CHANNEL_ID = 0;
-        private const int CHANNEL_TIMEOUT_IN_SECONDS = 1;
+        private const int CHANNEL_TIMEOUT_IN_SECONDS = 10;
+        private const double CHANNEL_TIMEOUT_RELATIVE_DEVIATION = 0.5;
         private const int ACK_TIMEOUT_IN_SECONDS = 20;
 
         [JsonIgnore]
@@ -64,17 +65,22 @@ namespace UWSN.Model.Protocols.DataLink
             SendFrame(frame, true);
         }
 
-        /// <summary>
-        /// УЧЕСТЬ РЕСИВЕР АЙДИ -1
-        /// </summary>
-        /// <param name="frame"></param>
-        /// <param name="firstTime"></param>
         public void SendFrame(Frame frame, bool firstTime)
         {
             if (firstTime)
-                Logger.WriteSensorLine(Sensor, $"(PureAloha) отправляю кадр для #{frame.ReceiverId}");
+            {
+                if (frame.ReceiverId == -1)
+                    Logger.WriteSensorLine(Sensor, $"(PureAloha) отправляю кадр для всех");
+                else
+                    Logger.WriteSensorLine(Sensor, $"(PureAloha) отправляю кадр для #{frame.ReceiverId}");
+            }
             else
-                Logger.WriteSensorLine(Sensor, $"(PureAloha) повторно отправляю кадр для #{frame.ReceiverId}");
+            {
+                if (frame.ReceiverId == -1)
+                    Logger.WriteSensorLine(Sensor, $"(PureAloha) повторно отправляю кадр для всех");
+                else
+                    Logger.WriteSensorLine(Sensor, $"(PureAloha) повторно отправляю кадр для #{frame.ReceiverId}");
+            }
 
             bool ackIsBlocking = SensorsAwaitingAck.Count > 0 && frame.Type != Frame.FrameType.Ack;
 
@@ -82,14 +88,13 @@ namespace UWSN.Model.Protocols.DataLink
             if (Simulation.Instance.ChannelManager.IsChannelBusy(CHANNEL_ID) ||
                 ackIsBlocking)
             {
-                var rngTimeout = new Random().NextDouble() * 0.1;
-
+                double rngTimeout = (new Random().NextDouble() - 0.5) * CHANNEL_TIMEOUT_IN_SECONDS * CHANNEL_TIMEOUT_RELATIVE_DEVIATION;
                 double timeout = CHANNEL_TIMEOUT_IN_SECONDS + rngTimeout;
 
                 if (ackIsBlocking)
                     Logger.WriteSensorLine(Sensor, "(PureAloha) невозможно совершить отправку, " +
                         "так как есть неотправленные пакеты ACK. " +
-                        $"начинаю ожидание в {timeout} сек.");
+                        $"Попробую еще раз через {timeout} сек.");
                 else
                     Logger.WriteSensorLine(Sensor, $"(PureAloha) Канал {CHANNEL_ID} занят, " +
                         $"начинаю ожидание в {timeout} сек.");
