@@ -22,7 +22,7 @@ public class Signal
         ChannelId = channelId;
         ReceivingEvents = new();
 
-        double transmissionTime = Frame.FRAME_SIZE_IN_BITS / Simulation.Instance.Modem.Bitrate * 1024.0; // TODO: добавить вычисление времени передачи
+        double transmissionTime = Frame.FRAME_SIZE_IN_BITS / (Simulation.Instance.Modem.Bitrate * 1024.0); // TODO: добавить вычисление времени передачи
 
         EndSending = new Event(
             Simulation.Instance.Time.AddSeconds(transmissionTime),
@@ -37,7 +37,10 @@ public class Signal
             if (sensor == Emitter)
                 continue;
 
-            if (new Random().NextDouble() > CalculateDeliveryProbability(sensor))
+            double probability = CalculateDeliveryProbability(sensor);
+            double random = new Random().NextDouble();
+
+            if (random > probability)
             {
                 continue;
             }
@@ -74,29 +77,27 @@ public class Signal
             receiversCount++;
         }
 
-        Simulation.Instance.EventManager.AddEvent(EndSending);
-
         if (receiversCount == 0)
         {
-            Simulation.Instance.EventManager.AddEvent(new Event(
-                Simulation.Instance.Time.AddMilliseconds(1),
-                $"Удаление сигнала из среды",
-                () => Simulation.Instance.ChannelManager.FreeChannel(ChannelId)));
-
+            Logger.WriteLine($"Менеджер сигналов: Сигнал от #{Emitter.Id} не дошел ни до одного сенсора. Канал {ChannelId} свободен.");
             return;
         }
+
+        Simulation.Instance.EventManager.AddEvent(EndSending);
+
+        var timeFreeChannel = timeEndReceivingMax;
 
         // TODO: уточнить когда освобождать
         // возможно когда сигнал выходит за границы окружения
         Simulation.Instance.EventManager.AddEvent(new Event(
-            timeEndReceivingMax.AddSeconds(1),
+            timeFreeChannel,
             $"Удаление сигнала из среды",
             () => Simulation.Instance.ChannelManager.FreeChannel(ChannelId)));
-    }
 
-    public void Emit()
-    {
         Simulation.Instance.ChannelManager.OccupyChannel(ChannelId, this);
+        Logger.WriteLine($"Менеджер сигналов: Сигнал от #{Emitter.Id} занял канал {ChannelId}.\n" +
+            $"\tКоличество получателей сигнала: {receiversCount}.\n" +
+            $"\tКанал будет особожден в {timeFreeChannel:dd.MM.yyyy HH:mm:ss.fff}.");
     }
 
     public void DetectCollision()

@@ -44,19 +44,25 @@ namespace UWSN.Model.Protocols
         {
             CurrentState = State.Emitting;
 
+            if (frame.ReceiverId == -1)
+                Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра для всех");
+            else
+                Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра для #{frame.ReceiverId}");
             Sensor.Battery -= 0.15;
 
             Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра для #{frame.ReceiverId}");
 
-            var signal = new Signal(Sensor, frame, channelId);
-            signal.Emit();
+            _ = new Signal(Sensor, frame, channelId);
         }
 
         public void EndSending(Frame frame)
         {
             CurrentState = State.Listening;
 
-            Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра для #{frame.ReceiverId}");
+            if (frame.ReceiverId == -1)
+                Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра для всех");
+            else
+                Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра для #{frame.ReceiverId}");
         }
 
         public void DetectCollision()

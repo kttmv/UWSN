@@ -8,7 +8,7 @@ namespace UWSN.Model.Sim
 {
     public class Simulation
     {
-        private const int MAX_PROCESSED_EVENTS = 1000000;
+        private const int MAX_PROCESSED_EVENTS = 100_000;
 
         #region Simulation Singleton
 
@@ -30,7 +30,7 @@ namespace UWSN.Model.Sim
         #endregion Simulation Singleton
 
         #region Properties
-        
+
         public ModemBase Modem { get; set; }
 
         public TimeSpan SensorSampleInterval { get; set; }
@@ -112,10 +112,9 @@ namespace UWSN.Model.Sim
             foreach (var sensor in Environment.Sensors)
             {
                 Logger.WriteLine($"Sensor: {sensor.Id}");
-
-                foreach (var neighbour in sensor.Network.Neighbours)
+                foreach (var (Id, _) in sensor.Network.Neighbours)
                 {
-                    Logger.WriteLine($"Neighbour: {neighbour.Id}");
+                    Logger.WriteLine($"Neighbour: {Id}");
                 }
 
                 break;

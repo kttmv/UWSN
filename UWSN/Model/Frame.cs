@@ -20,6 +20,6 @@ namespace UWSN.Model
         public required int ReceiverId { get; set; }
         public required DateTime TimeSend { get; set; }
         public required bool AckIsNeeded { get; set; }
-        public required object Data { get; set; }
+        public required object? Data { get; set; }
     }
 }
