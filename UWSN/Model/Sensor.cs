@@ -21,6 +21,8 @@ namespace UWSN.Model
 
         public double Battery { get; set; }
 
+        public int ClusterId {  get; set; }
+
         private int _id;
 
         public int Id

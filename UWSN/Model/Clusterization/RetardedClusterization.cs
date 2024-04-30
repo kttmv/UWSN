@@ -19,8 +19,9 @@ namespace UWSN.Model.Clusterization
             // Y - ЭТО ГЛУБИНА
             double areaLength = areaLimits.Max.X - areaLimits.Min.X;
             double areaWidth = areaLimits.Max.Z - areaLimits.Min.Z;
-            double clusterLength = areaLength / n / 2;
-            double clusterWidth = areaWidth / n / 2;
+            // эта единица на конце - по сути сколько угодно малое число еписилон, чтобы сенсоры, расположенные на границах, не образовывали новый кластер
+            double clusterLength = areaLength / (n / 2) + 1;
+            double clusterWidth = areaWidth / (n / 2) + 1;
 
             var clusterIdEncoder = new List<string>();
 
@@ -42,10 +43,10 @@ namespace UWSN.Model.Clusterization
 
                 int clusterId = clusterIdEncoder.IndexOf(clusterIdEncoding);
 
-                sensor.Network.ClusterId = clusterId;
+                sensor.ClusterId = clusterId;
             }
 
-            var group = sensors.GroupBy(s => s.Network.ClusterId);
+            var group = sensors.GroupBy(s => s.ClusterId);
             foreach (var gr in group)
             {
                 gr.OrderBy(s => s.Position.Y).Last().Network.IsReference = true;

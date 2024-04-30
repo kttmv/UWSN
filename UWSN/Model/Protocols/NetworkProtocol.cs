@@ -25,14 +25,14 @@ public class NetworkProtocol : ProtocolBase
 
     public List<Neighbour> Neighbours;
 
-    public int ClusterId;
+    //public int ClusterId;
 
     public bool IsReference;
 
     public NetworkProtocol()
     {
         Neighbours = new();
-        ClusterId = -1;
+        //ClusterId = -1;
         IsReference = false;
     }
 
@@ -63,8 +63,7 @@ public class NetworkProtocol : ProtocolBase
                 {
                     SenderId = Sensor.Id,
                     SenderPosition = Sensor.Position,
-                    // почему тут 0
-                    ReceiverId = 0,
+                    ReceiverId = -1,
                     Type = Frame.FrameType.Hello,
                     TimeSend = Simulation.Instance.Time,
                     AckIsNeeded = false,
