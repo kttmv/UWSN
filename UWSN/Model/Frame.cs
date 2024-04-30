@@ -22,5 +22,6 @@ namespace UWSN.Model
         public required DateTime TimeSend { get; set; }
         public required bool AckIsNeeded { get; set; }
         public required List<Neighbour>? NeighboursData { get; set; }
+        public required double BatteryLeft { get; set; }
     }
 }

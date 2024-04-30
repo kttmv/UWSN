@@ -63,11 +63,13 @@ public class NetworkProtocol : ProtocolBase
                 {
                     SenderId = Sensor.Id,
                     SenderPosition = Sensor.Position,
+                    // почему тут 0
                     ReceiverId = 0,
                     Type = Frame.FrameType.Hello,
                     TimeSend = Simulation.Instance.Time,
                     AckIsNeeded = false,
-                    NeighboursData = Sensor.Network.Neighbours
+                    NeighboursData = Sensor.Network.Neighbours,
+                    BatteryLeft = Sensor.Battery
                 };
 
                 Sensor.DataLink.SendFrame(newFrame);

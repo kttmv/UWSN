@@ -77,7 +77,8 @@ namespace UWSN.Model
                 Type = Frame.FrameType.Hello,
                 TimeSend = Simulation.Instance.Time,
                 AckIsNeeded = false,
-                NeighboursData = Network.Neighbours
+                NeighboursData = Network.Neighbours,
+                BatteryLeft = Battery
             };
 
             Simulation.Instance.EventManager.AddEvent(new Event(

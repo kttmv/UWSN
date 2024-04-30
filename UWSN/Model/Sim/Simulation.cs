@@ -69,14 +69,16 @@ namespace UWSN.Model.Sim
 
             SimulationInstance = this;
 
-            ChannelManager = new ChannelManager();
+            //todo: если не задавать количество каналов в конструкторе, то оно всегда 0,
+            //как будто не считывается с Json
+            ChannelManager = new ChannelManager(2);
             EventManager = new EventManager();
 
             Environment = new Environment();
 
             AreaLimits = new Vector3Range(new Vector3(), new Vector3());
 
-            DataLinkProtocolType = typeof(PureAlohaProtocol);
+            DataLinkProtocolType = typeof(MultiChanneledAloha);
 
             SensorSampleInterval = new TimeSpan(0, 30, 0);
         }
