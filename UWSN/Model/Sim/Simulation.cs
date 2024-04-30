@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Newtonsoft.Json;
+using UWSN.Model.Clusterization;
 using UWSN.Model.Modems;
 using UWSN.Model.Protocols.DataLink;
 using UWSN.Utilities;
@@ -69,14 +70,16 @@ namespace UWSN.Model.Sim
 
             SimulationInstance = this;
 
-            ChannelManager = new ChannelManager();
+            //todo: если не задавать количество каналов в конструкторе, то оно всегда 0,
+            //как будто не считывается с Json
+            ChannelManager = new ChannelManager(2);
             EventManager = new EventManager();
 
             Environment = new Environment();
 
             AreaLimits = new Vector3Range(new Vector3(), new Vector3());
 
-            DataLinkProtocolType = typeof(PureAlohaProtocol);
+            DataLinkProtocolType = typeof(MultiChanneledAloha);
 
             SensorSampleInterval = new TimeSpan(0, 30, 0);
         }
@@ -131,6 +134,10 @@ namespace UWSN.Model.Sim
             Logger.WriteLine($"\tКоличество отправленных сообщений: {Result.TotalSends}");
             Logger.WriteLine($"\tКоличество полученных сообщений: {Result.TotalReceives}");
             Logger.WriteLine($"\tКоличество коллизий: {Result.TotalCollisions}");
+
+            var clust = new RetardedClusterization(4);
+
+            Environment.Sensors = clust.Clusterize(Environment.Sensors, AreaLimits);
         }
     }
 }

@@ -80,6 +80,19 @@ namespace UWSN.CommandLine.Handlers
                         var y = al.Min.Y + (float)((j * stepRange) + NextDouble(rnd, -stepRange / 2, stepRange / 2));
                         var z = al.Min.Z + (float)((k * stepRange) + NextDouble(rnd, -stepRange / 2, stepRange / 2));
 
+                        if (x < al.Min.X)
+                            x = al.Min.X;
+                        if (x > al.Max.X)
+                            x = al.Max.X;
+                        if (y < al.Min.Y)
+                            y = al.Min.Y;
+                        if (y > al.Max.Y)
+                            y = al.Max.Y;
+                        if (z < al.Min.Z)
+                            z = al.Min.Z;
+                        if (z > al.Max.Z)
+                            z = al.Max.Z;
+
                         sensors[placedCount].Position = new Vector3(x, y, z);
 
                         placedCount++;

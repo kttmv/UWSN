@@ -10,7 +10,7 @@ public class ChannelManager
     /// <summary>
     /// Количество доступных каналов
     /// </summary>
-    public int NumberOfChannels { get; set; } = 1;
+    public int NumberOfChannels { get; set; }
 
     /// <summary>
     /// Отсортированные по каналам эммиты
@@ -22,12 +22,24 @@ public class ChannelManager
     {
         get
         {
-            return
-                Channels
-                .Select((Signal, Id) => (Signal, Id))
-                .Where(x => x.Signal == null)
-                .Select(x => x.Id)
-                .ToList();
+            var freeChannels = new List<int>();
+
+            foreach (var c in Channels)
+            {
+                if (c == null)
+                {
+                    freeChannels.Add(Channels.ToList().IndexOf(c));
+                }
+            }
+
+            return freeChannels;
+
+            //return
+            //    Channels
+            //    .Select((Signal, Id) => (Signal, Id))
+            //    .Where(x => x.Signal == null)
+            //    .Select(x => x.Id)
+            //    .ToList();
         }
     }
 
@@ -45,8 +57,9 @@ public class ChannelManager
         }
     }
 
-    public ChannelManager()
+    public ChannelManager(int numberOfChannels)
     {
+        NumberOfChannels = numberOfChannels;
         Channels = new Signal?[NumberOfChannels];
     }
 
