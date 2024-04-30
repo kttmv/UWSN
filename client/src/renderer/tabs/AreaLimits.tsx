@@ -11,12 +11,12 @@ import {
 import { IconBox } from '@tabler/icons-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Vector3Data } from '../shared/types/vector3Data'
+import { Vector3 } from '../shared/types/vector3'
 import useProjectStore from '../store/projectStore'
 
 interface EnvironmentInputs {
-    v1: Vector3Data
-    v2: Vector3Data
+    v1: Vector3
+    v2: Vector3
 }
 
 export default function AreaLimits() {

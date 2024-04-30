@@ -1,10 +1,10 @@
 import { Box } from '@react-three/drei'
-import { Vector3Data } from '../shared/types/vector3Data'
+import { Vector3 } from '../shared/types/vector3'
 import useViewerSettingsStore from '../store/viewerSettingsStore'
 
 interface Props {
-    v1: Vector3Data
-    v2: Vector3Data
+    v1: Vector3
+    v2: Vector3
 }
 
 export default function GridRectangle({ v1, v2 }: Props) {
@@ -26,7 +26,7 @@ export default function GridRectangle({ v1, v2 }: Props) {
     const lengthY = Math.abs(v2Scaled.Y - v1Scaled.Y)
     const lengthZ = Math.abs(v2Scaled.Z - v1Scaled.Z)
 
-    const startingPosition: Vector3Data = {
+    const startingPosition: Vector3 = {
         X: Math.min(v1Scaled.X, v2Scaled.X) + lengthX / 2,
         Y: Math.min(v1Scaled.Y, v2Scaled.Y) + lengthY / 2,
         Z: Math.min(v1Scaled.Z, v2Scaled.Z) + lengthZ / 2

@@ -223,10 +223,10 @@ public class Signal
 
     private SimulationDelta GetOrCreateSignalDelta(DateTime time)
     {
-        if (!Simulation.Instance.Result!.Deltas.TryGetValue(time, out SimulationDelta? value))
+        if (!Simulation.Instance.Result!.AllDeltas.TryGetValue(time, out SimulationDelta? value))
         {
             value = new();
-            Simulation.Instance.Result.Deltas.Add(time, value);
+            Simulation.Instance.Result.AllDeltas.Add(time, value);
         }
 
         return value;

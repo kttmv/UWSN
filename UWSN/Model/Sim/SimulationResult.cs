@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace UWSN.Model.Sim;
@@ -27,12 +28,12 @@ public class SimulationResult
     public int TotalCollisions { get; set; }
     public List<Frame> AllFrames { get; set; }
     public List<SignalResult> AllSignals { get; set; }
-    public Dictionary<DateTime, SimulationDelta> Deltas { get; set; }
+    public Dictionary<DateTime, SimulationDelta> AllDeltas { get; set; }
 
     public SimulationResult()
     {
         AllFrames = new();
         AllSignals = new();
-        Deltas = new();
+        AllDeltas = new();
     }
 }
