@@ -50,10 +50,12 @@ namespace UWSN.Model.Protocols
             if (frame.ReceiverId == -1)
                 Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра для всех");
             else
-                Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра для #{frame.ReceiverId}");
-            Sensor.Battery -= 0.15;
+                Logger.WriteSensorLine(
+                    Sensor,
+                    $"(Physical) начал отправку кадра для #{frame.ReceiverId}"
+                );
 
-            Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра для #{frame.ReceiverId}");
+            Sensor.Battery -= 0.15;
 
             _ = new Signal(Sensor, frame, channelId);
         }
@@ -65,7 +67,10 @@ namespace UWSN.Model.Protocols
             if (frame.ReceiverId == -1)
                 Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра для всех");
             else
-                Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра для #{frame.ReceiverId}");
+                Logger.WriteSensorLine(
+                    Sensor,
+                    $"(Physical) закончил отправку кадра для #{frame.ReceiverId}"
+                );
 
             Simulation.Instance.Result!.TotalSends += 1;
         }
@@ -74,7 +79,10 @@ namespace UWSN.Model.Protocols
         {
             CurrentState = State.Listening;
 
-            Logger.WriteSensorLine(Sensor, $"(Physical) обнаружил коллизию и прекратил отправку/принятие кадра");
+            Logger.WriteSensorLine(
+                Sensor,
+                $"(Physical) обнаружил коллизию и прекратил отправку/принятие кадра"
+            );
         }
     }
 }

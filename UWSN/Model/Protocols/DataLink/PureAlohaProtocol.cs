@@ -47,7 +47,7 @@ namespace UWSN.Model.Protocols.DataLink
                     Type = Frame.FrameType.Ack,
                     TimeSend = Simulation.Instance.Time,
                     AckIsNeeded = false,
-                    Data = null
+                    NeighboursData = null
                 };
 
                 Logger.WriteSensorLine(Sensor, $"(PureAloha) начинаю отправку ACK для #{ack.ReceiverId}");

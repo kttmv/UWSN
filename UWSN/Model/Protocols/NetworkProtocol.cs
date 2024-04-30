@@ -11,8 +11,20 @@ namespace UWSN.Model.Protocols;
 
 public class NetworkProtocol : ProtocolBase
 {
-    public List<(int Id, Vector3 Position)> Neighbours;
-    
+    public struct Neighbour
+    {
+        public int Id { get; set; }
+        public Vector3 Position { get; set; }
+
+        public Neighbour(int id, Vector3 position)
+        {
+            Id = id;
+            Position = position;
+        }
+    }
+
+    public List<Neighbour> Neighbours;
+
     public int ClusterId;
 
     public bool IsReference;
@@ -28,17 +40,12 @@ public class NetworkProtocol : ProtocolBase
     {
         if (frame.Type == Frame.FrameType.Hello)
         {
-            if (Neighbours.Count == 0) 
+            if (Neighbours.Count == 0)
             {
-                Neighbours.Add((Sensor.Id, Sensor.Position));
+                Neighbours.Add(new(Sensor.Id, Sensor.Position));
             }
 
-            var newNeighbours = frame.Data as List<(int Id, Vector3 Position)>;
-
-            if (newNeighbours == null)
-            {
-                throw new Exception("Неправильный тип");
-            }
+            var newNeighbours = frame.NeighboursData ?? throw new Exception("Неправильный тип");
 
             bool shouldSendToAll = false;
             foreach (var neighbour in newNeighbours)
@@ -60,7 +67,7 @@ public class NetworkProtocol : ProtocolBase
                     Type = Frame.FrameType.Hello,
                     TimeSend = Simulation.Instance.Time,
                     AckIsNeeded = false,
-                    Data = Sensor.Network.Neighbours
+                    NeighboursData = Sensor.Network.Neighbours
                 };
 
                 Sensor.DataLink.SendFrame(newFrame);
@@ -70,6 +77,5 @@ public class NetworkProtocol : ProtocolBase
 
     public void SendFrame(Frame frame)
     {
-        
     }
 }

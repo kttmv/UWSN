@@ -77,15 +77,13 @@ namespace UWSN.Model
                 Type = Frame.FrameType.Hello,
                 TimeSend = Simulation.Instance.Time,
                 AckIsNeeded = false,
-                Data = Network.Neighbours
+                NeighboursData = Network.Neighbours
             };
 
             Simulation.Instance.EventManager.AddEvent(new Event(
                 default,
                 $"Отправка HELLO от #{frame.SenderId}",
                 () => DataLink.SendFrame(frame)));
-
-            
         }
     }
 }

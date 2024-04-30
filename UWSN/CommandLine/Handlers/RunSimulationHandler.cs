@@ -23,17 +23,9 @@ namespace UWSN.CommandLine.Handlers
                 sensor.WakeUp();
             }
 
-            //var clust = new RetardedClusterization(4);
-            //clust.Clusterize()
-
             Simulation.Instance.Run();
 
-            //for (int i = 0; i < 4000; i += 100)
-            //{
-            //    var prob = DeliveryProbabilityCalculator.Calculate(60.0, 12.8, new Vector3(0, 0, 0), new Vector3(0, 0, i), 25);
-            //    Console.Write(Math.Pow(prob, 256.0) + ",");
-            //}
-
+            SerializationHelper.SaveSimulation(o.FilePath);
         }
     }
 }
