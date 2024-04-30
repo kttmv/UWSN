@@ -20,7 +20,7 @@ export default function Viewer3DScaleSlider() {
     return (
         <Slider
             id='slider'
-            defaultValue={500}
+            defaultValue={scale}
             colorScheme='teal'
             onChange={(v) => setScale(v)}
             onMouseEnter={() => setShowTooltip(true)}

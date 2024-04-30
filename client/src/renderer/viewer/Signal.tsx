@@ -15,8 +15,8 @@ export default function Signal({ from, to }: Props) {
                     [to.X, to.Y, to.Z]
                 ]}
                 vertexColors={[
-                    [0, 0, 0],
-                    [0.2, 0.2, 0.2]
+                    [0.05, 0.05, 0.05],
+                    [0.2, 0.3, 0.3]
                 ]}
                 lineWidth={5}
             />
