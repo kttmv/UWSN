@@ -135,9 +135,9 @@ namespace UWSN.Model.Sim
             Logger.WriteLine($"\tКоличество полученных сообщений: {Result.TotalReceives}");
             Logger.WriteLine($"\tКоличество коллизий: {Result.TotalCollisions}");
 
-            var clust = new RetardedClusterization(4);
+            //var clust = new RetardedClusterization(4);
 
-            Environment.Sensors = clust.Clusterize(Environment.Sensors, AreaLimits);
+            //Environment.Sensors = clust.Clusterize(Environment.Sensors, AreaLimits);
         }
     }
 }

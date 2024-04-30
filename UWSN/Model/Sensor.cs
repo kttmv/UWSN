@@ -80,7 +80,8 @@ namespace UWSN.Model
                 TimeSend = Simulation.Instance.Time,
                 AckIsNeeded = false,
                 NeighboursData = Network.Neighbours,
-                BatteryLeft = Battery
+                BatteryLeft = Battery,
+                DeadSensors = null,
             };
 
             Simulation.Instance.EventManager.AddEvent(new Event(

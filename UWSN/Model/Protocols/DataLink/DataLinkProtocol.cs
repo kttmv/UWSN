@@ -5,5 +5,7 @@
         public abstract void ReceiveFrame(Frame frame);
 
         public abstract void SendFrame(Frame frame);
+
+        public abstract void StopAllAction();
     }
 }

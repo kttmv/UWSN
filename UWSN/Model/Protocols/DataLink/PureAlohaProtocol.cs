@@ -23,15 +23,20 @@ namespace UWSN.Model.Protocols.DataLink
             SensorsAwaitingAck = new List<int>();
         }
 
+        public override void StopAllAction()
+        {
+            Simulation.Instance.EventManager.RemoveEvent(WaitingForAckEvent);
+            WaitingForAckEvent = null;
+        }
+
         public override void ReceiveFrame(Frame frame)
         {
             if (WaitingForAckEvent != null
                 && frame.Type == Frame.FrameType.Ack
                 && frame.ReceiverId == Sensor.Id)
             {
-                Simulation.Instance.EventManager.RemoveEvent(WaitingForAckEvent);
-                WaitingForAckEvent = null;
-                Sensor.Physical.CurrentState = PhysicalProtocol.State.Idle;
+                StopAllAction();
+                Sensor.Physical.CurrentState = PhysicalProtocol.State.Listening;
                 Logger.WriteSensorLine(Sensor, $"(PureAloha) получил ACK от #{frame.SenderId}");
 
                 return;
@@ -49,6 +54,7 @@ namespace UWSN.Model.Protocols.DataLink
                     AckIsNeeded = false,
                     NeighboursData = null,
                     BatteryLeft = double.NaN,
+                    DeadSensors = null,
                 };
 
                 Logger.WriteSensorLine(Sensor, $"(PureAloha) начинаю отправку ACK для #{ack.ReceiverId}");
@@ -127,6 +133,9 @@ namespace UWSN.Model.Protocols.DataLink
 
         private void ResendFrame(Frame frame, int attemptsLeft)
         {
+            if (Sensor.Physical.CurrentState == PhysicalProtocol.State.Idle)
+                return;
+
             if (attemptsLeft == 0)
             {
                 Logger.WriteSensorLine(Sensor, $"(PureAloha) не получил ACK от #{frame.ReceiverId}. Ожидание прекращено.");

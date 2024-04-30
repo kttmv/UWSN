@@ -21,9 +21,17 @@ namespace UWSN.Model.Protocols
 
         [JsonIgnore]
         public State CurrentState { get; set; } = State.Listening;
+        [JsonIgnore]
+        public State OriginalState { get; set; }
+        public bool ShouldReceiveMessages { get; set; } = true;
 
         public void StartReceiving(Frame frame)
         {
+            if (!ShouldReceiveMessages)
+                return;
+
+            OriginalState = Sensor.Physical.CurrentState;
+
             CurrentState = State.Receiving;
 
             Sensor.Battery -= 0.1;
@@ -33,7 +41,10 @@ namespace UWSN.Model.Protocols
 
         public void EndReceiving(Frame frame)
         {
-            CurrentState = State.Listening;
+            if (!ShouldReceiveMessages)
+                return;
+
+            CurrentState = OriginalState;
 
             Logger.WriteSensorLine(Sensor, $"(Physical) принял кадр от #{frame.SenderId}");
 
@@ -45,6 +56,8 @@ namespace UWSN.Model.Protocols
 
         public void StartSending(Frame frame, int channelId)
         {
+            OriginalState = Sensor.Physical.CurrentState;
+
             CurrentState = State.Emitting;
 
             if (frame.ReceiverId == -1)
@@ -62,7 +75,7 @@ namespace UWSN.Model.Protocols
 
         public void EndSending(Frame frame)
         {
-            CurrentState = State.Listening;
+            CurrentState = OriginalState;
 
             if (frame.ReceiverId == -1)
                 Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра для всех");

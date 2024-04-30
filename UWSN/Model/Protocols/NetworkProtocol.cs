@@ -29,15 +29,117 @@ public class NetworkProtocol : ProtocolBase
 
     public bool IsReference;
 
+    public List<int> DeadSensors;
+
     public NetworkProtocol()
     {
         Neighbours = new();
+
         //ClusterId = -1;
         IsReference = false;
+        DeadSensors = new();
     }
 
     public void ReceiveFrame(Frame frame)
     {
+        if (Sensor.Battery < 5.0)
+        {
+            if (!DeadSensors.Contains(Sensor.Id))
+            {
+                DeadSensors.Add(Sensor.Id);
+            }
+
+            var newFrame = new Frame
+            {
+                SenderId = Sensor.Id,
+                SenderPosition = Sensor.Position,
+                ReceiverId = -1,
+                Type = Frame.FrameType.Warning,
+                TimeSend = Simulation.Instance.Time,
+                AckIsNeeded = false,
+                NeighboursData = Sensor.Network.Neighbours,
+                BatteryLeft = Sensor.Battery,
+                DeadSensors = Sensor.Network.DeadSensors,
+            };
+
+            Sensor.DataLink.SendFrame(newFrame);
+
+            Sensor.Physical.CurrentState = PhysicalProtocol.State.Idle;
+            Sensor.DataLink.StopAllAction();
+            Sensor.Physical.ShouldReceiveMessages = false;
+
+            return;
+        }
+
+        if (frame.BatteryLeft < 5.0)
+        {
+            if (!DeadSensors.Contains(frame.SenderId))
+            {
+                DeadSensors.Add(frame.SenderId);
+            }
+
+            var newFrame = new Frame
+            {
+                SenderId = Sensor.Id,
+                SenderPosition = Sensor.Position,
+                ReceiverId = -1,
+                Type = Frame.FrameType.Warning,
+                TimeSend = Simulation.Instance.Time,
+                AckIsNeeded = false,
+                NeighboursData = Sensor.Network.Neighbours,
+                BatteryLeft = Sensor.Battery,
+                DeadSensors = Sensor.Network.DeadSensors,
+            };
+
+            Sensor.DataLink.SendFrame(newFrame);
+
+            Sensor.Physical.CurrentState = PhysicalProtocol.State.Idle;
+            Sensor.DataLink.StopAllAction();
+            Sensor.Physical.ShouldReceiveMessages = false;
+
+            return;
+        }
+
+        if (frame.Type == Frame.FrameType.Warning)
+        {
+            var newDeads = frame.DeadSensors;
+
+            bool shouldSendToAll = false;
+            foreach (var dead in newDeads)
+            {
+                if (!DeadSensors.Contains(dead))
+                {
+                    DeadSensors.Add(dead);
+                    shouldSendToAll = true;
+                }
+            }
+
+            if (shouldSendToAll)
+            {
+                var newFrame = new Frame
+                {
+                    SenderId = Sensor.Id,
+                    SenderPosition = Sensor.Position,
+                    ReceiverId = -1,
+                    Type = Frame.FrameType.Warning,
+                    TimeSend = Simulation.Instance.Time,
+                    AckIsNeeded = false,
+                    NeighboursData = Sensor.Network.Neighbours,
+                    BatteryLeft = Sensor.Battery,
+                    DeadSensors = Sensor.Network.DeadSensors,
+                };
+
+                Sensor.DataLink.SendFrame(newFrame);
+
+                Sensor.Physical.CurrentState = PhysicalProtocol.State.Idle;
+                Sensor.DataLink.StopAllAction();
+                Sensor.Physical.ShouldReceiveMessages = false;
+
+                return;
+            }   
+
+        }
+
         if (frame.Type == Frame.FrameType.Hello)
         {
             if (Neighbours.Count == 0)
@@ -68,7 +170,8 @@ public class NetworkProtocol : ProtocolBase
                     TimeSend = Simulation.Instance.Time,
                     AckIsNeeded = false,
                     NeighboursData = Sensor.Network.Neighbours,
-                    BatteryLeft = Sensor.Battery
+                    BatteryLeft = Sensor.Battery,
+                    DeadSensors = null,
                 };
 
                 Sensor.DataLink.SendFrame(newFrame);

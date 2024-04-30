@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Xml.Linq;
 using UWSN.Model.Modems;
 using UWSN.Model.Protocols;
 using UWSN.Model.Sim;
@@ -204,14 +205,22 @@ public class Signal
     private double CalculateDeliveryProbability(Sensor sensor)
     {
         //return 1.0;
-
+        //Name = nameof(SMTUTestModem);
+        //CenterFrequency = 26.0;
+        //Bandwidth = 16.0;
+        //Bitrate = 13900.0;
+        //Range = 3.5;
+        //PowerTX = 35.0;
+        //PowerRX = 0.72;
+        //PowerSP = double.NaN;
+        //PowerATWU = double.NaN;
         // взяты значения параметров модели среды для тестового моделирования
         return DeliveryProbabilityCalculator.Calculate(
-            60.0,
-            12.8,
+            26.0,
+            13.9,
             sensor.Position,
             Emitter.Position,
-            25.0
+            35.0
         );
 
         //return DeliveryProbabilityCalculator.CaulculateSensorDistance(new AquaModem1000(),
