@@ -12,7 +12,8 @@ namespace UWSN.Model
             RegularFrame,
             Ack,
             Data,
-            Hello
+            Hello,
+            Warning
         }
 
         public required FrameType Type { get; set; }
@@ -23,5 +24,6 @@ namespace UWSN.Model
         public required bool AckIsNeeded { get; set; }
         public required List<Neighbour>? NeighboursData { get; set; }
         public required double BatteryLeft { get; set; }
+        public required List<int>? DeadSensors { get; set; }
     }
 }
