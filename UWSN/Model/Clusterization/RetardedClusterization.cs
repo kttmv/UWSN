@@ -12,27 +12,39 @@ namespace UWSN.Model.Clusterization
         /// <summary>
         /// Количество кластеров (чотное число)
         /// </summary>
-        public int n; 
+        public int NumberOfClusters { get; set; }
 
-        public List<Sensor> Clusterize(List<Sensor> sensors, Vector3Range areaLimits)
+        public List<Sensor> Clusterize(
+            List<Sensor> sensors,
+            Vector3Range areaLimits,
+            int numberOfClusters
+        )
         {
-            // Y - ЭТО ГЛУБИНА
+            if (numberOfClusters % 2 == 1)
+            {
+                throw new ArgumentException("Количество кластеров есть чотное число");
+            }
+
             double areaLength = areaLimits.Max.X - areaLimits.Min.X;
             double areaWidth = areaLimits.Max.Z - areaLimits.Min.Z;
-            // эта единица на конце - по сути сколько угодно малое число еписилон, чтобы сенсоры, расположенные на границах, не образовывали новый кластер
-            double clusterLength = areaLength / (n / 2) + 1;
-            double clusterWidth = areaWidth / (n / 2) + 1;
+
+            // эта единица на конце - по сути сколько угодно малое число еписилон,
+            // чтобы сенсоры, расположенные на границах, не образовывали новый кластер
+            double clusterLength = areaLength / (NumberOfClusters / 2) + 1;
+            double clusterWidth = areaWidth / (NumberOfClusters / 2) + 1;
 
             var clusterIdEncoder = new List<string>();
 
             foreach (var sensor in sensors)
             {
                 // уравнение по n
-                //areaLimits.Min.X + clusterLength * n = sensor.Position.x
-                //n = (sensor.position.x - areaLimints.Min.X) div ClusterLength
+                // areaLimits.Min.X + clusterLength * n = sensor.Position.x
+                // n = (sensor.position.x - areaLimints.Min.X) div ClusterLength
 
-                int idClusterX = (int)Math.Floor((sensor.Position.X - areaLimits.Min.X) / clusterLength);
-                int idClusterZ = (int)Math.Floor((sensor.Position.Z - areaLimits.Min.Z) / clusterWidth);
+                int idClusterX = (int)
+                    Math.Floor((sensor.Position.X - areaLimits.Min.X) / clusterLength);
+                int idClusterZ = (int)
+                    Math.Floor((sensor.Position.Z - areaLimits.Min.Z) / clusterWidth);
 
                 string clusterIdEncoding = idClusterX + "_" + idClusterZ;
 
@@ -43,25 +55,16 @@ namespace UWSN.Model.Clusterization
 
                 int clusterId = clusterIdEncoder.IndexOf(clusterIdEncoding);
 
-                sensor.ClusterId = clusterId;
+                sensor.NextClusterization = new() { ClusterId = clusterId };
             }
 
             var group = sensors.GroupBy(s => s.ClusterId);
             foreach (var gr in group)
             {
-                gr.OrderBy(s => s.Position.Y).Last().Network.IsReference = true;
+                gr.OrderBy(s => s.Position.Y).Last().NextClusterization!.IsReference = true;
             }
 
             return sensors;
-        }
-
-        public RetardedClusterization(int n)
-        {
-            if (n % 2 == 1)
-            {
-                throw new ArgumentException("Количество кластеров есть чотное число");
-            }
-            this.n = n;
         }
     }
 }

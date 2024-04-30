@@ -32,14 +32,19 @@ namespace UWSN.Model.Sim
 
         #region Properties
 
-        public ModemBase Modem { get; set; }
+        public ModemBase? Modem { get; set; }
 
         [JsonIgnore]
-        public List<ModemBase> AvailableModems { get; set; }
+        public List<ModemBase>? AvailableModems { get; set; }
 
         public TimeSpan SensorSampleInterval { get; set; }
 
         public Type DataLinkProtocolType { get; set; }
+
+        public Type ClusterizationAlgorithmType { get; set; }
+
+        [JsonIgnore]
+        public IClusterization ClusterizationAlgorithm { get; set; }
 
         public Vector3Range AreaLimits { get; set; }
 
@@ -80,6 +85,12 @@ namespace UWSN.Model.Sim
             AreaLimits = new Vector3Range(new Vector3(), new Vector3());
 
             DataLinkProtocolType = typeof(MultiChanneledAloha);
+            ClusterizationAlgorithmType = typeof(RetardedClusterization);
+
+            ClusterizationAlgorithm = (IClusterization)(
+                Activator.CreateInstance(Instance.ClusterizationAlgorithmType)
+                ?? throw new NullReferenceException("Тип алгоритма кластеризации не определен")
+            );
 
             SensorSampleInterval = new TimeSpan(0, 30, 0);
         }
@@ -138,6 +149,11 @@ namespace UWSN.Model.Sim
             //var clust = new RetardedClusterization(4);
 
             //Environment.Sensors = clust.Clusterize(Environment.Sensors, AreaLimits);
+        }
+
+        public void Clusterize()
+        {
+            ClusterizationAlgorithm.Clusterize(Environment.Sensors, AreaLimits, 4);
         }
     }
 }

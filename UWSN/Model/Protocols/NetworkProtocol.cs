@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UWSN.Model.Protocols;
 using UWSN.Model.Sim;
+using UWSN.Utilities;
+using static UWSN.Model.Sim.SimulationDelta;
 
 namespace UWSN.Model.Protocols;
 
@@ -27,7 +29,6 @@ public class NetworkProtocol : ProtocolBase
 
     //public int ClusterId;
 
-    public bool IsReference;
 
     public List<int> DeadSensors;
 
@@ -36,7 +37,6 @@ public class NetworkProtocol : ProtocolBase
         Neighbours = new();
 
         //ClusterId = -1;
-        IsReference = false;
         DeadSensors = new();
     }
 
@@ -64,9 +64,7 @@ public class NetworkProtocol : ProtocolBase
 
             Sensor.DataLink.SendFrame(newFrame);
 
-            Sensor.Physical.CurrentState = PhysicalProtocol.State.Idle;
-            Sensor.DataLink.StopAllAction();
-            Sensor.Physical.ShouldReceiveMessages = false;
+            StopAction();
 
             return;
         }
@@ -93,16 +91,15 @@ public class NetworkProtocol : ProtocolBase
 
             Sensor.DataLink.SendFrame(newFrame);
 
-            Sensor.Physical.CurrentState = PhysicalProtocol.State.Idle;
-            Sensor.DataLink.StopAllAction();
-            Sensor.Physical.ShouldReceiveMessages = false;
+            StopAction();
 
             return;
         }
 
         if (frame.Type == Frame.FrameType.Warning)
         {
-            var newDeads = frame.DeadSensors;
+            var newDeads =
+                frame.DeadSensors ?? throw new NullReferenceException("Неправильный тип данных");
 
             bool shouldSendToAll = false;
             foreach (var dead in newDeads)
@@ -131,13 +128,10 @@ public class NetworkProtocol : ProtocolBase
 
                 Sensor.DataLink.SendFrame(newFrame);
 
-                Sensor.Physical.CurrentState = PhysicalProtocol.State.Idle;
-                Sensor.DataLink.StopAllAction();
-                Sensor.Physical.ShouldReceiveMessages = false;
+                StopAction();
 
                 return;
-            }   
-
+            }
         }
 
         if (frame.Type == Frame.FrameType.Hello)
@@ -147,7 +141,8 @@ public class NetworkProtocol : ProtocolBase
                 Neighbours.Add(new(Sensor.Id, Sensor.Position));
             }
 
-            var newNeighbours = frame.NeighboursData ?? throw new Exception("Неправильный тип");
+            var newNeighbours =
+                frame.NeighboursData ?? throw new Exception("Неправильный тип данных");
 
             bool shouldSendToAll = false;
             foreach (var neighbour in newNeighbours)
@@ -176,10 +171,63 @@ public class NetworkProtocol : ProtocolBase
 
                 Sensor.DataLink.SendFrame(newFrame);
             }
+
+            if (Neighbours.Count == Simulation.Instance.Environment.Sensors.Count)
+            {
+                Clusterize();
+            }
         }
     }
 
-    public void SendFrame(Frame frame)
+    private void StopAction()
     {
+        Sensor.Physical.CurrentState = PhysicalProtocol.State.Idle;
+        Sensor.DataLink.StopAllAction();
+        Sensor.Physical.ShouldReceiveMessages = false;
+
+        Clusterize();
+    }
+
+    public void SendFrame(Frame frame) { }
+
+    private void Clusterize()
+    {
+        if (Sensor.NextClusterization == null)
+        {
+            Simulation.Instance.Clusterize();
+        }
+
+        if (Sensor.NextClusterization == null)
+        {
+            throw new NullReferenceException("Что-то пошло не так в процессе кластеризации");
+        }
+
+        Sensor.ClusterId = Sensor.NextClusterization.ClusterId;
+        Sensor.IsReference = Sensor.NextClusterization.IsReference;
+        Sensor.NextClusterization = null;
+
+        if (Sensor.IsReference.Value)
+        {
+            Logger.WriteSensorLine(
+                Sensor,
+                $"(Network) определил себя новым референсным узлом кластера {Sensor.ClusterId}"
+            );
+        }
+        else
+        {
+            Logger.WriteSensorLine(
+                Sensor,
+                $"(Network) определил себя к кластеру {Sensor.ClusterId}."
+            );
+        }
+
+        var time = Simulation.Instance.Time;
+        var delta = new ClusterizationDelta(
+            Sensor.Id,
+            Sensor.ClusterId.Value,
+            Sensor.IsReference.Value
+        );
+
+        Simulation.Instance.Result!.AllDeltas[time].ClusterizationDeltas.Add(delta);
     }
 }

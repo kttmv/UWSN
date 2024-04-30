@@ -26,12 +26,28 @@ public class SimulationDelta
         }
     }
 
+    public struct ClusterizationDelta
+    {
+        public int SensorId { get; set; }
+        public int ClusterId { get; set; }
+        public bool IsReference { get; set; }
+
+        public ClusterizationDelta(int sensorId, int clusterId, bool isReference)
+        {
+            SensorId = sensorId;
+            ClusterId = clusterId;
+            IsReference = isReference;
+        }
+    }
+
     public DateTime Time { get; set; }
     public List<SignalDelta> SignalDeltas { get; set; }
+    public List<ClusterizationDelta> ClusterizationDeltas { get; set; }
 
     public SimulationDelta(DateTime time)
     {
         SignalDeltas = new();
+        ClusterizationDeltas = new();
         Time = time;
     }
 }
