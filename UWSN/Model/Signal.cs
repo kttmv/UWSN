@@ -14,7 +14,7 @@ public class Signal
     private Frame Frame { get; }
     private int ChannelId { get; }
 
-    public Event EndSending { get; set; }
+    public Event? EndSending { get; set; }
     public List<(
         Sensor Receiver,
         Event StartReceiving,
@@ -31,12 +31,6 @@ public class Signal
         double transmissionTime =
             Frame.FRAME_SIZE_IN_BITS / (Simulation.Instance.Modem.Bitrate * 1024.0);
 
-        EndSending = new Event(
-            Simulation.Instance.Time.AddSeconds(transmissionTime),
-            $"Окончание отправки кадра сенсором #{Emitter.Id}",
-            () => Emitter.Physical.EndSending(Frame)
-        );
-
         var timeEndReceivingMax = default(DateTime);
 
         int receiversCount = 0;
@@ -45,18 +39,16 @@ public class Signal
             if (sensor == Emitter)
                 continue;
 
-            double probability = CalculateDeliveryProbability(sensor);
-            double random = new Random().NextDouble();
-
-            if (random > probability)
-            {
+            if (!CheckProbablity(sensor))
                 continue;
-            }
+
+            receiversCount++;
 
             double distance = Vector3.Distance(sensor.Position, Emitter.Position);
             var timeStartReceiving = Simulation.Instance.Time.AddSeconds(
                 distance / SPEED_OF_SOUND_IN_METERS_PER_SECOND
             );
+
             var timeEndReceiving = timeStartReceiving.AddSeconds(transmissionTime);
 
             if (timeEndReceiving > timeEndReceivingMax)
@@ -64,70 +56,39 @@ public class Signal
                 timeEndReceivingMax = timeEndReceiving;
             }
 
-            var startReceiving = new Event(
-                timeStartReceiving,
-                $"Начало получения сенсором #{sensor.Id} кадра от #{Emitter.Id}",
-                () =>
-                {
-                    if (sensor.Physical.CurrentState == PhysicalProtocol.State.Listening)
-                        sensor.Physical.StartReceiving(Frame);
-                    else
-                        Logger.WriteLine(
-                            $"Менеджер сигналов: Сенсор #{sensor.Id} находится не в состоянии прослушивания."
-                        );
-                }
-            );
-
+            // добавление сигнала в результат симуляции
             int id = Simulation.Instance.Result!.AllSignals.Count;
             Simulation.Instance.Result.AllSignals.Add(new(id, Emitter.Id, sensor.Id));
 
             var delta = GetOrCreateSignalDelta(timeStartReceiving);
             delta.SignalDeltas.Add(new(id, SimulationDelta.SignalDeltaType.Add));
 
-            var endReceiving = new Event(
-                timeEndReceiving,
-                $"Окончание получения сенсором #{sensor.Id} кадра от #{Emitter.Id}",
-                () =>
-                {
-                    var delta = GetOrCreateSignalDelta(timeEndReceiving);
-                    delta.SignalDeltas.Add(new(id, SimulationDelta.SignalDeltaType.Remove));
-
-                    sensor.Physical.EndReceiving(Frame);
-                }
-            );
+            // создание событий начала и окончания приема сообщения
+            var startReceiving = CreateStartReceivingEvent(sensor, timeStartReceiving);
+            var endReceiving = CreateEndReceivingEvent(sensor, timeEndReceiving, id);
 
             ReceivingEvents.Add(new(sensor, startReceiving, endReceiving));
-            Simulation.Instance.EventManager.AddEvent(startReceiving);
-            Simulation.Instance.EventManager.AddEvent(endReceiving);
-
-            receiversCount++;
         }
 
         if (receiversCount == 0)
         {
             Logger.WriteLine(
-                $"Менеджер сигналов: Сигнал от #{Emitter.Id} не дошел ни до одного сенсора. Канал {ChannelId} свободен."
+                $"Менеджер сигналов: Сигнал от #{Emitter.Id} не дошел "
+                    + $"ни до одного сенсора. Канал {ChannelId} свободен."
             );
+
             return;
         }
 
+        // добавляем фрейм в результат симуляции
         Simulation.Instance.Result!.AllFrames.Add(frame);
 
-        Simulation.Instance.EventManager.AddEvent(EndSending);
+        CreateEndSendingEvent(transmissionTime);
 
-        var timeFreeChannel = timeEndReceivingMax;
-
-        // TODO: уточнить когда освобождать
-        // возможно когда сигнал выходит за границы окружения
-        Simulation.Instance.EventManager.AddEvent(
-            new Event(
-                timeFreeChannel,
-                $"Удаление сигнала из среды",
-                () => Simulation.Instance.ChannelManager.FreeChannel(ChannelId)
-            )
-        );
+        DateTime timeFreeChannel = CreateFreeChannelEvent(timeEndReceivingMax);
 
         Simulation.Instance.ChannelManager.OccupyChannel(ChannelId, this);
+
         Logger.WriteLine(
             $"Менеджер сигналов: Сигнал от #{Emitter.Id} занял канал {ChannelId}.\n"
                 + $"\tКоличество получателей сигнала: {receiversCount}.\n"
@@ -135,8 +96,92 @@ public class Signal
         );
     }
 
+    private DateTime CreateFreeChannelEvent(DateTime timeEndReceivingMax)
+    {
+        var timeFreeChannel = timeEndReceivingMax;
+
+        Simulation.Instance.EventManager.AddEvent(
+            new Event(
+                timeFreeChannel,
+                $"Удаление сигнала из среды",
+                () => Simulation.Instance.ChannelManager.FreeChannel(ChannelId)
+            )
+        );
+        return timeFreeChannel;
+    }
+
+    private void CreateEndSendingEvent(double transmissionTime)
+    {
+        EndSending = new Event(
+            Simulation.Instance.Time.AddSeconds(transmissionTime),
+            $"Окончание отправки кадра сенсором #{Emitter.Id}",
+            () => Emitter.Physical.EndSending(Frame)
+        );
+
+        Simulation.Instance.EventManager.AddEvent(EndSending);
+    }
+
+    private bool CheckProbablity(Sensor sensor)
+    {
+        double probability = CalculateDeliveryProbability(sensor);
+        double random = new Random().NextDouble();
+
+        return random <= probability;
+    }
+
+    private Event CreateStartReceivingEvent(Sensor sensor, DateTime timeStartReceiving)
+    {
+        var startReceiving = new Event(
+            timeStartReceiving,
+            $"Начало получения сенсором #{sensor.Id} кадра от #{Emitter.Id}",
+            () => StartReceivingAction(sensor)
+        );
+
+        Simulation.Instance.EventManager.AddEvent(startReceiving);
+        return startReceiving;
+    }
+
+    private void StartReceivingAction(Sensor sensor)
+    {
+        if (sensor.Physical.CurrentState == PhysicalProtocol.State.Listening)
+        {
+            sensor.Physical.StartReceiving(Frame);
+        }
+        else
+        {
+            Logger.WriteLine(
+                $"Менеджер сигналов: Сенсор #{sensor.Id} находится не в состоянии прослушивания."
+            );
+        }
+    }
+
+    private Event CreateEndReceivingEvent(Sensor sensor, DateTime timeEndReceiving, int id)
+    {
+        var endReceiving = new Event(
+            timeEndReceiving,
+            $"Окончание получения сенсором #{sensor.Id} кадра от #{Emitter.Id}",
+            () => EndReceivingAction(sensor, timeEndReceiving, id)
+        );
+
+        Simulation.Instance.EventManager.AddEvent(endReceiving);
+        return endReceiving;
+    }
+
+    private void EndReceivingAction(Sensor sensor, DateTime timeEndReceiving, int id)
+    {
+        var delta = GetOrCreateSignalDelta(timeEndReceiving);
+        delta.SignalDeltas.Add(new(id, SimulationDelta.SignalDeltaType.Remove));
+
+        sensor.Physical.EndReceiving(Frame);
+    }
+
     public void DetectCollision()
     {
+        if (EndSending == null)
+        {
+            throw new NullReferenceException("Что-то пошло не так");
+        }
+
         Simulation.Instance.EventManager.RemoveEvent(EndSending);
         Emitter.Physical.DetectCollision();
 
