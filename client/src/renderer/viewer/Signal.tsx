@@ -14,7 +14,10 @@ export default function Signal({ from, to }: Props) {
                     [from.X, from.Y, from.Z],
                     [to.X, to.Y, to.Z]
                 ]}
-                color='black'
+                vertexColors={[
+                    [0, 0, 0],
+                    [0.2, 0.2, 0.2]
+                ]}
                 lineWidth={5}
             />
         </>
