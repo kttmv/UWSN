@@ -4,9 +4,10 @@ import { useProjectStore } from '../store/projectStore'
 import useViewerSettingsStore from '../store/viewerSettingsStore'
 import GridRectangle from './GridRectangle'
 import SensorNode from './SensorNode'
+import Signal from './Signal'
 
 export default function Viewer3DCanvas() {
-    const { project } = useProjectStore()
+    const { project, currentSimulationResultState } = useProjectStore()
 
     const { scale } = useViewerSettingsStore()
 
@@ -39,6 +40,28 @@ export default function Viewer3DCanvas() {
                             ]}
                         />
                     ))}
+
+                    {currentSimulationResultState.Signals.map((signal, i) => {
+                        const sender =
+                            project.Environment.Sensors[signal.SenderId]
+                        const receiver =
+                            project.Environment.Sensors[signal.ReceiverId]
+
+                        const from = {
+                            X: sender.Position.X / scale,
+                            Y: sender.Position.Y / scale,
+                            Z: sender.Position.Z / scale
+                        }
+
+                        const to = {
+                            X: receiver.Position.X / scale,
+                            Y: receiver.Position.Y / scale,
+                            Z: receiver.Position.Z / scale
+                        }
+
+                        return <Signal key={i} from={from} to={to} />
+                    })}
+
                     <GridRectangle
                         v1={project.AreaLimits.Min}
                         v2={project.AreaLimits.Max}

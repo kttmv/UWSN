@@ -75,10 +75,6 @@ function calculateCurrentSimulationResultState(
         }
     }
 
-    console.log(index)
-    console.log(project.Result.Deltas[index])
-    console.log(project.Result.Deltas)
-
     const state: SimulationResultState = {
         Time: project.Result.Deltas[index].Time,
         Signals: []
