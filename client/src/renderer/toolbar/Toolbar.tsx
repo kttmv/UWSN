@@ -5,7 +5,7 @@ import {
     showSaveFileDialog,
     writeFile
 } from '../shared/helpers/fsHelpers'
-import useProjectStore from '../store/projectStore'
+import { useProjectStore } from '../store/projectStore'
 import { createDefaultProject } from './createDefaultProject'
 
 export default function Toolbar() {

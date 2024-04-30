@@ -25,7 +25,7 @@ export type Project = {
               TotalCollisions: number
               AllFrames: Frame[]
               AllSignals: Signal[]
-              AllDeltas: Record<string, SimulationDelta>[]
+              Deltas: SimulationDelta[]
           }
         | undefined
 }

@@ -1,6 +1,6 @@
 import { Flex, Heading } from '@chakra-ui/react'
 import Console from '../console/Console'
-import useProjectStore from '../store/projectStore'
+import { useProjectStore } from '../store/projectStore'
 import ApplicationTabs from '../tabs/ApplicationTabs'
 import Toolbar from '../toolbar/Toolbar'
 import Viewer3D from '../viewer/Viewer3D'

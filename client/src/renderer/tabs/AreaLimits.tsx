@@ -12,7 +12,7 @@ import { IconBox } from '@tabler/icons-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { Vector3 } from '../shared/types/vector3'
-import useProjectStore from '../store/projectStore'
+import { useProjectStore } from '../store/projectStore'
 
 interface EnvironmentInputs {
     v1: Vector3
