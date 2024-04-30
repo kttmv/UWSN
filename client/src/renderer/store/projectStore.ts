@@ -13,6 +13,8 @@ type State = {
     setProjectFilePath: (value: string) => void
     setProject: (value: Project) => void
     updateProject: () => void
+
+    setDeltaIndex: (value: number) => void
 }
 
 export const useProjectStore = create<State>((set, get) => ({
@@ -21,6 +23,7 @@ export const useProjectStore = create<State>((set, get) => ({
 
     currentDeltaIndex: -1,
     currentSimulationResultState: {
+        Time: '0001-01-01T00:00:00.00',
         Signals: []
     },
 
@@ -49,20 +52,9 @@ export const useProjectStore = create<State>((set, get) => ({
     },
 
     setDeltaIndex: (index: number) => {
-        const state: SimulationResultState = {
-            Signals: []
-        }
-
-        if (index === -1) {
-            set({
-                currentDeltaIndex: index,
-                currentSimulationResultState: state
-            })
-        }
-
         const project = get().project
 
-        calculateCurrentSimulationResultState(index, project, state)
+        const state = calculateCurrentSimulationResultState(index, project)
 
         set({ currentDeltaIndex: index, currentSimulationResultState: state })
     }
@@ -70,11 +62,26 @@ export const useProjectStore = create<State>((set, get) => ({
 
 function calculateCurrentSimulationResultState(
     index: number,
-    project: Project | undefined,
-    state: SimulationResultState
+    project: Project | undefined
 ) {
     if (!project || !project.Result || index >= project.Result.Deltas.length) {
         throw new Error('Что-то пошло не так')
+    }
+
+    if (index === -1) {
+        return {
+            Time: '0001-01-01T00:00:00.00',
+            Signals: []
+        }
+    }
+
+    console.log(index)
+    console.log(project.Result.Deltas[index])
+    console.log(project.Result.Deltas)
+
+    const state: SimulationResultState = {
+        Time: project.Result.Deltas[index].Time,
+        Signals: []
     }
 
     for (let i = 0; i <= index; i++) {
@@ -104,6 +111,8 @@ function calculateCurrentSimulationResultState(
             }
         }
     }
+
+    return state
 }
 
 async function parseProjectFile(
