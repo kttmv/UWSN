@@ -10,7 +10,8 @@ public class SimulationDelta
 {
     public enum SignalDeltaType
     {
-        Add, Remove
+        Add,
+        Remove
     }
 
     public struct SignalDelta
@@ -25,10 +26,12 @@ public class SimulationDelta
         }
     }
 
+    public DateTime Time { get; set; }
     public List<SignalDelta> SignalDeltas { get; set; }
 
-    public SimulationDelta()
+    public SimulationDelta(DateTime time)
     {
         SignalDeltas = new();
+        Time = time;
     }
 }

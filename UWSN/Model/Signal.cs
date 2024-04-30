@@ -234,7 +234,7 @@ public class Signal
     {
         if (!Simulation.Instance.Result!.AllDeltas.TryGetValue(time, out SimulationDelta? value))
         {
-            value = new();
+            value = new(time);
             Simulation.Instance.Result.AllDeltas.Add(time, value);
         }
 

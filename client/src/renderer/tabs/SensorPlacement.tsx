@@ -10,7 +10,7 @@ import {
 import { IconVector } from '@tabler/icons-react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { runPlaceSensorsRandomStep } from '../simulator/simulatorHelper'
-import useProjectStore from '../store/projectStore'
+import { useProjectStore } from '../store/projectStore'
 import SensorPlacementRandomStep from './SensorPlacementRandomStep'
 
 export enum SensorPlacementType {

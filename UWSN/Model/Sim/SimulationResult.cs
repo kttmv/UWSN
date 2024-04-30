@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace UWSN.Model.Sim;
 
@@ -28,7 +28,14 @@ public class SimulationResult
     public int TotalCollisions { get; set; }
     public List<Frame> AllFrames { get; set; }
     public List<SignalResult> AllSignals { get; set; }
+
+    [JsonIgnore]
     public Dictionary<DateTime, SimulationDelta> AllDeltas { get; set; }
+
+    public List<SimulationDelta> Deltas
+    {
+        get { return AllDeltas.ToList().Select(x => x.Value).OrderBy(x => x.Time).ToList(); }
+    }
 
     public SimulationResult()
     {
