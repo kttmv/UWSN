@@ -6,27 +6,34 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UWSN.Model.Sim;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace UWSN.Utilities;
 
 public class SerializationHelper
 {
-    public static JsonSerializerSettings SerializerSettings
+    private static JsonSerializer Serializer
     {
         get
         {
-            return new JsonSerializerSettings
+            var serializer = new JsonSerializer
             {
                 TypeNameHandling = TypeNameHandling.Auto,
                 Formatting = Formatting.Indented
             };
+            serializer.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+
+            return serializer;
         }
     }
 
     public static void SaveSimulation(string path)
     {
-        string json = JsonConvert.SerializeObject(Simulation.Instance, SerializerSettings);
-        File.WriteAllText(path, json);
+        using (var sw = new StreamWriter(path))
+        using (var writer = new JsonTextWriter(sw))
+        {
+            Serializer.Serialize(writer, Simulation.Instance);
+        }
 
         Console.WriteLine($"Файл {path} успешно сохранен.");
     }
@@ -38,9 +45,10 @@ public class SerializationHelper
             throw new FileNotFoundException("Не удалось найти указанный файл.");
         }
 
-        using StreamReader reader = new(path);
-
-        var sim = JsonConvert.DeserializeObject<Simulation>(reader.ReadToEnd(), SerializerSettings)
-            ?? throw new NullReferenceException("Не удалось прочитать файл");
+        using (var sr = new StreamReader(path))
+        using (var reader = new JsonTextReader(sr))
+        {
+            Serializer.Deserialize<Simulation>(reader);
+        }
     }
 }
