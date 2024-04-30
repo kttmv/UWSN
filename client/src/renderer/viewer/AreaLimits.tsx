@@ -1,9 +1,9 @@
-import { Vector3Data } from '../shared/types/vector3Data'
+import { Vector3 } from '../shared/types/vector3'
 import GridRectangle from './GridRectangle'
 
 interface Props {
-    v1: Vector3Data
-    v2: Vector3Data
+    v1: Vector3
+    v2: Vector3
 }
 
 export default function AreaLimits({ v1, v2 }: Props) {

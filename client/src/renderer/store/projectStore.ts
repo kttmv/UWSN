@@ -1,12 +1,12 @@
 import { create } from 'zustand'
 import { readFile, writeFile } from '../shared/helpers/fsHelpers'
-import { ProjectData } from '../shared/types/projectData'
+import { Project } from '../shared/types/project'
 
 type State = {
     projectFilePath: string
     setProjectFilePath: (value: string) => void
-    project: ProjectData | undefined
-    setProject: (value: ProjectData) => void
+    project: Project | undefined
+    setProject: (value: Project) => void
     updateProject: () => void
 }
 
@@ -26,7 +26,7 @@ const useProjectStore = create<State>((set, get) => ({
             console.error(`Не удалось прочитать файл ${path}.`, error)
         }
     },
-    setProject: async (newProject: ProjectData) => {
+    setProject: async (newProject: Project) => {
         const path = get().projectFilePath
 
         try {

@@ -1,8 +1,8 @@
 import { NetworkProtocolType } from '../shared/types/networkProtocolType'
-import { ProjectData } from '../shared/types/projectData'
+import { Project } from '../shared/types/project'
 
 export function createDefaultProject() {
-    const project: ProjectData = {
+    const project: Project = {
         SensorSampleInterval: '00:10:00',
         NetworkProtocolType: NetworkProtocolType.PureAloha,
         AreaLimits: {
@@ -22,7 +22,8 @@ export function createDefaultProject() {
         },
         Environment: {
             Sensors: []
-        }
+        },
+        Result: undefined
     }
 
     return project
