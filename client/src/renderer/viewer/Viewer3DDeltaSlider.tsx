@@ -14,12 +14,8 @@ import { useProjectStore } from '../store/projectStore'
 export default function Viewer3DDeltaSlider() {
     const [showTooltip, setShowTooltip] = useState(false)
 
-    const {
-        project,
-        currentDeltaIndex,
-        currentSimulationResultState,
-        setDeltaIndex
-    } = useProjectStore()
+    const { project, simulationDeltaIndex, simulationState, setDeltaIndex } =
+        useProjectStore()
 
     if (!project?.Result) {
         throw new Error('Что-то пошло не так')
@@ -31,11 +27,11 @@ export default function Viewer3DDeltaSlider() {
     return (
         <Flex direction='row' gap={4}>
             <Button
-                isDisabled={currentDeltaIndex === min}
+                isDisabled={simulationDeltaIndex === min}
                 size='xs'
                 onClick={() => {
-                    if (currentDeltaIndex > min) {
-                        setDeltaIndex(currentDeltaIndex - 1)
+                    if (simulationDeltaIndex > min) {
+                        setDeltaIndex(simulationDeltaIndex - 1)
                     }
                 }}
             >
@@ -63,18 +59,18 @@ export default function Viewer3DDeltaSlider() {
                     color='white'
                     placement='top'
                     isOpen={showTooltip}
-                    label={`${currentSimulationResultState.Time.replace('T', ' ')}`}
+                    label={`${simulationState.Time.replace('T', ' ')}`}
                 >
                     <SliderThumb />
                 </Tooltip>
             </Slider>
 
             <Button
-                isDisabled={currentDeltaIndex === max}
+                isDisabled={simulationDeltaIndex === max}
                 size='xs'
                 onClick={() => {
-                    if (currentDeltaIndex < max) {
-                        setDeltaIndex(currentDeltaIndex + 1)
+                    if (simulationDeltaIndex < max) {
+                        setDeltaIndex(simulationDeltaIndex + 1)
                     }
                 }}
             >

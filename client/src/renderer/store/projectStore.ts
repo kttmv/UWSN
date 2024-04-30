@@ -1,14 +1,15 @@
 import { create } from 'zustand'
 import { readFile, writeFile } from '../shared/helpers/fsHelpers'
 import { Project } from '../shared/types/project'
-import { SimulationResultState } from '../shared/types/simulationResultState'
+import { Sensor } from '../shared/types/sensor'
+import { SimulationState } from '../shared/types/simulationResultState'
 
 type State = {
     projectFilePath: string
     project: Project | undefined
 
-    currentDeltaIndex: number
-    currentSimulationResultState: SimulationResultState
+    simulationDeltaIndex: number
+    simulationState: SimulationState
 
     setProjectFilePath: (value: string) => void
     setProject: (value: Project) => void
@@ -21,11 +22,8 @@ export const useProjectStore = create<State>((set, get) => ({
     projectFilePath: '',
     project: undefined,
 
-    currentDeltaIndex: -1,
-    currentSimulationResultState: {
-        Time: '0001-01-01T00:00:00.00',
-        Signals: []
-    },
+    simulationDeltaIndex: -1,
+    simulationState: createDefaultState(undefined),
 
     setProjectFilePath: async (path: string) => {
         await parseProjectFile(path, set)
@@ -54,48 +52,43 @@ export const useProjectStore = create<State>((set, get) => ({
     setDeltaIndex: (index: number) => {
         const project = get().project
 
-        const state = calculateCurrentSimulationResultState(index, project)
+        const state = calculateSimulationState(index, project)
 
-        set({ currentDeltaIndex: index, currentSimulationResultState: state })
+        set({ simulationDeltaIndex: index, simulationState: state })
     }
 }))
 
-function calculateCurrentSimulationResultState(
+function calculateSimulationState(
     index: number,
     project: Project | undefined
-) {
+): SimulationState {
     if (!project || !project.Result || index >= project.Result.Deltas.length) {
         throw new Error('Что-то пошло не так')
     }
 
     if (index === -1) {
-        return {
-            Time: '0001-01-01T00:00:00.00',
-            Signals: []
-        }
+        return createDefaultState(project)
     }
 
-    const state: SimulationResultState = {
-        Time: project.Result.Deltas[index].Time,
-        Signals: []
-    }
+    const state = createDefaultState(project)
 
     for (let i = 0; i <= index; i++) {
-        const signalDeltas = project.Result.Deltas[i].SignalDeltas
+        const simulationDelta = project.Result.Deltas[i]
 
-        for (const signalDelta of signalDeltas) {
-            switch (signalDelta.Type) {
+        const signalDeltas = simulationDelta.SignalDeltas
+        const clusterizationDeltas = simulationDelta.ClusterizationDeltas
+
+        for (const delta of signalDeltas) {
+            switch (delta.Type) {
                 case 'Add': {
-                    const signal =
-                        project.Result.AllSignals[signalDelta.SignalId]
+                    const signal = project.Result.AllSignals[delta.SignalId]
 
                     state.Signals.push(signal)
 
                     break
                 }
                 case 'Remove': {
-                    const signal =
-                        project.Result.AllSignals[signalDelta.SignalId]
+                    const signal = project.Result.AllSignals[delta.SignalId]
 
                     state.Signals = state.Signals.filter((x) => x !== signal)
 
@@ -105,6 +98,14 @@ function calculateCurrentSimulationResultState(
                     throw new Error('Что-то пошло не так')
                 }
             }
+        }
+
+        for (const delta of clusterizationDeltas) {
+            // const sensorData = project.Environment.Sensors[delta.SensorId]
+            const sensor = state.Sensors[delta.SensorId]
+
+            sensor.ClusterId = delta.ClusterId
+            sensor.IsReference = delta.IsReference
         }
     }
 
@@ -122,5 +123,25 @@ async function parseProjectFile(
         set(() => ({ project }))
     } catch (error) {
         console.error(`Не удалось прочитать файл ${path}.`, error)
+    }
+}
+
+function createDefaultState(project: Project | undefined): SimulationState {
+    let sensors: Sensor[] | undefined = undefined
+    if (project) {
+        sensors = project.Environment.Sensors.map((x) => ({
+            Id: x.Id,
+            Position: x.Position,
+            ClusterId: -1,
+            IsReference: false
+        }))
+    } else {
+        sensors = []
+    }
+
+    return {
+        Time: '0001-01-01T00:00:00.00',
+        Signals: [],
+        Sensors: sensors
     }
 }

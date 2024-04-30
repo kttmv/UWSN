@@ -7,7 +7,7 @@ import SensorNode from './SensorNode'
 import Signal from './Signal'
 
 export default function Viewer3DCanvas() {
-    const { project, currentSimulationResultState } = useProjectStore()
+    const { project, simulationState } = useProjectStore()
 
     const { scale } = useViewerSettingsStore()
 
@@ -30,9 +30,11 @@ export default function Viewer3DCanvas() {
             <OrbitControls makeDefault />
             {project && (
                 <>
-                    {project.Environment.Sensors.map((sensor) => (
+                    {simulationState.Sensors.map((sensor) => (
                         <SensorNode
                             key={sensor.Id}
+                            clusterId={sensor.ClusterId}
+                            isReference={sensor.IsReference}
                             position={[
                                 sensor.Position.X / scale,
                                 sensor.Position.Y / scale,
@@ -41,7 +43,7 @@ export default function Viewer3DCanvas() {
                         />
                     ))}
 
-                    {currentSimulationResultState.Signals.map((signal, i) => {
+                    {simulationState.Signals.map((signal, i) => {
                         const sender =
                             project.Environment.Sensors[signal.SenderId]
                         const receiver =

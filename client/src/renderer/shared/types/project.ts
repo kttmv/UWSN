@@ -1,6 +1,6 @@
 import { Frame } from './frame'
 import { NetworkProtocolType } from './networkProtocolType'
-import { Sensor } from './sensor'
+import { SensorData } from './sensorData'
 import { Signal } from './signal'
 import { SimulationDelta } from './simulationDelta'
 import { Vector3 } from './vector3'
@@ -16,7 +16,7 @@ export type Project = {
         NumberOfChannels: number
     }
     Environment: {
-        Sensors: Sensor[]
+        Sensors: SensorData[]
     }
     Result:
         | {
