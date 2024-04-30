@@ -1,4 +1,5 @@
 import { Card, useBreakpointValue } from '@chakra-ui/react'
+import { useProjectStore } from '../store/projectStore'
 import Viewer3DDeltaSlider from './Viewer3DDeltaSlider'
 
 export default function Viewer3DDeltaSettings() {
@@ -11,6 +12,12 @@ export default function Viewer3DDeltaSettings() {
         base: 'calc(100% - 10px)',
         lg: 'calc(100% - 34px)'
     })
+
+    const { project } = useProjectStore()
+
+    if (!project || !project.Result) {
+        return <></>
+    }
 
     return (
         <Card

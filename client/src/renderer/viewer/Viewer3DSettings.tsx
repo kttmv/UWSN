@@ -20,7 +20,7 @@ export default function Viewer3DSettings() {
                     <IconSettings />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent>
+            <PopoverContent padding='10px'>
                 <PopoverArrow />
                 <PopoverCloseButton />
                 <PopoverHeader> Настройки </PopoverHeader>
