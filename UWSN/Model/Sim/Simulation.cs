@@ -33,6 +33,9 @@ namespace UWSN.Model.Sim
 
         public ModemBase Modem { get; set; }
 
+        [JsonIgnore]
+        public List<ModemBase> AvailableModems { get; set; }
+
         public TimeSpan SensorSampleInterval { get; set; }
 
         public Type DataLinkProtocolType { get; set; }
@@ -76,8 +79,6 @@ namespace UWSN.Model.Sim
             DataLinkProtocolType = typeof(PureAlohaProtocol);
 
             SensorSampleInterval = new TimeSpan(0, 30, 0);
-
-            Modem = new AquaModem1000();
         }
 
         /// <summary>

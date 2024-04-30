@@ -138,7 +138,7 @@ namespace UWSN.Utilities
             return area;
         }
 
-        public static double CaulculateSensorDistance(ModemBase modem, Vector3Range arealimits, double s = 0.5, double w = 0.0, double k = 1.0)
+        public static double CaulculateSensorDistance(ModemBase modem, Vector3Range arealimits, double s = 0.5, double w = 0.0, double k = 2.0)
         {
             //Попробуйте посчитать расстояние для мощности - 35 Вт, частоты - 26 кГц,
             //полосы пропускания – 16 кГц, SNR – 18,1 ДБ, битовой скорости 13,9 кБит.
@@ -162,10 +162,10 @@ namespace UWSN.Utilities
             // чо делать с пустыми значениями характеристик модемов - неясно
 
             // тестовый модем
-            f = 26.0;
-            ps = 35.0;
-            b = 16.0;
-            fbit = 13900;
+            //f = 26.0;
+            //ps = 35.0;
+            //b = 16.0;
+            //fbit = 13900;
 
             double bf = 10 * Math.Log10(b / fbit);
 
