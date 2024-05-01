@@ -9,11 +9,6 @@ namespace UWSN.Model.Clusterization
 {
     public class RetardedClusterization : IClusterization
     {
-        /// <summary>
-        /// Количество кластеров (чотное число)
-        /// </summary>
-        public int NumberOfClusters { get; set; }
-
         public List<Sensor> Clusterize(
             List<Sensor> sensors,
             Vector3Range areaLimits,
@@ -30,8 +25,8 @@ namespace UWSN.Model.Clusterization
 
             // эта единица на конце - по сути сколько угодно малое число еписилон,
             // чтобы сенсоры, расположенные на границах, не образовывали новый кластер
-            double clusterLength = areaLength / (NumberOfClusters / 2) + 1;
-            double clusterWidth = areaWidth / (NumberOfClusters / 2) + 1;
+            double clusterLength = areaLength / (numberOfClusters / 2) + 1;
+            double clusterWidth = areaWidth / (numberOfClusters / 2) + 1;
 
             var clusterIdEncoder = new List<string>();
 
@@ -58,8 +53,8 @@ namespace UWSN.Model.Clusterization
                 sensor.NextClusterization = new() { ClusterId = clusterId };
             }
 
-            var group = sensors.GroupBy(s => s.ClusterId);
-            foreach (var gr in group)
+            var groups = sensors.GroupBy(s => s.NextClusterization!.ClusterId);
+            foreach (var gr in groups)
             {
                 gr.OrderBy(s => s.Position.Y).Last().NextClusterization!.IsReference = true;
             }

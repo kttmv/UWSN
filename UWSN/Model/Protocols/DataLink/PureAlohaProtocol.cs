@@ -25,15 +25,20 @@ namespace UWSN.Model.Protocols.DataLink
 
         public override void StopAllAction()
         {
+            if (WaitingForAckEvent == null)
+                return;
+
             Simulation.Instance.EventManager.RemoveEvent(WaitingForAckEvent);
             WaitingForAckEvent = null;
         }
 
         public override void ReceiveFrame(Frame frame)
         {
-            if (WaitingForAckEvent != null
+            if (
+                WaitingForAckEvent != null
                 && frame.Type == Frame.FrameType.Ack
-                && frame.ReceiverId == Sensor.Id)
+                && frame.ReceiverId == Sensor.Id
+            )
             {
                 StopAllAction();
                 Sensor.Physical.CurrentState = PhysicalProtocol.State.Listening;
@@ -57,7 +62,10 @@ namespace UWSN.Model.Protocols.DataLink
                     DeadSensors = null,
                 };
 
-                Logger.WriteSensorLine(Sensor, $"(PureAloha) начинаю отправку ACK для #{ack.ReceiverId}");
+                Logger.WriteSensorLine(
+                    Sensor,
+                    $"(PureAloha) начинаю отправку ACK для #{ack.ReceiverId}"
+                );
 
                 SensorsAwaitingAck.Add(ack.ReceiverId);
 
@@ -79,37 +87,54 @@ namespace UWSN.Model.Protocols.DataLink
                 if (frame.ReceiverId == -1)
                     Logger.WriteSensorLine(Sensor, $"(PureAloha) отправляю кадр для всех");
                 else
-                    Logger.WriteSensorLine(Sensor, $"(PureAloha) отправляю кадр для #{frame.ReceiverId}");
+                    Logger.WriteSensorLine(
+                        Sensor,
+                        $"(PureAloha) отправляю кадр для #{frame.ReceiverId}"
+                    );
             }
             else
             {
                 if (frame.ReceiverId == -1)
                     Logger.WriteSensorLine(Sensor, $"(PureAloha) повторно отправляю кадр для всех");
                 else
-                    Logger.WriteSensorLine(Sensor, $"(PureAloha) повторно отправляю кадр для #{frame.ReceiverId}");
+                    Logger.WriteSensorLine(
+                        Sensor,
+                        $"(PureAloha) повторно отправляю кадр для #{frame.ReceiverId}"
+                    );
             }
 
             bool ackIsBlocking = SensorsAwaitingAck.Count > 0 && frame.Type != Frame.FrameType.Ack;
 
             // если канал занят или необходимо отправить ACK, то ждем и повторяем попытку
-            if (Simulation.Instance.ChannelManager.IsChannelBusy(CHANNEL_ID) ||
-                ackIsBlocking)
+            if (Simulation.Instance.ChannelManager.IsChannelBusy(CHANNEL_ID) || ackIsBlocking)
             {
-                double rngTimeout = (new Random().NextDouble() - 0.5) * CHANNEL_TIMEOUT_IN_SECONDS * CHANNEL_TIMEOUT_RELATIVE_DEVIATION;
+                double rngTimeout =
+                    (new Random().NextDouble() - 0.5)
+                    * CHANNEL_TIMEOUT_IN_SECONDS
+                    * CHANNEL_TIMEOUT_RELATIVE_DEVIATION;
                 double timeout = CHANNEL_TIMEOUT_IN_SECONDS + rngTimeout;
 
                 if (ackIsBlocking)
-                    Logger.WriteSensorLine(Sensor, "(PureAloha) невозможно совершить отправку, " +
-                        "так как есть неотправленные пакеты ACK. " +
-                        $"Попробую еще раз через {timeout} сек.");
+                    Logger.WriteSensorLine(
+                        Sensor,
+                        "(PureAloha) невозможно совершить отправку, "
+                            + "так как есть неотправленные пакеты ACK. "
+                            + $"Попробую еще раз через {timeout} сек."
+                    );
                 else
-                    Logger.WriteSensorLine(Sensor, $"(PureAloha) Канал {CHANNEL_ID} занят, " +
-                        $"начинаю ожидание в {timeout} сек.");
+                    Logger.WriteSensorLine(
+                        Sensor,
+                        $"(PureAloha) Канал {CHANNEL_ID} занят, "
+                            + $"начинаю ожидание в {timeout} сек."
+                    );
 
-                Simulation.Instance.EventManager.AddEvent(new Event(
-                    Simulation.Instance.Time.AddSeconds(timeout),
-                    $"Повторная попытка отправки кадра сенсором #{Sensor.Id}",
-                    () => SendFrame(frame, firstTime)));
+                Simulation.Instance.EventManager.AddEvent(
+                    new Event(
+                        Simulation.Instance.Time.AddSeconds(timeout),
+                        $"Повторная попытка отправки кадра сенсором #{Sensor.Id}",
+                        () => SendFrame(frame, firstTime)
+                    )
+                );
 
                 return;
             }
@@ -126,7 +151,10 @@ namespace UWSN.Model.Protocols.DataLink
 
             if (firstTime && frame.AckIsNeeded)
             {
-                Logger.WriteSensorLine(Sensor, $"(PureAloha) начинаю ожидать ACK от #{frame.ReceiverId}");
+                Logger.WriteSensorLine(
+                    Sensor,
+                    $"(PureAloha) начинаю ожидать ACK от #{frame.ReceiverId}"
+                );
                 CreateAckTimeout(frame, 3);
             }
         }
@@ -138,12 +166,18 @@ namespace UWSN.Model.Protocols.DataLink
 
             if (attemptsLeft == 0)
             {
-                Logger.WriteSensorLine(Sensor, $"(PureAloha) не получил ACK от #{frame.ReceiverId}. Ожидание прекращено.");
+                Logger.WriteSensorLine(
+                    Sensor,
+                    $"(PureAloha) не получил ACK от #{frame.ReceiverId}. Ожидание прекращено."
+                );
                 return;
             }
 
-            Logger.WriteSensorLine(Sensor, $"(PureAloha) ACK не был получен. Повторно отправляю кадр сенсору #{frame.ReceiverId}. " +
-                $"Попыток осталось: {attemptsLeft}");
+            Logger.WriteSensorLine(
+                Sensor,
+                $"(PureAloha) ACK не был получен. Повторно отправляю кадр сенсору #{frame.ReceiverId}. "
+                    + $"Попыток осталось: {attemptsLeft}"
+            );
 
             SendFrame(frame, false);
 
@@ -152,12 +186,16 @@ namespace UWSN.Model.Protocols.DataLink
 
         private void CreateAckTimeout(Frame frame, int attemptsLeft)
         {
-            Logger.WriteSensorLine(Sensor, $"(PureAloha) жду ACK от #{frame.ReceiverId} в течение {ACK_TIMEOUT_IN_SECONDS} сек.");
+            Logger.WriteSensorLine(
+                Sensor,
+                $"(PureAloha) жду ACK от #{frame.ReceiverId} в течение {ACK_TIMEOUT_IN_SECONDS} сек."
+            );
 
             WaitingForAckEvent = new Event(
                 Simulation.Instance.Time.AddSeconds(ACK_TIMEOUT_IN_SECONDS),
                 $"Проверка получения ACK сенсором #{Sensor.Id}",
-                () => ResendFrame(frame, attemptsLeft));
+                () => ResendFrame(frame, attemptsLeft)
+            );
 
             Simulation.Instance.EventManager.AddEvent(WaitingForAckEvent);
         }

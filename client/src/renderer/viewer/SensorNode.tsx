@@ -52,15 +52,15 @@ export default function SensorNode({
         <mesh
             position={position}
             ref={meshRef}
-            scale={active ? 1.25 : 1}
+            scale={active ? 2 : 1}
             onClick={() => setActive(!active)}
             onPointerOver={() => setHover(true)}
             onPointerOut={() => setHover(false)}
         >
             {!isReference && <boxGeometry args={[1, 1, 1]} />}
-            {isReference && <sphereGeometry args={[1.5]} />}
+            {isReference && <sphereGeometry args={[1]} />}
             <meshStandardMaterial
-                color={hovered ? 'pink' : active ? 'hotpink' : color}
+                color={hovered ? 'pink' : active ? 'white' : color}
             />
             <Edges />
         </mesh>

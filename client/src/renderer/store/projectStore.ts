@@ -11,11 +11,15 @@ type State = {
     simulationDeltaIndex: number
     simulationState: SimulationState
 
+    isShellRunning: boolean
+
     setProjectFilePath: (value: string) => void
     setProject: (value: Project) => void
     updateProject: () => void
 
     setDeltaIndex: (value: number) => void
+
+    setIsShellRunning: (value: boolean) => void
 }
 
 export const useProjectStore = create<State>((set, get) => ({
@@ -25,8 +29,11 @@ export const useProjectStore = create<State>((set, get) => ({
     simulationDeltaIndex: -1,
     simulationState: createDefaultState(undefined),
 
+    isShellRunning: false,
+
     setProjectFilePath: async (path: string) => {
         await parseProjectFile(path, set)
+        set({ projectFilePath: path })
     },
 
     updateProject: async () => {
@@ -55,6 +62,10 @@ export const useProjectStore = create<State>((set, get) => ({
         const state = calculateSimulationState(index, project)
 
         set({ simulationDeltaIndex: index, simulationState: state })
+    },
+
+    setIsShellRunning: (value: boolean) => {
+        set({ isShellRunning: value })
     }
 }))
 
@@ -62,15 +73,15 @@ function calculateSimulationState(
     index: number,
     project: Project | undefined
 ): SimulationState {
-    if (!project || !project.Result || index >= project.Result.Deltas.length) {
-        throw new Error('Что-то пошло не так')
-    }
-
-    if (index === -1) {
-        return createDefaultState(project)
-    }
-
     const state = createDefaultState(project)
+
+    if (!project || !project.Result || index === -1) {
+        return state
+    }
+
+    if (index >= project.Result.Deltas.length || index < -1) {
+        throw new Error('Неправильный индекс дельты симуляции')
+    }
 
     for (let i = 0; i <= index; i++) {
         const simulationDelta = project.Result.Deltas[i]
@@ -120,14 +131,20 @@ async function parseProjectFile(
         const content = await readFile(path)
         const project = JSON.parse(content)
 
-        set(() => ({ project }))
+        const state = calculateSimulationState(-1, project)
+
+        set(() => ({
+            simulationDeltaIndex: -1,
+            simulationState: state,
+            project
+        }))
     } catch (error) {
         console.error(`Не удалось прочитать файл ${path}.`, error)
     }
 }
 
 function createDefaultState(project: Project | undefined): SimulationState {
-    let sensors: Sensor[] | undefined = undefined
+    let sensors: Sensor[] | undefined
     if (project) {
         sensors = project.Environment.Sensors.map((x) => ({
             Id: x.Id,

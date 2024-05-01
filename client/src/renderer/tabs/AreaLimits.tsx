@@ -8,7 +8,7 @@ import {
     Input,
     Text
 } from '@chakra-ui/react'
-import { IconBox } from '@tabler/icons-react'
+import { IconArrowAutofitContent, IconBox } from '@tabler/icons-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { Vector3 } from '../shared/types/vector3'
@@ -30,6 +30,10 @@ export default function AreaLimits() {
     const dirtyFields = formState.dirtyFields
 
     const { project, setProject } = useProjectStore()
+
+    if (!project) {
+        throw new Error('что-то пошло не так')
+    }
 
     useEffect(() => {
         if (project) {
@@ -64,6 +68,49 @@ export default function AreaLimits() {
 
         setProject(newProject)
         reset(data)
+    }
+
+    const onAutoFitClick = () => {
+        const newProject = structuredClone(project)
+
+        if (!newProject) {
+            throw new Error()
+        }
+
+        const minX = Math.min(
+            ...project.Environment.Sensors.map((x) => x.Position.X)
+        )
+        const minY = Math.min(
+            ...project.Environment.Sensors.map((x) => x.Position.Y)
+        )
+        const minZ = Math.min(
+            ...project.Environment.Sensors.map((x) => x.Position.Z)
+        )
+
+        const maxX = Math.max(
+            ...project.Environment.Sensors.map((x) => x.Position.X)
+        )
+        const maxY = Math.max(
+            ...project.Environment.Sensors.map((x) => x.Position.Y)
+        )
+        const maxZ = Math.max(
+            ...project.Environment.Sensors.map((x) => x.Position.Z)
+        )
+
+        newProject.AreaLimits = {
+            Min: {
+                X: Number(minX),
+                Y: Number(minY),
+                Z: Number(minZ)
+            },
+            Max: {
+                X: Number(maxX),
+                Y: Number(maxY),
+                Z: Number(maxZ)
+            }
+        }
+
+        setProject(newProject)
     }
 
     return (
@@ -174,7 +221,16 @@ export default function AreaLimits() {
                     isDisabled={!formState.isValid || !formState.isDirty}
                 >
                     <IconBox />
-                    <Text m={1}>Применить</Text>
+                    <Text m={1}>Применить границы</Text>
+                </Button>
+
+                <Button
+                    type='button'
+                    isDisabled={project.Environment.Sensors.length === 0}
+                    onClick={onAutoFitClick}
+                >
+                    <IconArrowAutofitContent />
+                    <Text m={1}>Подогнать границы под сенсоры</Text>
                 </Button>
             </Flex>
         </form>
