@@ -1,15 +1,15 @@
 import { Button, Card, CardBody, Flex, Text } from '@chakra-ui/react'
 import { IconCaretDown, IconCaretUp } from '@tabler/icons-react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import useConsoleStore from '../store/consoleStore'
 
 export default function Console() {
-    const { consoleOutput, addLineToConsoleOutput } = useConsoleStore()
-    const [isOpen, setIsOpen] = useState(false)
+    const { isOpen, setIsOpen, consoleOutput, addLineToConsoleOutput } =
+        useConsoleStore()
 
     useEffect(() => {
         const removeListener = window.electronAPI.ipcRenderer.on(
-            'run-simulator-reply',
+            'run-shell-reply',
             (data) => {
                 addLineToConsoleOutput(data as string)
             }

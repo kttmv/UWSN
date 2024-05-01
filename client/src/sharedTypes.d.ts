@@ -8,15 +8,15 @@ declare global {
         electronAPI: ElectronHandler
     }
     type Channels =
-        | 'run-simulator'
+        | 'run-shell'
         | 'read-file'
         | 'open-file-dialog'
         | 'save-file-dialog'
         | 'write-file'
 
     type ReplyChannels =
-        | 'run-simulator-reply'
-        | 'run-simulator-close'
+        | 'run-shell-reply'
+        | 'run-shell-close'
         | 'read-file-reply'
         | 'open-file-dialog-reply'
         | 'save-file-dialog-reply'

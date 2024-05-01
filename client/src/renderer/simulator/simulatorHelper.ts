@@ -2,12 +2,16 @@ import { SensorPlacementDistributionType } from '../tabs/SensorPlacement'
 
 export function runSimulatorShell(args: string): Promise<void> {
     return new Promise((resolve) => {
-        window.electronAPI.ipcRenderer.once('run-simulator-close', () => {
+        window.electronAPI.ipcRenderer.once('run-shell-close', () => {
             resolve()
         })
 
-        window.electronAPI.ipcRenderer.send('run-simulator', args)
+        window.electronAPI.ipcRenderer.send('run-shell', args)
     })
+}
+
+export function runSimulation(projectPath: string): Promise<void> {
+    return runSimulatorShell(`runSim -f "${projectPath}"`)
 }
 
 export function runPlaceSensorsRandomStep(

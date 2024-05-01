@@ -1,15 +1,26 @@
 import { Button, Card, Tooltip } from '@chakra-ui/react'
-import { IconFile, IconFolderOpen } from '@tabler/icons-react'
+import { IconFile, IconFolderOpen, IconPlayerPlay } from '@tabler/icons-react'
 import {
     showOpenFileDialog,
     showSaveFileDialog,
     writeFile
 } from '../shared/helpers/fsHelpers'
+import { runSimulation } from '../simulator/simulatorHelper'
+import useConsoleStore from '../store/consoleStore'
 import { useProjectStore } from '../store/projectStore'
 import { createDefaultProject } from './createDefaultProject'
 
 export default function Toolbar() {
-    const { setProjectFilePath } = useProjectStore()
+    const {
+        project,
+        updateProject,
+        projectFilePath,
+        setProjectFilePath,
+        isShellRunning,
+        setIsShellRunning
+    } = useProjectStore()
+
+    const { setIsOpen: setConsoleIsOpen } = useConsoleStore()
 
     const onCreateNewClick = async () => {
         const result = await showSaveFileDialog({
@@ -37,16 +48,45 @@ export default function Toolbar() {
         }
     }
 
+    const onRunSimulationClick = async () => {
+        setIsShellRunning(true)
+        setConsoleIsOpen(true)
+        await runSimulation(projectFilePath)
+        setIsShellRunning(false)
+
+        updateProject()
+    }
+
+    const noSensors = project?.Environment.Sensors.length === 0
+    const noProject = project === undefined
+
+    const runSimulationLabel = noProject
+        ? 'Не выбран проект'
+        : noSensors
+          ? 'Отсутствуют сенсоры'
+          : isShellRunning
+            ? 'Консоль уже запущена'
+            : 'Запустить симуляцию'
+
     return (
-        <Card borderRadius={0} gap={1} p={1} flexDirection='row'>
+        <Card borderRadius={0} gap={2} p={1} flexDirection='row'>
             <Tooltip label='Создать новую симуляцию'>
                 <Button onClick={onCreateNewClick}>
                     <IconFile />
                 </Button>
             </Tooltip>
+
             <Tooltip label='Открыть симуляцию'>
                 <Button onClick={onOpenClick}>
                     <IconFolderOpen />
+                </Button>
+            </Tooltip>
+            <Tooltip label={runSimulationLabel}>
+                <Button
+                    onClick={onRunSimulationClick}
+                    isDisabled={noSensors || noProject || isShellRunning}
+                >
+                    <IconPlayerPlay />
                 </Button>
             </Tooltip>
         </Card>

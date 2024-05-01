@@ -10,6 +10,7 @@ import {
 import { IconVector } from '@tabler/icons-react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { runPlaceSensorsRandomStep } from '../simulator/simulatorHelper'
+import useConsoleStore from '../store/consoleStore'
 import { useProjectStore } from '../store/projectStore'
 import SensorPlacementRandomStep from './SensorPlacementRandomStep'
 
@@ -34,6 +35,7 @@ export type SensorPlacementInputs = {
 
 export default function SensorPlacement() {
     const { projectFilePath, updateProject } = useProjectStore()
+    const { setIsOpen: setConsoleIsOpen } = useConsoleStore()
 
     const { register, handleSubmit, watch, formState } =
         useForm<SensorPlacementInputs>({
@@ -63,6 +65,8 @@ export default function SensorPlacement() {
                 throw new Error('Что-то пошло не так')
             }
         }
+
+        setConsoleIsOpen(true)
     }
 
     const selectedType = Number(watch('selectedType'))

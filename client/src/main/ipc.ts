@@ -28,7 +28,7 @@ function reply(event: IpcMainEvent, channel: ReplyChannels, arg: unknown) {
 }
 // -----------------------------------------------------------------------------
 
-on('run-simulator', (event, args) => {
+on('run-shell', (event, args) => {
     console.log('\nRUN SIMULATOR')
     console.log('ARGS: ', args)
 
@@ -42,17 +42,17 @@ on('run-simulator', (event, args) => {
 
     child.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`)
-        reply(event, 'run-simulator-reply', data.toString())
+        reply(event, 'run-shell-reply', data.toString())
     })
 
     child.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`)
-        reply(event, 'run-simulator-reply', data.toString())
+        reply(event, 'run-shell-reply', data.toString())
     })
 
     child.on('close', (code) => {
         console.log(`child process exited with code ${code}`)
-        reply(event, 'run-simulator-close', code)
+        reply(event, 'run-shell-close', code)
     })
 })
 
