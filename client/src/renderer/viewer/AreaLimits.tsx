@@ -7,59 +7,61 @@ interface Props {
 }
 
 export default function AreaLimits({ v1, v2 }: Props) {
+    const padding = 1
+
     return (
         <>
             <GridRectangle
                 v1={v1}
                 v2={{
-                    X: v2.X + 0.5,
-                    Y: v2.Y + 0.5,
-                    Z: v1.Z - 0.5
+                    X: v2.X + padding,
+                    Y: v2.Y + padding,
+                    Z: v1.Z - padding
                 }}
             />
 
             <GridRectangle
                 v1={v1}
                 v2={{
-                    X: v2.X + 0.5,
-                    Y: v1.Y - 0.5,
-                    Z: v2.Z + 0.5
+                    X: v2.X + padding,
+                    Y: v1.Y - padding,
+                    Z: v2.Z + padding
                 }}
             />
 
             <GridRectangle
                 v1={v1}
                 v2={{
-                    X: v1.X - 0.5,
-                    Y: v2.Y + 0.5,
-                    Z: v1.Z - 0.5
+                    X: v1.X - padding,
+                    Y: v2.Y + padding,
+                    Z: v1.Z - padding
                 }}
             />
 
             <GridRectangle
                 v1={v2}
                 v2={{
-                    X: v2.X + 0.5,
-                    Y: v1.Y - 0.5,
-                    Z: v1.Z - 0.5
+                    X: v2.X + padding,
+                    Y: v1.Y - padding,
+                    Z: v1.Z - padding
                 }}
             />
 
             <GridRectangle
                 v1={v2}
                 v2={{
-                    X: v1.X - 0.5,
-                    Y: v2.Y + 0.5,
-                    Z: v1.Z - 0.5
+                    X: v1.X - padding,
+                    Y: v2.Y + padding,
+                    Z: v1.Z - padding
                 }}
             />
 
             <GridRectangle
                 v1={v2}
                 v2={{
-                    X: v1.X - 0.5,
-                    Y: v1.Y - 0.5,
-                    Z: v2.Z + 0.5
+                    X: v1.X - padding,
+                    Y: v1.Y - padding,
+                    Z: v2.Z + padding
                 }}
             />
         </>

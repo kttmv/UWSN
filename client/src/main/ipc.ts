@@ -8,6 +8,7 @@ import {
     SaveDialogOptions
 } from 'electron'
 import fs from 'fs'
+import os from 'os'
 
 // -----------------------------------------------------------------------------
 // Эти функции нужны для того, чтобы строго соблюдалась типизация каналов.
@@ -32,9 +33,16 @@ on('run-shell', (event, args) => {
     console.log('\nRUN SIMULATOR')
     console.log('ARGS: ', args)
 
+    const isWindows = os.platform() === 'win32'
+    const isLinux = os.platform() === 'linux'
+
     const path = app.isPackaged
-        ? 'simulator\\UWSN.exe'
-        : '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe'
+        ? isWindows
+            ? 'simulator\\UWSN.exe'
+            : 'simulator/UWSN'
+        : isWindows
+          ? '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe'
+          : 'dotnet run --project ../UWSN --'
 
     const child = spawn(`${path} ${args}`, [], {
         shell: true
@@ -43,6 +51,46 @@ on('run-shell', (event, args) => {
     child.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`)
         reply(event, 'run-shell-reply', data.toString())
+    })
+
+    child.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`)
+        reply(event, 'run-shell-reply', data.toString())
+    })
+
+    child.on('close', (code) => {
+        console.log(`child process exited with code ${code}`)
+        reply(event, 'run-shell-close', code)
+    })
+})
+
+on('run-shell-simulation', (event, args) => {
+    console.log('\nRUN SIMULATOR (NO STDOUT)')
+    console.log('ARGS: ', args)
+
+    const isWindows = os.platform() === 'win32'
+    const isLinux = os.platform() === 'linux'
+
+    const path = app.isPackaged
+        ? isWindows
+            ? 'simulator\\UWSN.exe'
+            : 'simulator/UWSN'
+        : isWindows
+          ? '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe'
+          : 'dotnet run --project ../UWSN --'
+
+    const child = spawn(`${path} ${args}`, [], {
+        shell: true
+    })
+
+    child.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`)
+        const match = data.toString().match(/Событие №(\d+)/);
+        if (match) {
+            const number = parseInt(match[1])
+            if (number % 1000 === 0)
+            reply(event, 'run-shell-reply', `Обработано событий: ${match[1]}`)
+        }
     })
 
     child.stderr.on('data', (data) => {

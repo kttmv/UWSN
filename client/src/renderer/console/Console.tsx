@@ -8,14 +8,28 @@ export default function Console() {
         useConsoleStore()
 
     useEffect(() => {
-        const removeListener = window.electronAPI.ipcRenderer.on(
+        const removeReplyListener = window.electronAPI.ipcRenderer.on(
             'run-shell-reply',
             (data) => {
                 addLineToConsoleOutput(data as string)
             }
         )
 
-        return removeListener
+        const removeCloseListener = window.electronAPI.ipcRenderer.on(
+            'run-shell-close',
+            (data) => {
+                addLineToConsoleOutput(
+                    `Процесс завершен с кодом ${data as number}`
+                )
+            }
+        )
+
+        const remove = () => {
+            removeReplyListener()
+            removeCloseListener()
+        }
+
+        return remove
     }, [])
 
     return (
