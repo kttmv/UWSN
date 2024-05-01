@@ -56,6 +56,9 @@ namespace UWSN.Model.Protocols
 
         public void StartSending(Frame frame, int channelId)
         {
+            if (Sensor.Battery < 5.0)
+                return;
+
             OriginalState = Sensor.Physical.CurrentState;
 
             CurrentState = State.Emitting;

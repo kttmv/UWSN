@@ -39,6 +39,8 @@ namespace UWSN.Model.Sim
 
         public TimeSpan SensorSampleInterval { get; set; }
 
+        public DateTime StartSamplingTime { get; set; } = new DateTime().AddDays(1);
+
         public Type DataLinkProtocolType { get; set; }
 
         public Type ClusterizationAlgorithmType { get; set; }

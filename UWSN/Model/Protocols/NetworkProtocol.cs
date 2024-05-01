@@ -60,6 +60,7 @@ public class NetworkProtocol : ProtocolBase
                 NeighboursData = Sensor.Network.Neighbours,
                 BatteryLeft = Sensor.Battery,
                 DeadSensors = Sensor.Network.DeadSensors,
+                Data = null,
             };
 
             Sensor.DataLink.SendFrame(newFrame);
@@ -87,6 +88,7 @@ public class NetworkProtocol : ProtocolBase
                 NeighboursData = Sensor.Network.Neighbours,
                 BatteryLeft = Sensor.Battery,
                 DeadSensors = Sensor.Network.DeadSensors,
+                Data = null,
             };
 
             Sensor.DataLink.SendFrame(newFrame);
@@ -94,6 +96,49 @@ public class NetworkProtocol : ProtocolBase
             StopAction();
 
             return;
+        }
+
+        if (frame.Type == Frame.FrameType.Data)
+        {
+            if ((bool)Sensor.IsReference)
+            {
+                Sensor.ReceivedData.Add(frame.Data);
+
+                return;
+            }
+
+            //имеем право?
+            var clusterMates = Simulation.Instance.Environment.Sensors.Where(s => s.ClusterId == Sensor.ClusterId).ToList();
+            int idRef = clusterMates.First(m => (bool)m.IsReference).Id;
+
+            var refPos = Sensor.Network.Neighbours.First(n => n.Id == idRef).Position;
+            double distToRef = Vector3.Distance(Sensor.Position, refPos);
+            int hopId = -1;
+            var neighboursByDistance = Sensor.Network.Neighbours.OrderBy(n => Vector3.Distance(Sensor.Position, n.Position));
+
+            foreach (var neighbour in neighboursByDistance)
+            {
+                if (Vector3.Distance(neighbour.Position, refPos) < distToRef && clusterMates.Count(m => m.Id == neighbour.Id) > 0)
+                {
+                    hopId = neighbour.Id;
+                }
+            }
+
+            var newFrame = new Frame
+            {
+                SenderId = Sensor.Id,
+                SenderPosition = Sensor.Position,
+                ReceiverId = hopId,
+                Type = Frame.FrameType.Data,
+                TimeSend = Simulation.Instance.Time,
+                AckIsNeeded = true,
+                NeighboursData = null,
+                BatteryLeft = Sensor.Battery,
+                DeadSensors = null,
+                Data = frame.Data,
+            };
+
+            Sensor.DataLink.SendFrame(newFrame);
         }
 
         if (frame.Type == Frame.FrameType.Warning)
@@ -124,6 +169,7 @@ public class NetworkProtocol : ProtocolBase
                     NeighboursData = Sensor.Network.Neighbours,
                     BatteryLeft = Sensor.Battery,
                     DeadSensors = Sensor.Network.DeadSensors,
+                    Data = null,
                 };
 
                 Sensor.DataLink.SendFrame(newFrame);
@@ -167,6 +213,7 @@ public class NetworkProtocol : ProtocolBase
                     NeighboursData = Sensor.Network.Neighbours,
                     BatteryLeft = Sensor.Battery,
                     DeadSensors = null,
+                    Data = null,
                 };
 
                 Sensor.DataLink.SendFrame(newFrame);

@@ -21,6 +21,11 @@ public class Sensor
 
     public double Battery { get; set; }
 
+    /// <summary>
+    /// Данные, полученные в ходе обмена данными. Только для референсов. Для проверки
+    /// </summary>
+    public List<string> ReceivedData { get; set; }
+
     [JsonIgnore]
     public int? ClusterId { get; set; }
 
@@ -65,6 +70,7 @@ public class Sensor
         Network = new NetworkProtocol();
         Id = id;
         Battery = 100.0;
+        ReceivedData = new List<string>();
     }
 
     public Sensor()
@@ -76,6 +82,7 @@ public class Sensor
         );
         Network = new NetworkProtocol();
         Battery = 100.0;
+        ReceivedData = new List<string>();
     }
 
     public void WakeUp()
@@ -91,6 +98,7 @@ public class Sensor
             NeighboursData = Network.Neighbours,
             BatteryLeft = Battery,
             DeadSensors = null,
+            Data = null,
         };
 
         Simulation.Instance.EventManager.AddEvent(
@@ -100,6 +108,61 @@ public class Sensor
                 () => DataLink.SendFrame(frame)
             )
         );
+
+        for (int i = 1; i < 2; i++)
+        {
+            Simulation.Instance.EventManager.AddEvent(
+                new Event(
+                    Simulation.Instance.StartSamplingTime.Add(Simulation.Instance.SensorSampleInterval * i),
+                    $"Отправка DATA от #{frame.SenderId}",
+                    () => SendData()
+                    )
+                );
+
+        }
+    }
+
+    public void SendData()
+    {
+        if ((bool)IsReference)
+        {
+            ReceivedData.Add($"D_{Id}");
+
+            return;
+        }
+
+        // имеем право?
+        var clusterMates = Simulation.Instance.Environment.Sensors.Where(s => s.ClusterId == ClusterId).ToList();
+        int idRef = clusterMates.First(m => (bool)m.IsReference).Id;
+
+        var refPos = Network.Neighbours.First(n => n.Id == idRef).Position;
+        double distToRef = Vector3.Distance(Position, refPos);
+        int hopId = -1;
+        var neighboursByDistance = Network.Neighbours.OrderBy(n => Vector3.Distance(Position, n.Position));
+
+        foreach (var neighbour in neighboursByDistance)
+        {
+            if (Vector3.Distance(neighbour.Position, refPos) < distToRef && clusterMates.Count(m => m.Id == neighbour.Id) > 0)
+            {
+                hopId = neighbour.Id;
+            }
+        }
+
+        var frame = new Frame
+        {
+            SenderId = Id,
+            SenderPosition = Position,
+            ReceiverId = hopId,
+            Type = Frame.FrameType.Data,
+            TimeSend = Simulation.Instance.Time,
+            AckIsNeeded = true,
+            NeighboursData = null,
+            BatteryLeft = Battery,
+            DeadSensors = null,
+            Data = $"D_{Id}",
+        };
+
+        DataLink.SendFrame(frame);
     }
 }
 

@@ -25,5 +25,6 @@ namespace UWSN.Model
         public required List<Neighbour>? NeighboursData { get; set; }
         public required double BatteryLeft { get; set; }
         public required List<int>? DeadSensors { get; set; }
+        public required string? Data { get; set; }
     }
 }

@@ -44,6 +44,11 @@ public class Signal
             if (sensor == Emitter)
                 continue;
 
+            if (sensor.Battery < 5.0)
+            {
+                continue;
+            }
+
             if (!CheckProbablity(sensor))
                 continue;
 
