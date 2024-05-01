@@ -11,7 +11,7 @@ export default function Viewer3D() {
     return (
         <Flex
             direction={{ base: 'column', lg: 'row' }}
-            h={isOpen ? { base: '33%', lg: '100%' } : undefined}
+            h={isOpen ? { base: '50%', lg: '100%' } : undefined}
             flexGrow={isOpen ? 1 : 0}
             minW={0}
             minH={0}

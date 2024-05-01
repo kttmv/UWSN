@@ -28,6 +28,7 @@ export default function App() {
                         minW={0}
                         minH={0}
                         w={{ base: '100%', lg: '50%' }}
+                        h='100%'
                     >
                         <ApplicationTabs />
                         <Console />
