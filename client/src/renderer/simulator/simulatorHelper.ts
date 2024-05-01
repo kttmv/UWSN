@@ -10,8 +10,18 @@ export function runSimulatorShell(args: string): Promise<void> {
     })
 }
 
+export function runSimulatorShellNoStdout(args: string): Promise<void> {
+    return new Promise((resolve) => {
+        window.electronAPI.ipcRenderer.once('run-shell-close', () => {
+            resolve()
+        })
+
+        window.electronAPI.ipcRenderer.send('run-shell-simulation', args)
+    })
+}
+
 export function runSimulation(projectPath: string): Promise<void> {
-    return runSimulatorShell(`runSim -f "${projectPath}"`)
+    return runSimulatorShellNoStdout(`runSim -f "${projectPath}"`)
 }
 
 export function runPlaceSensorsRandomStep(

@@ -6,7 +6,8 @@ import {
     FormLabel,
     Grid,
     Input,
-    Text
+    Text,
+    Tooltip
 } from '@chakra-ui/react'
 import { IconArrowAutofitContent, IconBox } from '@tabler/icons-react'
 import { useEffect } from 'react'
@@ -113,6 +114,8 @@ export default function AreaLimits() {
         setProject(newProject)
     }
 
+    const noSensors = project.Environment.Sensors.length === 0
+
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <Flex direction='column' gap={4}>
@@ -216,22 +219,37 @@ export default function AreaLimits() {
                     </FormErrorMessage>
                 </FormControl>
 
-                <Button
-                    type='submit'
-                    isDisabled={!formState.isValid || !formState.isDirty}
+                <Tooltip
+                    label={
+                        !formState.isValid
+                            ? 'Введены неправильные значения'
+                            : !formState.isDirty &&
+                              'Введенные границы совпадают'
+                    }
+                    isDisabled={formState.isDirty && formState.isValid}
                 >
-                    <IconBox />
-                    <Text m={1}>Применить границы</Text>
-                </Button>
+                    <Button
+                        type='submit'
+                        isDisabled={!formState.isValid || !formState.isDirty}
+                    >
+                        <IconBox />
+                        <Text m={1}>Применить границы</Text>
+                    </Button>
+                </Tooltip>
 
-                <Button
-                    type='button'
-                    isDisabled={project.Environment.Sensors.length === 0}
-                    onClick={onAutoFitClick}
+                <Tooltip
+                    label={noSensors && 'Отсутствуют сенсоры'}
+                    isDisabled={!noSensors}
                 >
-                    <IconArrowAutofitContent />
-                    <Text m={1}>Подогнать границы под сенсоры</Text>
-                </Button>
+                    <Button
+                        type='button'
+                        isDisabled={noSensors}
+                        onClick={onAutoFitClick}
+                    >
+                        <IconArrowAutofitContent />
+                        <Text m={1}>Подогнать границы под сенсоры</Text>
+                    </Button>
+                </Tooltip>
             </Flex>
         </form>
     )

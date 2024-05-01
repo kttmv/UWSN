@@ -9,6 +9,7 @@ declare global {
     }
     type Channels =
         | 'run-shell'
+        | 'run-shell-simulation'
         | 'read-file'
         | 'open-file-dialog'
         | 'save-file-dialog'

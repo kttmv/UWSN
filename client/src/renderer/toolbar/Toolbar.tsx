@@ -20,6 +20,8 @@ export default function Toolbar() {
         setIsShellRunning
     } = useProjectStore()
 
+    const { addLineToConsoleOutput } = useConsoleStore()
+
     const { setIsOpen: setConsoleIsOpen } = useConsoleStore()
 
     const onCreateNewClick = async () => {
@@ -51,6 +53,7 @@ export default function Toolbar() {
     const onRunSimulationClick = async () => {
         setIsShellRunning(true)
         setConsoleIsOpen(true)
+        addLineToConsoleOutput('Запущен процесс симуляции')
         await runSimulation(projectFilePath)
         setIsShellRunning(false)
 
