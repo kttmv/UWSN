@@ -27,14 +27,15 @@ public class PlaceSensorsRandomStepHandler
             sensors.Add(new Sensor(i));
         }
 
-        Simulation.Instance.Environment.Sensors =
-            PlaceSensors(sensors,
-                o.Count_X,
-                o.Count_Y,
-                o.Count_Z,
-                o.DistributionType,
-                o.UniParameterA,
-                o.UniParameterB);
+        Simulation.Instance.Environment.Sensors = PlaceSensors(
+            sensors,
+            o.Count_X,
+            o.Count_Y,
+            o.Count_Z,
+            o.DistributionType,
+            o.UniParameterA,
+            o.UniParameterB
+        );
 
         SerializationHelper.SaveSimulation(o.FilePath);
     }
@@ -46,7 +47,8 @@ public class PlaceSensorsRandomStepHandler
         int countZ,
         DistributionType distrType,
         double uniParameterA = 0,
-        double uniParameterB = 1)
+        double uniParameterB = 1
+    )
     {
         switch (distrType)
         {
@@ -65,7 +67,12 @@ public class PlaceSensorsRandomStepHandler
         return sensors;
     }
 
-    private static List<Sensor> PlaceNormal(List<Sensor> sensors, int countX, int countY, int countZ)
+    private static List<Sensor> PlaceNormal(
+        List<Sensor> sensors,
+        int countX,
+        int countY,
+        int countZ
+    )
     {
         var al = Simulation.Instance.AreaLimits;
 
@@ -89,9 +96,24 @@ public class PlaceSensorsRandomStepHandler
                     //    break;
                     //}
 
-                    var x = al.Min.X + (float)((i * stepRangeX) + NextDouble(rnd, -stepRangeX / 2, stepRangeX / 2));
-                    var y = al.Min.Y + (float)((j * stepRangeY) + NextDouble(rnd, -stepRangeY / 2, stepRangeY / 2));
-                    var z = al.Min.Z + (float)((k * stepRangeZ) + NextDouble(rnd, -stepRangeZ / 2, stepRangeZ / 2));
+                    var x = (float)(
+                        al.Min.X
+                        + stepRangeX / 2
+                        + (i * stepRangeX)
+                        + NextDouble(rnd, -stepRangeX / 2, stepRangeX / 2)
+                    );
+                    var y = (float)(
+                        al.Min.Y
+                        + stepRangeY / 2
+                        + (j * stepRangeY)
+                        + NextDouble(rnd, -stepRangeY / 2, stepRangeY / 2)
+                    );
+                    var z = (float)(
+                        al.Min.Z
+                        + stepRangeZ / 2
+                        + (k * stepRangeZ)
+                        + NextDouble(rnd, -stepRangeZ / 2, stepRangeZ / 2)
+                    );
 
                     sensors[placedCount].Position = new Vector3(x, y, z);
 
@@ -100,7 +122,9 @@ public class PlaceSensorsRandomStepHandler
             }
         }
 
-        Console.WriteLine($"Расстановка сенсоров ({countX * countY * countZ}) по нормальному распределению прошла успешно.");
+        Console.WriteLine(
+            $"Расстановка сенсоров ({countX * countY * countZ}) по нормальному распределению прошла успешно."
+        );
 
         return sensors;
     }
@@ -109,7 +133,8 @@ public class PlaceSensorsRandomStepHandler
         List<Sensor> sensors,
         float stepRange,
         double uniParameterA = 0,
-        double uniParameterB = 1)
+        double uniParameterB = 1
+    )
     {
         var rng = new TRngStream();
 
@@ -121,10 +146,7 @@ public class PlaceSensorsRandomStepHandler
 
         rng.NewStream(0, seed);
 
-        var dst = new TVec
-        {
-            Length = sensors.Count * 3
-        };
+        var dst = new TVec { Length = sensors.Count * 3 };
 
         rng.RandomUniform(dst, uniParameterA, uniParameterB);
 
@@ -143,9 +165,18 @@ public class PlaceSensorsRandomStepHandler
                         break;
                     }
 
-                    var x = (float)((i * stepRange) + UniformDouble(dst.Values[dstIndx + 0], -stepRange / 2, stepRange / 2));
-                    var y = (float)((j * stepRange) + UniformDouble(dst.Values[dstIndx + 1], -stepRange / 2, stepRange / 2));
-                    var z = (float)((k * stepRange) + UniformDouble(dst.Values[dstIndx + 2], -stepRange / 2, stepRange / 2));
+                    var x = (float)(
+                        (i * stepRange)
+                        + UniformDouble(dst.Values[dstIndx + 0], -stepRange / 2, stepRange / 2)
+                    );
+                    var y = (float)(
+                        (j * stepRange)
+                        + UniformDouble(dst.Values[dstIndx + 1], -stepRange / 2, stepRange / 2)
+                    );
+                    var z = (float)(
+                        (k * stepRange)
+                        + UniformDouble(dst.Values[dstIndx + 2], -stepRange / 2, stepRange / 2)
+                    );
 
                     sensors[placedCount].Position = new Vector3(x, y, z);
 
@@ -155,7 +186,9 @@ public class PlaceSensorsRandomStepHandler
             }
         }
 
-        Console.WriteLine($"Расстановка сенсоров ({sensors.Count}) по непрерывному распределению прошла успешно.");
+        Console.WriteLine(
+            $"Расстановка сенсоров ({sensors.Count}) по непрерывному распределению прошла успешно."
+        );
 
         return sensors;
     }
