@@ -29,8 +29,12 @@ public class Signal
         ChannelId = channelId;
         ReceivingEvents = new();
 
-        double transmissionTime =
-            Frame.FRAME_SIZE_IN_BITS / (Simulation.Instance.Modem.Bitrate * 1024.0);
+        var modem = Simulation.Instance.Modem;
+
+        if (modem == null)
+            throw new NullReferenceException("Не указан тип модема");
+
+        double transmissionTime = Frame.FRAME_SIZE_IN_BITS / (modem.Bitrate * 1024.0);
 
         var timeEndReceivingMax = default(DateTime);
 

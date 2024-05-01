@@ -93,6 +93,8 @@ namespace UWSN.Model.Sim
             );
 
             SensorSampleInterval = new TimeSpan(0, 30, 0);
+
+            Modem ??= new AquaModem1000();
         }
 
         /// <summary>
