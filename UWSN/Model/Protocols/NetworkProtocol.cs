@@ -17,11 +17,15 @@ public class NetworkProtocol : ProtocolBase
     {
         public int Id { get; set; }
         public Vector3 Position { get; set; }
+        public int? ClusterId { get; set; }
+        public bool? IsReference { get; set; }
 
-        public Neighbour(int id, Vector3 position)
+        public Neighbour(int id, Vector3 position, int? clusterId, bool? isReference)
         {
             Id = id;
             Position = position;
+            ClusterId = clusterId;
+            IsReference = isReference;
         }
     }
 
@@ -98,7 +102,7 @@ public class NetworkProtocol : ProtocolBase
             return;
         }
 
-        if (frame.Type == Frame.FrameType.Data)
+        if (frame.Type == Frame.FrameType.Data && frame.ReceiverId == Sensor.Id)
         {
             if ((bool)Sensor.IsReference)
             {
@@ -107,22 +111,9 @@ public class NetworkProtocol : ProtocolBase
                 return;
             }
 
-            //имеем право?
-            var clusterMates = Simulation.Instance.Environment.Sensors.Where(s => s.ClusterId == Sensor.ClusterId).ToList();
-            int idRef = clusterMates.First(m => (bool)m.IsReference).Id;
-
-            var refPos = Sensor.Network.Neighbours.First(n => n.Id == idRef).Position;
-            double distToRef = Vector3.Distance(Sensor.Position, refPos);
-            int hopId = -1;
-            var neighboursByDistance = Sensor.Network.Neighbours.OrderBy(n => Vector3.Distance(Sensor.Position, n.Position));
-
-            foreach (var neighbour in neighboursByDistance)
-            {
-                if (Vector3.Distance(neighbour.Position, refPos) < distToRef && clusterMates.Count(m => m.Id == neighbour.Id) > 0)
-                {
-                    hopId = neighbour.Id;
-                }
-            }
+            int hopId = Sensor.CalculateNextHop();
+            if (hopId < 0)
+                throw new Exception("Дефолтный id = -1(ничего не вычислилось)");
 
             var newFrame = new Frame
             {
@@ -184,7 +175,7 @@ public class NetworkProtocol : ProtocolBase
         {
             if (Neighbours.Count == 0)
             {
-                Neighbours.Add(new(Sensor.Id, Sensor.Position));
+                Neighbours.Add(new(Sensor.Id, Sensor.Position, Sensor.ClusterId, Sensor.IsReference));
             }
 
             var newNeighbours =

@@ -69,7 +69,7 @@ public class Sensor
         );
         Network = new NetworkProtocol();
         Id = id;
-        Battery = 100.0;
+        Battery = 10000.0;
         ReceivedData = new List<string>();
     }
 
@@ -81,7 +81,7 @@ public class Sensor
             ?? throw new NullReferenceException("Тип сетевого протокола не определен")
         );
         Network = new NetworkProtocol();
-        Battery = 100.0;
+        Battery = 10000.0;
         ReceivedData = new List<string>();
     }
 
@@ -131,22 +131,7 @@ public class Sensor
             return;
         }
 
-        // имеем право?
-        var clusterMates = Simulation.Instance.Environment.Sensors.Where(s => s.ClusterId == ClusterId).ToList();
-        int idRef = clusterMates.First(m => (bool)m.IsReference).Id;
-
-        var refPos = Network.Neighbours.First(n => n.Id == idRef).Position;
-        double distToRef = Vector3.Distance(Position, refPos);
-        int hopId = -1;
-        var neighboursByDistance = Network.Neighbours.OrderBy(n => Vector3.Distance(Position, n.Position));
-
-        foreach (var neighbour in neighboursByDistance)
-        {
-            if (Vector3.Distance(neighbour.Position, refPos) < distToRef && clusterMates.Count(m => m.Id == neighbour.Id) > 0)
-            {
-                hopId = neighbour.Id;
-            }
-        }
+        int hopId = CalculateNextHop();
 
         var frame = new Frame
         {
@@ -163,6 +148,27 @@ public class Sensor
         };
 
         DataLink.SendFrame(frame);
+    }
+
+    public int CalculateNextHop()
+    {
+        var clusterMates = Simulation.Instance.Environment.Sensors.Where(s => s.ClusterId == ClusterId).ToList();
+        int idRef = clusterMates.First(m => (bool)m.IsReference).Id;
+
+        var refPos = Network.Neighbours.First(n => n.Id == idRef).Position;
+        double distToRef = Vector3.Distance(Position, refPos);
+        int hopId = -1;
+        var neighboursByDistance = Network.Neighbours.OrderBy(n => Vector3.Distance(Position, n.Position));
+
+        foreach (var neighbour in neighboursByDistance)
+        {
+            if (Vector3.Distance(neighbour.Position, refPos) < distToRef && clusterMates.Count(m => m.Id == neighbour.Id) > 0)
+            {
+                hopId = neighbour.Id;
+            }
+        }
+
+        return hopId;
     }
 }
 
