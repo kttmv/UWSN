@@ -7,11 +7,12 @@ interface State {
     setIsOpen: (value: boolean) => void
 }
 
-const useConsoleStore = create<State>((set) => ({
+const useConsoleStore = create<State>((set, state) => ({
     consoleOutput: [],
     isOpen: false,
-    addLineToConsoleOutput: (value: string) =>
-        set((state) => ({ consoleOutput: [...state.consoleOutput, value] })),
+    addLineToConsoleOutput: (value: string) => {
+        state().consoleOutput.push(value)
+    },
     setIsOpen: (value: boolean) => set({ isOpen: value })
 }))
 
