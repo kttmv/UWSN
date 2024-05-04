@@ -8,6 +8,7 @@ import {
 import { runSimulation } from '../simulator/simulatorHelper'
 import useConsoleStore from '../store/consoleStore'
 import { useProjectStore } from '../store/projectStore'
+import useViewerStore from '../store/viewerStore'
 import { createDefaultProject } from './createDefaultProject'
 
 export default function Toolbar() {
@@ -23,6 +24,8 @@ export default function Toolbar() {
     const { addLineToConsoleOutput } = useConsoleStore()
 
     const { setIsOpen: setConsoleIsOpen } = useConsoleStore()
+
+    const { setIsOpen: setViewerIsOpen } = useViewerStore()
 
     const onCreateNewClick = async () => {
         const result = await showSaveFileDialog({
@@ -54,10 +57,13 @@ export default function Toolbar() {
         setIsShellRunning(true)
         setConsoleIsOpen(true)
         addLineToConsoleOutput('Запущен процесс симуляции')
+
         await runSimulation(projectFilePath)
+
         setIsShellRunning(false)
 
         updateProject()
+        setViewerIsOpen(true)
     }
 
     const noSensors = project?.Environment.Sensors.length === 0

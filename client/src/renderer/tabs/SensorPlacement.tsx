@@ -12,6 +12,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { runPlaceSensorsRandomStep } from '../simulator/simulatorHelper'
 import useConsoleStore from '../store/consoleStore'
 import { useProjectStore } from '../store/projectStore'
+import useViewerStore from '../store/viewerStore'
 import SensorPlacementRandomStep from './SensorPlacementRandomStep'
 
 export enum SensorPlacementType {
@@ -36,7 +37,10 @@ export type SensorPlacementInputs = {
 export default function SensorPlacement() {
     const { projectFilePath, project, setProject, updateProject } =
         useProjectStore()
+
     const { setIsOpen: setConsoleIsOpen } = useConsoleStore()
+
+    const { setIsOpen: setViewerIsOpen } = useViewerStore()
 
     const { register, handleSubmit, watch, formState } =
         useForm<SensorPlacementInputs>({
@@ -75,6 +79,7 @@ export default function SensorPlacement() {
         }
 
         updateProject()
+        setViewerIsOpen(true)
     }
 
     const selectedType = Number(watch('selectedType'))

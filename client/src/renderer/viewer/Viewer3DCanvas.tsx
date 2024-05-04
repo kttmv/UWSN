@@ -1,7 +1,7 @@
 import { OrbitControls, Sky } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { useProjectStore } from '../store/projectStore'
-import useViewerSettingsStore from '../store/viewerSettingsStore'
+import useViewerStore from '../store/viewerStore'
 import GridRectangle from './GridRectangle'
 import SensorNode from './SensorNode'
 import Signal from './Signal'
@@ -9,7 +9,7 @@ import Signal from './Signal'
 export default function Viewer3DCanvas() {
     const { project, simulationState } = useProjectStore()
 
-    const { scale } = useViewerSettingsStore()
+    const { scale } = useViewerStore()
 
     return (
         <Canvas>

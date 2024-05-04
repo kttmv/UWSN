@@ -1,6 +1,6 @@
 import { Box } from '@react-three/drei'
 import { Vector3 } from '../shared/types/vector3'
-import useViewerSettingsStore from '../store/viewerSettingsStore'
+import useViewerStore from '../store/viewerStore'
 
 interface Props {
     v1: Vector3
@@ -8,7 +8,7 @@ interface Props {
 }
 
 export default function GridRectangle({ v1, v2 }: Props) {
-    const { scale } = useViewerSettingsStore()
+    const { scale } = useViewerStore()
 
     const v1Scaled = {
         X: v1.X / scale,
