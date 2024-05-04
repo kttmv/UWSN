@@ -11,6 +11,8 @@ export default function ViewerCanvas() {
 
     const { scale } = useViewerStore()
 
+    console.log(simulationState.Sensors)
+
     return (
         <Canvas>
             <Sky />
@@ -31,16 +33,7 @@ export default function ViewerCanvas() {
             {project && (
                 <>
                     {simulationState.Sensors.map((sensor) => (
-                        <SensorNode
-                            key={sensor.Id}
-                            clusterId={sensor.ClusterId}
-                            isReference={sensor.IsReference}
-                            position={[
-                                sensor.Position.X / scale,
-                                sensor.Position.Y / scale,
-                                sensor.Position.Z / scale
-                            ]}
-                        />
+                        <SensorNode key={sensor.Id} sensor={sensor} />
                     ))}
 
                     {simulationState.Signals.map((signal, i) => {
