@@ -9,7 +9,7 @@ import {
 import { useState } from 'react'
 import useViewerStore from '../store/viewerStore'
 
-export default function Viewer3DScaleSlider() {
+export default function ViewerScaleSlider() {
     const [showTooltip, setShowTooltip] = useState(false)
 
     const { scale, setScale } = useViewerStore()

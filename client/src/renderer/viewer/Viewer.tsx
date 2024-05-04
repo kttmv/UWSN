@@ -1,11 +1,11 @@
 import { Button, Flex } from '@chakra-ui/react'
 import { IconCaretDown, IconCaretUp } from '@tabler/icons-react'
 import useViewerStore from '../store/viewerStore'
-import Viewer3DCanvas from './Viewer3DCanvas'
-import Viewer3DDeltaSettings from './Viewer3DDeltaSettings'
-import Viewer3DSettings from './Viewer3DSettings'
+import ViewerCanvas from './ViewerCanvas'
+import ViewerDeltaSettings from './ViewerDeltaSettings'
+import ViewerSettings from './ViewerSettings'
 
-export default function Viewer3D() {
+export default function Viewer() {
     const { isOpen, setIsOpen } = useViewerStore()
 
     return (
@@ -19,9 +19,9 @@ export default function Viewer3D() {
         >
             {isOpen && (
                 <>
-                    <Viewer3DCanvas />
-                    <Viewer3DSettings />
-                    <Viewer3DDeltaSettings />
+                    <ViewerCanvas />
+                    <ViewerSettings />
+                    <ViewerDeltaSettings />
                 </>
             )}
 

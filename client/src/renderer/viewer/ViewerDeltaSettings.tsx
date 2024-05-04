@@ -1,8 +1,8 @@
 import { Card, useBreakpointValue } from '@chakra-ui/react'
 import { useProjectStore } from '../store/projectStore'
-import Viewer3DDeltaSlider from './Viewer3DDeltaSlider'
+import ViewerDeltaSlider from './ViewerDeltaSlider'
 
-export default function Viewer3DDeltaSettings() {
+export default function ViewerDeltaSettings() {
     const bottom = useBreakpointValue({
         base: '25px',
         lg: '0px'
@@ -28,7 +28,7 @@ export default function Viewer3DDeltaSettings() {
             margin='5px'
             padding='10px'
         >
-            <Viewer3DDeltaSlider />
+            <ViewerDeltaSlider />
         </Card>
     )
 }

@@ -6,7 +6,7 @@ import GridRectangle from './GridRectangle'
 import SensorNode from './SensorNode'
 import Signal from './Signal'
 
-export default function Viewer3DCanvas() {
+export default function ViewerCanvas() {
     const { project, simulationState } = useProjectStore()
 
     const { scale } = useViewerStore()
