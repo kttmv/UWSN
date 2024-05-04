@@ -1,4 +1,4 @@
-import { spawn } from 'child_process'
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import {
     app,
     dialog,
@@ -29,10 +29,7 @@ function reply(event: IpcMainEvent, channel: ReplyChannels, arg: unknown) {
 }
 // -----------------------------------------------------------------------------
 
-on('run-shell', (event, args) => {
-    console.log('\nRUN SIMULATOR')
-    console.log('ARGS: ', args)
-
+function runShell(args: string): ChildProcessWithoutNullStreams {
     const isWindows = os.platform() === 'win32'
     const isLinux = os.platform() === 'linux'
 
@@ -47,6 +44,15 @@ on('run-shell', (event, args) => {
     const child = spawn(`${path} ${args}`, [], {
         shell: true
     })
+
+    return child
+}
+
+on('run-shell', (event, args) => {
+    console.log('\nRUN SIMULATOR')
+    console.log('ARGS: ', args)
+
+    const child = runShell(args as string)
 
     child.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`)
@@ -64,32 +70,25 @@ on('run-shell', (event, args) => {
     })
 })
 
+const SEND_REPLIES_EVERY_NTH_EVENT = 10_000
+
 on('run-shell-simulation', (event, args) => {
     console.log('\nRUN SIMULATOR (NO STDOUT)')
     console.log('ARGS: ', args)
 
-    const isWindows = os.platform() === 'win32'
-    const isLinux = os.platform() === 'linux'
-
-    const path = app.isPackaged
-        ? isWindows
-            ? 'simulator\\UWSN.exe'
-            : 'simulator/UWSN'
-        : isWindows
-          ? '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe'
-          : 'dotnet run --project ../UWSN --'
-
-    const child = spawn(`${path} ${args}`, [], {
-        shell: true
-    })
+    const child = runShell(args as string)
 
     child.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`)
-        const match = data.toString().match(/Событие №(\d+)/);
+        const match = data.toString().match(/Событие №(\d+)/)
         if (match) {
             const number = parseInt(match[1])
-            if (number % 1000 === 0)
-            reply(event, 'run-shell-reply', `Обработано событий: ${match[1]}`)
+            if (number % SEND_REPLIES_EVERY_NTH_EVENT === 0)
+                reply(
+                    event,
+                    'run-shell-reply',
+                    `Обработано событий: ${match[1]}`
+                )
         }
     })
 
