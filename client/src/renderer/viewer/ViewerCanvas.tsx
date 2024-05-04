@@ -1,5 +1,6 @@
 import { OrbitControls, Sky } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
+import { useEffect } from 'react'
 import { useProjectStore } from '../store/projectStore'
 import useViewerStore from '../store/viewerStore'
 import GridRectangle from './GridRectangle'
@@ -9,7 +10,12 @@ import Signal from './Signal'
 export default function ViewerCanvas() {
     const { project, simulationState } = useProjectStore()
 
-    const { scale } = useViewerStore()
+    const { scale, selectedSensor, setSelectedSensor } = useViewerStore()
+
+    useEffect(() => {
+        if (selectedSensor)
+            setSelectedSensor(simulationState.Sensors[selectedSensor.Id])
+    }, [simulationState])
 
     console.log(simulationState.Sensors)
 

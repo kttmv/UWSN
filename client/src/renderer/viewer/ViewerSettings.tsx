@@ -1,5 +1,6 @@
 import {
     Button,
+    Heading,
     Popover,
     PopoverArrow,
     PopoverBody,
@@ -23,7 +24,9 @@ export default function ViewerSettings() {
             <PopoverContent padding='10px'>
                 <PopoverArrow />
                 <PopoverCloseButton />
-                <PopoverHeader> Настройки </PopoverHeader>
+                <PopoverHeader>
+                    <Heading size='md'> Настройки </Heading>
+                </PopoverHeader>
                 <PopoverBody>
                     <Text>Масштаб</Text>
                     <ViewerScaleSlider />
