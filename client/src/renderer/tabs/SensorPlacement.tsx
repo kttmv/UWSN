@@ -12,6 +12,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { runPlaceSensorsRandomStep } from '../simulator/simulatorHelper'
 import useConsoleStore from '../store/consoleStore'
 import { useProjectStore } from '../store/projectStore'
+import useViewerStore from '../store/viewerStore'
 import SensorPlacementRandomStep from './SensorPlacementRandomStep'
 
 export enum SensorPlacementType {
@@ -34,8 +35,12 @@ export type SensorPlacementInputs = {
 }
 
 export default function SensorPlacement() {
-    const { projectFilePath, updateProject } = useProjectStore()
+    const { projectFilePath, project, setProject, updateProject } =
+        useProjectStore()
+
     const { setIsOpen: setConsoleIsOpen } = useConsoleStore()
+
+    const { setIsOpen: setViewerIsOpen } = useViewerStore()
 
     const { register, handleSubmit, watch, formState } =
         useForm<SensorPlacementInputs>({
@@ -44,11 +49,20 @@ export default function SensorPlacement() {
         })
 
     const onSubmit: SubmitHandler<SensorPlacementInputs> = async (data) => {
+        if (!project) {
+            throw new Error('Project не может быть undefined')
+        }
+        const newProject = structuredClone(project)
+        newProject.Result = undefined
+        setProject(newProject)
+
+        setConsoleIsOpen(true)
+
         const type = Number(data.selectedType)
 
         switch (type) {
             case SensorPlacementType.RandomStep: {
-                runPlaceSensorsRandomStep(
+                await runPlaceSensorsRandomStep(
                     data.distributionType,
                     data.countX,
                     data.countY,
@@ -56,17 +70,16 @@ export default function SensorPlacement() {
                     data.uniformA,
                     data.uniformB,
                     projectFilePath
-                ).then(() => {
-                    updateProject()
-                })
+                )
                 break
             }
             default: {
-                throw new Error('Что-то пошло не так')
+                throw new Error('Незвестный тип расстановки сенсоров')
             }
         }
 
-        setConsoleIsOpen(true)
+        updateProject()
+        setViewerIsOpen(true)
     }
 
     const selectedType = Number(watch('selectedType'))

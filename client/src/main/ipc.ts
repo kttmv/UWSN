@@ -1,4 +1,4 @@
-import { spawn } from 'child_process'
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import {
     app,
     dialog,
@@ -24,83 +24,100 @@ function on(
 }
 
 function reply(event: IpcMainEvent, channel: ReplyChannels, arg: unknown) {
-    console.log(`IPC REPLY (${channel}):\n${JSON.stringify(arg)}`)
+    let str = JSON.stringify(arg)
+
+    if (str.length > 100) {
+        str = str.substring(0, 100) + '...'
+    }
+
+    console.log(`IPC REPLY (${channel}):\n${str}`)
     event.reply(channel, arg)
 }
 // -----------------------------------------------------------------------------
+
+function runShell(
+    event: IpcMainEvent,
+    args: string
+): ChildProcessWithoutNullStreams {
+    const isWindows = os.platform() === 'win32'
+    const isLinux = os.platform() === 'linux'
+
+    const path = app.isPackaged
+        ? isWindows
+            ? 'simulator\\UWSN.exe'
+            : 'simulator/UWSN'
+        : isWindows
+          ? '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe'
+          : 'dotnet run --project ../UWSN --'
+
+    const child = spawn(`${path} ${args}`, [], {
+        shell: true
+    })
+
+    child.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`)
+        reply(event, 'run-shell-reply', data.toString())
+    })
+
+    child.on('close', (code) => {
+        console.log(`child process exited with code ${code}`)
+        reply(event, 'run-shell-close', code)
+    })
+
+    return child
+}
 
 on('run-shell', (event, args) => {
     console.log('\nRUN SIMULATOR')
     console.log('ARGS: ', args)
 
-    const isWindows = os.platform() === 'win32'
-    const isLinux = os.platform() === 'linux'
-
-    const path = app.isPackaged
-        ? isWindows
-            ? 'simulator\\UWSN.exe'
-            : 'simulator/UWSN'
-        : isWindows
-          ? '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe'
-          : 'dotnet run --project ../UWSN --'
-
-    const child = spawn(`${path} ${args}`, [], {
-        shell: true
-    })
+    const child = runShell(event, args as string)
 
     child.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`)
         reply(event, 'run-shell-reply', data.toString())
     })
-
-    child.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`)
-        reply(event, 'run-shell-reply', data.toString())
-    })
-
-    child.on('close', (code) => {
-        console.log(`child process exited with code ${code}`)
-        reply(event, 'run-shell-close', code)
-    })
 })
+
+const SEND_REPLIES_EVERY_NTH_EVENT = 10_000
 
 on('run-shell-simulation', (event, args) => {
     console.log('\nRUN SIMULATOR (NO STDOUT)')
     console.log('ARGS: ', args)
 
-    const isWindows = os.platform() === 'win32'
-    const isLinux = os.platform() === 'linux'
-
-    const path = app.isPackaged
-        ? isWindows
-            ? 'simulator\\UWSN.exe'
-            : 'simulator/UWSN'
-        : isWindows
-          ? '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe'
-          : 'dotnet run --project ../UWSN --'
-
-    const child = spawn(`${path} ${args}`, [], {
-        shell: true
-    })
+    const child = runShell(event, args as string)
 
     child.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`)
-        const match = data.toString().match(/Событие №(\d+)/);
-        if (match) {
-            const number = parseInt(match[1])
-            if (number % 1000 === 0)
-            reply(event, 'run-shell-reply', `Обработано событий: ${match[1]}`)
+
+        const line = data.toString() as string
+
+        const matchEvent = line.match(/\[(.+)\] Событие №(\d+)/)
+        if (matchEvent) {
+            const time = matchEvent[1]
+            const number = parseInt(matchEvent[2])
+            if (number % SEND_REPLIES_EVERY_NTH_EVENT === 0) {
+                reply(
+                    event,
+                    'run-shell-reply',
+                    `Обработано событий: ${number}. Время симуляции: ${time}`
+                )
+            }
         }
-    })
 
-    child.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`)
-        reply(event, 'run-shell-reply', data.toString())
-    })
+        const matchStop = line.match(/\[(.+)\] Симуляция остановлена./)
+        if (matchStop) {
+            const time = matchStop[1]
+            reply(
+                event,
+                'run-shell-reply',
+                `Симуляция остановлена. Конечное время симуляции: ${time}`
+            )
+        }
 
-    child.on('close', (code) => {
-        console.log(`child process exited with code ${code}`)
-        reply(event, 'run-shell-close', code)
+        if (line.includes('Был достигнут лимит событий')) {
+            reply(event, 'run-shell-reply', line)
+        }
     })
 })
 

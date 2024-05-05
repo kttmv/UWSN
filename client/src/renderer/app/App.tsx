@@ -3,7 +3,7 @@ import Console from '../console/Console'
 import { useProjectStore } from '../store/projectStore'
 import ApplicationTabs from '../tabs/ApplicationTabs'
 import Toolbar from '../toolbar/Toolbar'
-import Viewer3D from '../viewer/Viewer3D'
+import Viewer from '../viewer/Viewer'
 
 export default function App() {
     const { project } = useProjectStore()
@@ -20,7 +20,7 @@ export default function App() {
                     minW={0}
                     minH={0}
                 >
-                    <Viewer3D />
+                    <Viewer />
                     <Flex
                         direction='column'
                         flexGrow={1}

@@ -113,12 +113,13 @@ namespace UWSN.Model.Sim
 
                 if (e == null)
                 {
-                    Logger.WriteLine("Больше событий нет. Симуляция окончена.");
+                    Logger.WriteLine("Больше событий нет.");
                     break;
                 }
 
                 Time = e.Time;
 
+                Logger.WriteLine($"=============================");
                 Logger.WriteLine($"Событие №{i}. {e.Description}", true);
 
                 e.Invoke();
@@ -130,29 +131,18 @@ namespace UWSN.Model.Sim
 
             if (i >= MAX_PROCESSED_EVENTS)
             {
-                Logger.WriteLine("Достигнут лимит событий. Симуляция остановлена");
+                Logger.WriteLine("Был достигнут лимит событий.");
             }
 
-            //foreach (var sensor in Environment.Sensors)
-            //{
-            //    Logger.WriteLine($"Sensor: {sensor.Id}");
-            //    foreach (var (Id, _) in sensor.Network.Neighbours)
-            //    {
-            //        Logger.WriteLine($"Neighbour: {Id}");
-            //    }
-
-            //    break;
-            //}
+            Logger.WriteLine("");
+            Logger.WriteLine("Симуляция остановлена.", true);
 
             Logger.WriteLine("");
+            Logger.WriteLine($"=============================");
             Logger.WriteLine("Результаты симуляции:");
             Logger.WriteLine($"\tКоличество отправленных сообщений: {Result.TotalSends}");
             Logger.WriteLine($"\tКоличество полученных сообщений: {Result.TotalReceives}");
             Logger.WriteLine($"\tКоличество коллизий: {Result.TotalCollisions}");
-
-            //var clust = new RetardedClusterization(4);
-
-            //Environment.Sensors = clust.Clusterize(Environment.Sensors, AreaLimits);
         }
 
         public void Clusterize()

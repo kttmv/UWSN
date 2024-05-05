@@ -1,15 +1,17 @@
 import { OrbitControls, Sky } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { useProjectStore } from '../store/projectStore'
-import useViewerSettingsStore from '../store/viewerSettingsStore'
+import useViewerStore from '../store/viewerStore'
 import GridRectangle from './GridRectangle'
 import SensorNode from './SensorNode'
 import Signal from './Signal'
 
-export default function Viewer3DCanvas() {
+export default function ViewerCanvas() {
     const { project, simulationState } = useProjectStore()
 
-    const { scale } = useViewerSettingsStore()
+    const { scale } = useViewerStore()
+
+    console.log(simulationState.Sensors)
 
     return (
         <Canvas>
@@ -31,16 +33,7 @@ export default function Viewer3DCanvas() {
             {project && (
                 <>
                     {simulationState.Sensors.map((sensor) => (
-                        <SensorNode
-                            key={sensor.Id}
-                            clusterId={sensor.ClusterId}
-                            isReference={sensor.IsReference}
-                            position={[
-                                sensor.Position.X / scale,
-                                sensor.Position.Y / scale,
-                                sensor.Position.Z / scale
-                            ]}
-                        />
+                        <SensorNode key={sensor.Id} sensor={sensor} />
                     ))}
 
                     {simulationState.Signals.map((signal, i) => {

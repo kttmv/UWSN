@@ -7,12 +7,12 @@ import {
     Tooltip
 } from '@chakra-ui/react'
 import { useState } from 'react'
-import useViewerSettingsStore from '../store/viewerSettingsStore'
+import useViewerStore from '../store/viewerStore'
 
-export default function Viewer3DScaleSlider() {
+export default function ViewerScaleSlider() {
     const [showTooltip, setShowTooltip] = useState(false)
 
-    const { scale, setScale } = useViewerSettingsStore()
+    const { scale, setScale } = useViewerStore()
 
     const min = 1
     const max = 2000

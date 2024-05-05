@@ -11,7 +11,7 @@ import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 import { useState } from 'react'
 import { useProjectStore } from '../store/projectStore'
 
-export default function Viewer3DDeltaSlider() {
+export default function ViewerDeltaSlider() {
     const [showTooltip, setShowTooltip] = useState(false)
 
     const { project, simulationDeltaIndex, simulationState, setDeltaIndex } =

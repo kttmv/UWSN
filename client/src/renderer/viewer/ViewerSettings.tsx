@@ -10,9 +10,9 @@ import {
     Text
 } from '@chakra-ui/react'
 import { IconSettings } from '@tabler/icons-react'
-import Viewer3DScaleSlider from './Viewer3DScaleSlider'
+import ViewerScaleSlider from './ViewerScaleSlider'
 
-export default function Viewer3DSettings() {
+export default function ViewerSettings() {
     return (
         <Popover>
             <PopoverTrigger>
@@ -26,7 +26,7 @@ export default function Viewer3DSettings() {
                 <PopoverHeader> Настройки </PopoverHeader>
                 <PopoverBody>
                     <Text>Масштаб</Text>
-                    <Viewer3DScaleSlider />
+                    <ViewerScaleSlider />
                 </PopoverBody>
             </PopoverContent>
         </Popover>
