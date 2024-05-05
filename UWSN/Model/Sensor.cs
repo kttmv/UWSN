@@ -87,6 +87,8 @@ public class Sensor
 
     public void WakeUp()
     {
+        ReceivedData.Clear();
+
         var frame = new Frame
         {
             SenderId = Id,
@@ -146,6 +148,26 @@ public class Sensor
             DeadSensors = null,
             Data = $"D_{Id}",
         };
+
+        if (Id == 9)
+        {
+            var specialFrame = new Frame
+            {
+                SenderId = Id,
+                SenderPosition = Position,
+                ReceiverId = hopId,
+                Type = Frame.FrameType.Data,
+                TimeSend = Simulation.Instance.Time,
+                AckIsNeeded = true,
+                NeighboursData = null,
+                BatteryLeft = Battery,
+                DeadSensors = null,
+                Data = $"D_{Id}q",
+            };
+
+            DataLink.SendFrame(specialFrame);
+            return;
+        }
 
         DataLink.SendFrame(frame);
     }

@@ -79,7 +79,7 @@ namespace UWSN.Model.Sim
 
             //todo: если не задавать количество каналов в конструкторе, то оно всегда 0,
             //как будто не считывается с Json
-            ChannelManager = new ChannelManager(2);
+            ChannelManager = new ChannelManager(1);
             EventManager = new EventManager();
 
             Environment = new Environment();
