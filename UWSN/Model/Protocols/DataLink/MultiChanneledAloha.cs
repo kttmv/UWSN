@@ -181,6 +181,8 @@ namespace UWSN.Model.Protocols.DataLink
                     Sensor,
                     $"(MultiChanneledAloha) не получил ACK от #{frame.ReceiverId}. Ожидание прекращено."
                 );
+
+                WaitingForAckEvent = null;
                 return;
             }
 

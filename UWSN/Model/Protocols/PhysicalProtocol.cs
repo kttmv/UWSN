@@ -27,6 +27,9 @@ namespace UWSN.Model.Protocols
 
         public void StartReceiving(Frame frame)
         {
+            if (Sensor.IsDead)
+                return;
+
             if (!ShouldReceiveMessages)
                 return;
 
@@ -56,7 +59,7 @@ namespace UWSN.Model.Protocols
 
         public void StartSending(Frame frame, int channelId)
         {
-            if (Sensor.Battery < 5.0)
+            if (Sensor.IsDead)
                 return;
 
             OriginalState = Sensor.Physical.CurrentState;

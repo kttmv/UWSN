@@ -171,6 +171,8 @@ namespace UWSN.Model.Protocols.DataLink
                     Sensor,
                     $"(PureAloha) не получил ACK от #{frame.ReceiverId}. Ожидание прекращено."
                 );
+
+                WaitingForAckEvent = null;
                 return;
             }
 
