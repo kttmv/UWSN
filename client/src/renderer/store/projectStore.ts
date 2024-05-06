@@ -116,11 +116,26 @@ function calculateSimulationState(
         for (const delta of sensorDeltas) {
             const sensor = state.Sensors[delta.Id]
 
-            if (delta.ClusterId) sensor.ClusterId = delta.ClusterId
-            if (delta.IsReference) sensor.IsReference = delta.IsReference
-            if (delta.Battery) sensor.Battery += delta.Battery
+            // ниже нужно обязательно писать именно
+            // ... !== undefined, так как 0 - это тоже false
+            // (я обожаю джаваскрипт. я только что потратил
+            // час времени на то, чтобы понять, в чем трабл
+            // с нулевым кластером)
+
+            if (delta.ClusterId !== undefined) {
+                sensor.ClusterId = delta.ClusterId
+            }
+
+            if (delta.IsReference !== undefined) {
+                sensor.IsReference = delta.IsReference
+            }
+            if (delta.Battery !== undefined) {
+                sensor.Battery += delta.Battery
+            }
         }
     }
+
+    console.log(state)
 
     return state
 }
