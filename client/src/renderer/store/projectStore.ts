@@ -90,6 +90,8 @@ function calculateSimulationState(
     for (let i = 0; i <= index; i++) {
         const simulationDelta = project.Result.Deltas[i]
 
+        state.Time = simulationDelta.Time
+
         const signalDeltas = simulationDelta.SignalDeltas
         const sensorDeltas = simulationDelta.SensorDeltas
 
