@@ -5,6 +5,7 @@ export type PureAloha = {
     Timeout: number
     TimeoutRelativeDeviation: number
     AckTimeout: number
+    AckRetries: number
 }
 
 export function isPureAloha(obj: any): obj is PureAloha {
@@ -16,6 +17,7 @@ export type MultiChanneledAloha = {
     Timeout: number
     TimeoutRelativeDeviation: number
     AckTimeout: number
+    AckRetries: number
 }
 
 export function isMultichanneledAloha(obj: any): obj is MultiChanneledAloha {

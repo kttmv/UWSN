@@ -15,7 +15,8 @@ export function createDefaultProject() {
                 $type: DataLinkProtocolType.PureAloha,
                 Timeout: 10,
                 TimeoutRelativeDeviation: 0.5,
-                AckTimeout: 20
+                AckTimeout: 20,
+                AckRetries: 3
             },
 
             ClusterizationAlgorithm: {

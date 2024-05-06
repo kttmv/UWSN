@@ -11,6 +11,7 @@ namespace UWSN.Model.Protocols.DataLink
         public int Timeout { get; set; } = 10;
         public double TimeoutRelativeDeviation { get; set; } = 0.5;
         public int AckTimeout { get; set; } = 20;
+        public int AckRetries { get; set; } = 3;
 
         [JsonIgnore]
         private Event? WaitingForAckEvent { get; set; }
@@ -113,6 +114,14 @@ namespace UWSN.Model.Protocols.DataLink
                     (new Random().NextDouble() - 0.5) * Timeout * TimeoutRelativeDeviation;
                 double timeout = Timeout + rngTimeout;
 
+                if (timeout <= 0)
+                {
+                    throw new Exception(
+                        "Значение времени ожидания отрицательное. "
+                            + "Вероятно, выставлено слишком большое относительное отклонение времени ожидания."
+                    );
+                }
+
                 if (ackIsBlocking)
                     Logger.WriteSensorLine(
                         Sensor,
@@ -154,7 +163,7 @@ namespace UWSN.Model.Protocols.DataLink
                     Sensor,
                     $"(PureAloha) начинаю ожидать ACK от #{frame.ReceiverId}"
                 );
-                CreateAckTimeout(frame, 3);
+                CreateAckTimeout(frame, AckRetries);
             }
         }
 

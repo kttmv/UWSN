@@ -36,7 +36,7 @@ export default function ViewerSelectedSensorInfo() {
         `Z: ${selectedSensor.Position.Z.toFixed(1)} }`
 
     let clusterString =
-        selectedSensor.ClusterId !== -1
+        selectedSensor.ClusterId > -1
             ? selectedSensor.ClusterId.toString()
             : 'Отсутствует'
 

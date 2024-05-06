@@ -53,6 +53,21 @@ export default function PureAlohaSettings({ form }: Props) {
                             : undefined
                     }
                 />
+
+                <Text whiteSpace='nowrap'>
+                    Количество попыток ожидания Ack:
+                </Text>
+                <Input
+                    {...form.register('DataLinkProtocol.AckRetries', {
+                        required: true,
+                        min: 0
+                    })}
+                    fontWeight={
+                        form.formState.dirtyFields.DataLinkProtocol?.AckRetries
+                            ? 'bold'
+                            : undefined
+                    }
+                />
             </Grid>
         </>
     )
