@@ -1,16 +1,14 @@
-﻿using UWSN.Utilities;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using UWSN.Utilities;
 
 namespace UWSN.Model.Sim;
 
 public class ChannelManager
 {
-    // TODO: Не использовать дефолтное значение и выставлять 
-    // его при инициализации (или вместе с протоколами)
     /// <summary>
     /// Количество доступных каналов
     /// </summary>
-    public int NumberOfChannels { get; set; }
+    public int NumberOfChannels { get; set; } = 4;
 
     /// <summary>
     /// Отсортированные по каналам эммиты
@@ -33,13 +31,6 @@ public class ChannelManager
             }
 
             return freeChannels;
-
-            //return
-            //    Channels
-            //    .Select((Signal, Id) => (Signal, Id))
-            //    .Where(x => x.Signal == null)
-            //    .Select(x => x.Id)
-            //    .ToList();
         }
     }
 
@@ -48,8 +39,7 @@ public class ChannelManager
     {
         get
         {
-            return
-                Channels
+            return Channels
                 .Select((Signal, Id) => (Signal, Id))
                 .Where(x => x.Signal != null)
                 .Select(x => x.Id)
@@ -57,9 +47,8 @@ public class ChannelManager
         }
     }
 
-    public ChannelManager(int numberOfChannels)
+    public ChannelManager()
     {
-        NumberOfChannels = numberOfChannels;
         Channels = new Signal?[NumberOfChannels];
     }
 

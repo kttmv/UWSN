@@ -4,12 +4,24 @@ import { Project } from '../shared/types/project'
 
 export function createDefaultProject() {
     const project: Project = {
-        SensorSampleInterval: '00:10:00',
-        DataLinkProtocolType: DataLinkProtocolType.PureAloha,
-        ClusterizationAlgorithm: {
-            $type: ClusterizationAlgorithmType.RetardedClusterization,
-            NumberOfClusters: 6
+        SensorSettings: {
+            SensorSampleInterval: '00:10:00',
+            StartSamplingTime: '0001-01-02T00:00:00',
+
+            InitialSensorBattery: 100,
+
+            DataLinkProtocol: {
+                $type: DataLinkProtocolType.PureAloha
+            },
+
+            ClusterizationAlgorithm: {
+                $type: ClusterizationAlgorithmType.RetardedClusterization,
+                NumberOfClusters: 6
+            }
         },
+
+        DeadSensorsPercent: 0.33,
+
         AreaLimits: {
             Min: {
                 X: 0,
@@ -22,12 +34,15 @@ export function createDefaultProject() {
                 Z: 10_000
             }
         },
+
         ChannelManager: {
             NumberOfChannels: 1
         },
+
         Environment: {
             Sensors: []
         },
+
         Result: undefined
     }
 

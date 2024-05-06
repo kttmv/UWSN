@@ -1,11 +1,10 @@
 ﻿using Newtonsoft.Json;
-using UWSN.Model.Protocols;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
 
 namespace UWSN.Model.Protocols.DataLink
 {
-    public class PureAlohaProtocol : DataLinkProtocol
+    public class PureAloha : DataLinkProtocol
     {
         private const int CHANNEL_ID = 0;
         private const int CHANNEL_TIMEOUT_IN_SECONDS = 10;
@@ -18,7 +17,7 @@ namespace UWSN.Model.Protocols.DataLink
         [JsonIgnore]
         private List<int> SensorsAwaitingAck { get; set; }
 
-        public PureAlohaProtocol()
+        public PureAloha()
         {
             SensorsAwaitingAck = new List<int>();
         }

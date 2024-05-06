@@ -1,6 +1,4 @@
 ﻿using System.Numerics;
-using System.Xml.Linq;
-using UWSN.Model.Modems;
 using UWSN.Model.Protocols;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
@@ -29,7 +27,7 @@ public class Signal
         ChannelId = channelId;
         ReceivingEvents = new();
 
-        var modem = Simulation.Instance.Modem;
+        var modem = Simulation.Instance.SensorSettings.Modem;
 
         if (modem == null)
             throw new NullReferenceException("Не указан тип модема");

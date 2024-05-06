@@ -1,31 +1,25 @@
 import { Flex, FormLabel, Select } from '@chakra-ui/react'
-import { FormState, UseFormRegister, UseFormWatch } from 'react-hook-form'
+import { UseFormReturn } from 'react-hook-form'
 import { isRetardedClusterization } from '../shared/types/clsterizationAlgorith'
 import { ClusterizationAlgorithmType } from '../shared/types/clusterizationAlogirthmType'
 import { DataLinkProtocolType } from '../shared/types/dataLinkProtocolType'
+import { SensorSettings } from '../shared/types/sensorSettings'
 import RetardedClusterizationSettings from './RetardedClusterizationSettings'
-import { SensorSettingsInputs } from './SensorSettings'
 
 type Props = {
-    register: UseFormRegister<SensorSettingsInputs>
-    formState: FormState<SensorSettingsInputs>
-    watch: UseFormWatch<SensorSettingsInputs>
+    form: UseFormReturn<SensorSettings>
 }
 
-export default function SensorProtocolSettings({
-    register,
-    formState,
-    watch
-}: Props) {
+export default function SensorProtocolSettings({ form }: Props) {
     return (
         <Flex gap={4} direction='column'>
             <FormLabel>Канальный уровень:</FormLabel>
             <Select
-                {...register('DataLinkProtocolType', {
+                {...form.register('DataLinkProtocol.$type', {
                     required: true
                 })}
                 fontWeight={
-                    formState.dirtyFields.DataLinkProtocolType
+                    form.formState.dirtyFields.DataLinkProtocol?.$type
                         ? 'bold'
                         : undefined
                 }
@@ -41,11 +35,11 @@ export default function SensorProtocolSettings({
 
             <FormLabel>Алгоритм кластеризации:</FormLabel>
             <Select
-                {...register('ClusterizationAlgorithm.$type', {
+                {...form.register('ClusterizationAlgorithm.$type', {
                     required: true
                 })}
                 fontWeight={
-                    formState.dirtyFields.ClusterizationAlgorithm?.$type
+                    form.formState.dirtyFields.ClusterizationAlgorithm?.$type
                         ? 'bold'
                         : undefined
                 }
@@ -57,8 +51,8 @@ export default function SensorProtocolSettings({
                 </option>
             </Select>
 
-            {isRetardedClusterization(watch().ClusterizationAlgorithm) && (
-                <RetardedClusterizationSettings register={register} />
+            {isRetardedClusterization(form.watch().ClusterizationAlgorithm) && (
+                <RetardedClusterizationSettings form={form} />
             )}
         </Flex>
     )
