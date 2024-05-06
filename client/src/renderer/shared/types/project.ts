@@ -1,5 +1,6 @@
+import { ClusterizationAlgorithm } from './clsterizationAlgorith'
+import { DataLinkProtocolType } from './dataLinkProtocolType'
 import { Frame } from './frame'
-import { NetworkProtocolType } from './networkProtocolType'
 import { SensorData } from './sensorData'
 import { Signal } from './signal'
 import { SimulationDelta } from './simulationDelta'
@@ -7,7 +8,8 @@ import { Vector3 } from './vector3'
 
 export type Project = {
     SensorSampleInterval: string
-    NetworkProtocolType: NetworkProtocolType
+    DataLinkProtocolType: DataLinkProtocolType
+    ClusterizationAlgorithm: ClusterizationAlgorithm
     AreaLimits: {
         Min: Vector3
         Max: Vector3

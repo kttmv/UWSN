@@ -1,10 +1,15 @@
-import { NetworkProtocolType } from '../shared/types/networkProtocolType'
+import { ClusterizationAlgorithmType } from '../shared/types/clusterizationAlogirthmType'
+import { DataLinkProtocolType } from '../shared/types/dataLinkProtocolType'
 import { Project } from '../shared/types/project'
 
 export function createDefaultProject() {
     const project: Project = {
         SensorSampleInterval: '00:10:00',
-        NetworkProtocolType: NetworkProtocolType.PureAloha,
+        DataLinkProtocolType: DataLinkProtocolType.PureAloha,
+        ClusterizationAlgorithm: {
+            $type: ClusterizationAlgorithmType.RetardedClusterization,
+            NumberOfClusters: 6
+        },
         AreaLimits: {
             Min: {
                 X: 0,

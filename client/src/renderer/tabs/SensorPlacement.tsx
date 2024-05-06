@@ -13,25 +13,23 @@ import { runPlaceSensorsRandomStep } from '../simulator/simulatorHelper'
 import useConsoleStore from '../store/consoleStore'
 import { useProjectStore } from '../store/projectStore'
 import useViewerStore from '../store/viewerStore'
-import SensorPlacementRandomStep from './SensorPlacementRandomStep'
+import SensorPlacementRandomStep, {
+    RandomStepParameters
+} from './SensorPlacementRandomStep'
 
 export enum SensorPlacementType {
-    RandomStep = 1
+    None = -1,
+    RandomStep
 }
 
-export enum SensorPlacementDistributionType {
-    Normal = 1,
+export enum RandomStepDistributionType {
+    Normal,
     Uniform
 }
 
 export type SensorPlacementInputs = {
     selectedType: SensorPlacementType
-    distributionType: SensorPlacementDistributionType
-    uniformA: number
-    uniformB: number
-    countX: number
-    countY: number
-    countZ: number
+    randomStepParameters: RandomStepParameters | undefined
 }
 
 export default function SensorPlacement() {
@@ -41,6 +39,11 @@ export default function SensorPlacement() {
     const { setIsOpen: setConsoleIsOpen } = useConsoleStore()
 
     const { setIsOpen: setViewerIsOpen } = useViewerStore()
+
+    const defaultValues: SensorPlacementInputs = {
+        selectedType: SensorPlacementType.None,
+        randomStepParameters: undefined
+    }
 
     const { register, handleSubmit, watch, formState } =
         useForm<SensorPlacementInputs>({
@@ -62,13 +65,17 @@ export default function SensorPlacement() {
 
         switch (type) {
             case SensorPlacementType.RandomStep: {
+                if (!data.randomStepParameters) {
+                    throw new Error('Не определены параметры распределения')
+                }
+
                 await runPlaceSensorsRandomStep(
-                    data.distributionType,
-                    data.countX,
-                    data.countY,
-                    data.countZ,
-                    data.uniformA,
-                    data.uniformB,
+                    data.randomStepParameters.distributionType,
+                    data.randomStepParameters.countX,
+                    data.randomStepParameters.countY,
+                    data.randomStepParameters.countZ,
+                    data.randomStepParameters.uniformA,
+                    data.randomStepParameters.uniformB,
                     projectFilePath
                 )
                 break
@@ -90,8 +97,14 @@ export default function SensorPlacement() {
                 <FormLabel>Расстановка сенсоров</FormLabel>
                 <Flex align='center' gap={2}>
                     <Text minWidth='150px'>Тип расстановки</Text>
-                    <Select {...register('selectedType')} defaultValue={-1}>
-                        <option value={-1}>Выберите тип расстановки</option>
+                    <Select
+                        {...register('selectedType')}
+                        defaultValue={SensorPlacementType.None}
+                    >
+                        <option value={SensorPlacementType.None}>
+                            Выберите тип расстановки
+                        </option>
+
                         <option value={SensorPlacementType.RandomStep}>
                             Ортогональное распределение со случайным шагом
                         </option>
@@ -108,14 +121,20 @@ export default function SensorPlacement() {
 
                 <Tooltip
                     label={
-                        'Внимание! Данное действие удалит все ' +
-                        'текущие сенсоры и результаты симуляции'
+                        formState.isValid &&
+                        selectedType !== SensorPlacementType.None
+                            ? 'Внимание! Данное действие удалит все ' +
+                              'текущие сенсоры и результаты симуляции'
+                            : 'Выбраны неверные параметры расстановки'
                     }
                 >
                     <Button
                         width='100%'
                         type='submit'
-                        isDisabled={!formState.isValid}
+                        isDisabled={
+                            !formState.isValid ||
+                            selectedType === SensorPlacementType.None
+                        }
                     >
                         <IconVector />
                         <Text m={1}>Расставить сенсоры по акватории</Text>

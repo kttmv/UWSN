@@ -43,9 +43,6 @@ namespace UWSN.Model.Sim
 
         public Type DataLinkProtocolType { get; set; }
 
-        public Type ClusterizationAlgorithmType { get; set; }
-
-        [JsonIgnore]
         public IClusterization ClusterizationAlgorithm { get; set; }
 
         public Vector3Range AreaLimits { get; set; }
@@ -87,16 +84,14 @@ namespace UWSN.Model.Sim
             AreaLimits = new Vector3Range(new Vector3(), new Vector3());
 
             DataLinkProtocolType = typeof(MultiChanneledAloha);
-            ClusterizationAlgorithmType = typeof(RetardedClusterization);
-
-            ClusterizationAlgorithm = (IClusterization)(
-                Activator.CreateInstance(Instance.ClusterizationAlgorithmType)
-                ?? throw new NullReferenceException("Тип алгоритма кластеризации не определен")
-            );
+            ClusterizationAlgorithm = new RetardedClusterization()
+            {
+                NumberOfClusters = 6
+            };
 
             SensorSampleInterval = new TimeSpan(0, 30, 0);
 
-            Modem ??= new AquaModem1000();
+            Modem = new AquaModem1000();
         }
 
         /// <summary>
@@ -147,7 +142,7 @@ namespace UWSN.Model.Sim
 
         public void Clusterize()
         {
-            ClusterizationAlgorithm.Clusterize(Environment.Sensors, AreaLimits, 4);
+            ClusterizationAlgorithm.Clusterize();
         }
     }
 }

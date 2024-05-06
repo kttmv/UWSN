@@ -3,30 +3,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UWSN.Model.Sim;
 using UWSN.Utilities;
 
 namespace UWSN.Model.Clusterization
 {
     public class RetardedClusterization : IClusterization
     {
-        public List<Sensor> Clusterize(
-            List<Sensor> sensors,
-            Vector3Range areaLimits,
-            int numberOfClusters
-        )
+        public int NumberOfClusters { get; set; }
+
+        public List<Sensor> Clusterize()
         {
-            if (numberOfClusters % 2 == 1)
+            if (NumberOfClusters <= 0)
+            {
+                throw new ArgumentException("Количество кластеров должно быть больше нуля");
+            }
+
+            if (NumberOfClusters % 2 == 1)
             {
                 throw new ArgumentException("Количество кластеров есть чотное число");
             }
+
+            var areaLimits = Simulation.Instance.AreaLimits;
+            var sensors = Simulation.Instance.Environment.Sensors;
 
             double areaLength = areaLimits.Max.X - areaLimits.Min.X;
             double areaWidth = areaLimits.Max.Z - areaLimits.Min.Z;
 
             // эта единица на конце - по сути сколько угодно малое число еписилон,
             // чтобы сенсоры, расположенные на границах, не образовывали новый кластер
-            double clusterLength = areaLength / (numberOfClusters / 2) + 1;
-            double clusterWidth = areaWidth / (numberOfClusters / 2) + 1;
+            double clusterLength = areaLength / (NumberOfClusters / 2) + 1;
+            double clusterWidth = areaWidth / (NumberOfClusters / 2) + 1;
 
             var clusterIdEncoder = new List<string>();
 

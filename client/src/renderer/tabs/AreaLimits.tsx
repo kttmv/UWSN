@@ -21,8 +21,20 @@ interface EnvironmentInputs {
 }
 
 export default function AreaLimits() {
+    const { project, setProject } = useProjectStore()
+
+    if (!project) {
+        throw new Error('Project не определен')
+    }
+
+    const defaultValues: EnvironmentInputs = {
+        v1: project.AreaLimits.Min,
+        v2: project.AreaLimits.Max
+    }
+
     const { register, handleSubmit, reset, formState } =
         useForm<EnvironmentInputs>({
+            defaultValues,
             reValidateMode: 'onBlur',
             mode: 'all'
         })
@@ -30,21 +42,8 @@ export default function AreaLimits() {
     const errors = formState.errors
     const dirtyFields = formState.dirtyFields
 
-    const { project, setProject } = useProjectStore()
-
-    if (!project) {
-        throw new Error('что-то пошло не так')
-    }
-
     useEffect(() => {
-        if (project) {
-            reset({
-                v1: project.AreaLimits.Min,
-                v2: project.AreaLimits.Max
-            })
-        } else {
-            reset()
-        }
+        reset(defaultValues)
     }, [project])
 
     const onSubmit: SubmitHandler<EnvironmentInputs> = (data) => {

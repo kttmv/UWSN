@@ -17,8 +17,6 @@ export default function ViewerCanvas() {
             setSelectedSensor(simulationState.Sensors[selectedSensor.Id])
     }, [simulationState])
 
-    console.log(simulationState.Sensors)
-
     return (
         <Canvas>
             <Sky />
