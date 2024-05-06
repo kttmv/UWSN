@@ -33,11 +33,13 @@ export const useProjectStore = create<State>((set, get) => ({
 
     setProjectFilePath: async (path: string) => {
         await parseProjectFile(path, set)
+        get().setDeltaIndex(-1)
         set({ projectFilePath: path })
     },
 
     updateProject: async () => {
         const path = get().projectFilePath
+        get().setDeltaIndex(-1)
         await parseProjectFile(path, set)
     },
 
@@ -46,6 +48,8 @@ export const useProjectStore = create<State>((set, get) => ({
 
         try {
             writeFile(path, JSON.stringify(newProject, null, 4))
+
+            get().setDeltaIndex(-1)
 
             set(() => ({ project: newProject }))
         } catch (error) {
@@ -87,22 +91,18 @@ function calculateSimulationState(
         const simulationDelta = project.Result.Deltas[i]
 
         const signalDeltas = simulationDelta.SignalDeltas
-        const clusterizationDeltas = simulationDelta.ClusterizationDeltas
+        const sensorDeltas = simulationDelta.SensorDeltas
 
         for (const delta of signalDeltas) {
             switch (delta.Type) {
                 case 'Add': {
                     const signal = project.Result.AllSignals[delta.SignalId]
-
                     state.Signals.push(signal)
-
                     break
                 }
                 case 'Remove': {
                     const signal = project.Result.AllSignals[delta.SignalId]
-
                     state.Signals = state.Signals.filter((x) => x !== signal)
-
                     break
                 }
                 default: {
@@ -111,12 +111,12 @@ function calculateSimulationState(
             }
         }
 
-        for (const delta of clusterizationDeltas) {
-            // const sensorData = project.Environment.Sensors[delta.SensorId]
-            const sensor = state.Sensors[delta.SensorId]
+        for (const delta of sensorDeltas) {
+            const sensor = state.Sensors[delta.Id]
 
-            sensor.ClusterId = delta.ClusterId
-            sensor.IsReference = delta.IsReference
+            if (delta.ClusterId) sensor.ClusterId = delta.ClusterId
+            if (delta.IsReference) sensor.IsReference = delta.IsReference
+            if (delta.Battery) sensor.Battery += delta.Battery
         }
     }
 
@@ -150,7 +150,8 @@ function createDefaultState(project: Project | undefined): SimulationState {
             Id: x.Id,
             Position: x.Position,
             ClusterId: -1,
-            IsReference: false
+            IsReference: false,
+            Battery: project.SensorSettings.InitialSensorBattery
         }))
     } else {
         sensors = []

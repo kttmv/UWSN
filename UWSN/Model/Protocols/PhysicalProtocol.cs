@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
+using static UWSN.Model.Sim.SimulationDelta;
 
 namespace UWSN.Model.Protocols
 {
@@ -21,6 +22,7 @@ namespace UWSN.Model.Protocols
 
         [JsonIgnore]
         public State CurrentState { get; set; } = State.Listening;
+
         [JsonIgnore]
         public State OriginalState { get; set; }
         public bool ShouldReceiveMessages { get; set; } = true;
@@ -38,6 +40,17 @@ namespace UWSN.Model.Protocols
             CurrentState = State.Receiving;
 
             Sensor.Battery -= 0.1;
+
+            var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
+            delta.SensorDeltas.Add(
+                new SensorDelta
+                {
+                    Id = Sensor.Id,
+                    ClusterId = null,
+                    IsReference = null,
+                    Battery = -0.1
+                }
+            );
 
             Logger.WriteSensorLine(Sensor, $"(Physical) начал принимать кадр от #{frame.SenderId}");
         }
@@ -75,6 +88,17 @@ namespace UWSN.Model.Protocols
                 );
 
             Sensor.Battery -= 0.15;
+
+            var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
+            delta.SensorDeltas.Add(
+                new SensorDelta
+                {
+                    Id = Sensor.Id,
+                    ClusterId = null,
+                    IsReference = null,
+                    Battery = -0.15
+                }
+            );
 
             _ = new Signal(Sensor, frame, channelId);
         }

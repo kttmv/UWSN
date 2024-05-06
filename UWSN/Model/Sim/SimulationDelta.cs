@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UWSN.Model.Sim;
+﻿namespace UWSN.Model.Sim;
 
 public class SimulationDelta
 {
@@ -16,38 +10,24 @@ public class SimulationDelta
 
     public struct SignalDelta
     {
-        public int SignalId { get; set; }
-        public SignalDeltaType Type { get; set; }
-
-        public SignalDelta(int signalId, SignalDeltaType type)
-        {
-            SignalId = signalId;
-            Type = type;
-        }
+        public required int SignalId { get; set; }
+        public required SignalDeltaType Type { get; set; }
     }
 
-    public struct ClusterizationDelta
+    public struct SensorDelta
     {
-        public int SensorId { get; set; }
-        public int ClusterId { get; set; }
-        public bool IsReference { get; set; }
-
-        public ClusterizationDelta(int sensorId, int clusterId, bool isReference)
-        {
-            SensorId = sensorId;
-            ClusterId = clusterId;
-            IsReference = isReference;
-        }
+        public required int Id { get; set; }
+        public required int? ClusterId { get; set; }
+        public required bool? IsReference { get; set; }
+        public required double? Battery { get; set; }
     }
 
-    public DateTime Time { get; set; }
-    public List<SignalDelta> SignalDeltas { get; set; }
-    public List<ClusterizationDelta> ClusterizationDeltas { get; set; }
+    public DateTime Time { get; set; } = new();
+    public List<SignalDelta> SignalDeltas { get; set; } = new();
+    public List<SensorDelta> SensorDeltas { get; set; } = new();
 
     public SimulationDelta(DateTime time)
     {
-        SignalDeltas = new();
-        ClusterizationDeltas = new();
         Time = time;
     }
 }

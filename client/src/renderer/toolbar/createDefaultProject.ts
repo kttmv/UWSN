@@ -9,6 +9,7 @@ export function createDefaultProject() {
             StartSamplingTime: '0001-01-02T00:00:00',
 
             InitialSensorBattery: 100,
+            BatteryDeadCharge: 5,
 
             DataLinkProtocol: {
                 $type: DataLinkProtocolType.PureAloha,

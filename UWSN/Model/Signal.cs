@@ -2,6 +2,7 @@
 using UWSN.Model.Protocols;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
+using static UWSN.Model.Sim.SimulationDelta;
 
 namespace UWSN.Model;
 
@@ -42,7 +43,7 @@ public class Signal
             if (sensor == Emitter)
                 continue;
 
-            if (sensor.Battery < 5.0)
+            if (sensor.Battery < Simulation.Instance.SensorSettings.BatteryDeadCharge)
             {
                 continue;
             }
@@ -68,8 +69,10 @@ public class Signal
             int id = Simulation.Instance.Result!.AllSignals.Count;
             Simulation.Instance.Result.AllSignals.Add(new(id, Emitter.Id, sensor.Id));
 
-            var delta = GetOrCreateSignalDelta(timeStartReceiving);
-            delta.SignalDeltas.Add(new(id, SimulationDelta.SignalDeltaType.Add));
+            var delta = SimulationResult.GetOrCreateSimulationDelta(timeStartReceiving);
+            delta.SignalDeltas.Add(
+                new SignalDelta { SignalId = id, Type = SimulationDelta.SignalDeltaType.Add }
+            );
 
             // создание событий начала и окончания приема сообщения
             var startReceiving = CreateStartReceivingEvent(sensor, timeStartReceiving);
@@ -177,8 +180,10 @@ public class Signal
 
     private void EndReceivingAction(Sensor sensor, DateTime timeEndReceiving, int id)
     {
-        var delta = GetOrCreateSignalDelta(timeEndReceiving);
-        delta.SignalDeltas.Add(new(id, SimulationDelta.SignalDeltaType.Remove));
+        var delta = SimulationResult.GetOrCreateSimulationDelta(timeEndReceiving);
+        delta.SignalDeltas.Add(
+            new SignalDelta { SignalId = id, Type = SimulationDelta.SignalDeltaType.Remove }
+        );
 
         sensor.Physical.EndReceiving(Frame);
     }
@@ -235,16 +240,5 @@ public class Signal
 
         //return DeliveryProbabilityCalculator.CalculatePassiveSonarEq(20.0, 0, 18000);
         //return DeliveryProbabilityCalculator.Calculate(60.0, 12.8, new Vector3(0, 0, 0), new Vector3(0, 0, 2225), 25.0, true);
-    }
-
-    private SimulationDelta GetOrCreateSignalDelta(DateTime time)
-    {
-        if (!Simulation.Instance.Result!.AllDeltas.TryGetValue(time, out SimulationDelta? value))
-        {
-            value = new(time);
-            Simulation.Instance.Result.AllDeltas.Add(time, value);
-        }
-
-        return value;
     }
 }

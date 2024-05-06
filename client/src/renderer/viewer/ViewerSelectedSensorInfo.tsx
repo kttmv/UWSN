@@ -10,6 +10,7 @@ import {
     useBreakpointValue
 } from '@chakra-ui/react'
 import { IconX } from '@tabler/icons-react'
+import { useProjectStore } from '../store/projectStore'
 import useViewerStore from '../store/viewerStore'
 
 export default function ViewerSelectedSensorInfo() {
@@ -19,6 +20,11 @@ export default function ViewerSelectedSensorInfo() {
         base: '5px',
         lg: '31px'
     })
+
+    const { project } = useProjectStore()
+    if (!project) {
+        throw new Error('Project не определен')
+    }
 
     if (!selectedSensor) {
         return <></>
@@ -62,8 +68,20 @@ export default function ViewerSelectedSensorInfo() {
                 >
                     <Text>Координаты:</Text>
                     <Card padding='5px'>{positionString}</Card>
+
                     <Text>Кластер:</Text>
                     <Card padding='5px'>{clusterString}</Card>
+
+                    <Text>Батарея:</Text>
+                    <Card padding='5px'>
+                        {selectedSensor.Battery.toFixed(2)} (
+                        {(
+                            (selectedSensor.Battery /
+                                project.SensorSettings.InitialSensorBattery) *
+                            100
+                        ).toFixed(2)}
+                        %)
+                    </Card>
                 </Grid>
             </CardBody>
         </Card>

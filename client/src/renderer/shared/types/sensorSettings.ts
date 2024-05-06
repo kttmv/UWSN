@@ -9,4 +9,5 @@ export type SensorSettings = {
     StartSamplingTime: string
 
     InitialSensorBattery: number
+    BatteryDeadCharge: number
 }

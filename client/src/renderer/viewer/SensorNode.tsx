@@ -3,11 +3,11 @@ import { useRef, useState } from 'react'
 import * as THREE from 'three'
 import { Mesh } from 'three'
 import { Sensor } from '../shared/types/sensor'
+import { useProjectStore } from '../store/projectStore'
 import useViewerStore from '../store/viewerStore'
 
 const clusterColors: THREE.ColorRepresentation[] = [
     'red',
-    'green',
     'violet',
     'yellow',
     'khaki',
@@ -40,13 +40,22 @@ export default function SensorNode({ sensor }: Props) {
 
     const { scale, selectedSensor, setSelectedSensor } = useViewerStore()
 
+    const { project } = useProjectStore()
+    if (!project) {
+        throw new Error('Project не определен')
+    }
+
     const isSelected = selectedSensor && sensor.Id === selectedSensor.Id
 
     let color: THREE.ColorRepresentation
-    if (sensor.ClusterId > -1) {
-        color = clusterColors[sensor.ClusterId % clusterColors.length]
+    if (sensor.Battery <= project.SensorSettings.BatteryDeadCharge) {
+        color = 'black'
     } else {
-        color = 'orange'
+        if (sensor.ClusterId > -1) {
+            color = clusterColors[sensor.ClusterId % clusterColors.length]
+        } else {
+            color = 'orange'
+        }
     }
 
     const setSelected = () => {

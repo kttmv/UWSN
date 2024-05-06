@@ -25,12 +25,13 @@ public class Sensor
     [JsonIgnore]
     public bool IsDead
     {
-        get { return Battery < 5.0; }
+        get { return Battery < Simulation.Instance.SensorSettings.BatteryDeadCharge; }
     }
 
     /// <summary>
     /// Данные, полученные в ходе обмена данными. Только для референсов. Для проверки
     /// </summary>
+    [JsonIgnore]
     public List<string> ReceivedData { get; set; } = new();
 
     [JsonIgnore]
