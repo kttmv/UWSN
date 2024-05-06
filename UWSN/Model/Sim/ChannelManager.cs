@@ -13,7 +13,24 @@ public class ChannelManager
     /// <summary>
     /// Отсортированные по каналам эммиты
     /// </summary>
-    private Signal?[] Channels { get; set; }
+    private Signal?[] Channels
+    {
+        get
+        {
+            // костыль. при создании объекта количество каналов не известно,
+            // так как десериализация заполняет его свойства ПОСЛЕ его создания.
+            // так что приходится создавать массив каналов при первом обращении к нему,
+            // когда все уже точно создано.
+            if (_channels == null)
+            {
+                _channels = new Signal?[NumberOfChannels];
+            }
+
+            return _channels;
+        }
+    }
+
+    private Signal?[]? _channels { get; set; }
 
     [JsonIgnore]
     public List<int> FreeChannels
@@ -45,11 +62,6 @@ public class ChannelManager
                 .Select(x => x.Id)
                 .ToList();
         }
-    }
-
-    public ChannelManager()
-    {
-        Channels = new Signal?[NumberOfChannels];
     }
 
     public bool IsChannelBusy(int channelId)
