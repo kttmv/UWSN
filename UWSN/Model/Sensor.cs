@@ -19,7 +19,17 @@ public class Sensor
     [JsonIgnore]
     public NetworkProtocol Network { get; set; }
 
+    [JsonIgnore]
     public double Battery { get; set; }
+
+    [JsonIgnore]
+    public bool IsDead
+    {
+        get
+        {
+            return Battery < 5.0;
+        }
+    }
 
     /// <summary>
     /// Данные, полученные в ходе обмена данными. Только для референсов. Для проверки
@@ -69,7 +79,7 @@ public class Sensor
         );
         Network = new NetworkProtocol();
         Id = id;
-        Battery = 10000.0;
+        Battery = Simulation.Instance.InitialSensorBattery;
         ReceivedData = new List<string>();
     }
 
@@ -81,7 +91,7 @@ public class Sensor
             ?? throw new NullReferenceException("Тип сетевого протокола не определен")
         );
         Network = new NetworkProtocol();
-        Battery = 10000.0;
+        Battery = Simulation.Instance.InitialSensorBattery;
         ReceivedData = new List<string>();
     }
 
@@ -111,13 +121,19 @@ public class Sensor
             )
         );
 
-        for (int i = 1; i < 2; i++)
+        for (int i = 1; i < 1000; i++)
         {
+            int k = i;
+
             Simulation.Instance.EventManager.AddEvent(
                 new Event(
                     Simulation.Instance.StartSamplingTime.Add(Simulation.Instance.SensorSampleInterval * i),
                     $"Отправка DATA от #{frame.SenderId}",
-                    () => SendData()
+                    () =>
+                        {
+                            Simulation.Instance.CurrentCycle = k;
+                            SendData();
+                        }
                     )
                 );
 
@@ -126,6 +142,9 @@ public class Sensor
 
     public void SendData()
     {
+        if (IsReference == null)
+            return;
+
         if ((bool)IsReference)
         {
             ReceivedData.Add($"D_{Id}");

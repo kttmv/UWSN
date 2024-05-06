@@ -37,6 +37,16 @@ namespace UWSN.Model.Sim
         [JsonIgnore]
         public List<ModemBase>? AvailableModems { get; set; }
 
+        /// <summary>
+        /// % мёртвых сенсоров, при достижении которого мы считаем сеть мертвой
+        /// </summary>
+        public double DeadSensorsPercent { get; set; }
+
+        [JsonIgnore]
+        public int CurrentCycle { get; set; }
+
+        public double InitialSensorBattery { get; set; } = 100.0;
+
         public TimeSpan SensorSampleInterval { get; set; }
 
         public DateTime StartSamplingTime { get; set; } = new DateTime().AddDays(1);
@@ -79,7 +89,7 @@ namespace UWSN.Model.Sim
 
             //todo: если не задавать количество каналов в конструкторе, то оно всегда 0,
             //как будто не считывается с Json
-            ChannelManager = new ChannelManager(1);
+            ChannelManager = new ChannelManager(16);
             EventManager = new EventManager();
 
             Environment = new Environment();
@@ -127,6 +137,13 @@ namespace UWSN.Model.Sim
                 Logger.WriteLine("");
 
                 i++;
+
+                if (Environment.Sensors.Where(s => s.IsDead).Count() / (double)Environment.Sensors.Count >= DeadSensorsPercent)
+                {
+                    Logger.WriteLine("Сеть мертва");
+
+                    break;
+                } 
             }
 
             if (i >= MAX_PROCESSED_EVENTS)
@@ -143,6 +160,7 @@ namespace UWSN.Model.Sim
             Logger.WriteLine($"\tКоличество отправленных сообщений: {Result.TotalSends}");
             Logger.WriteLine($"\tКоличество полученных сообщений: {Result.TotalReceives}");
             Logger.WriteLine($"\tКоличество коллизий: {Result.TotalCollisions}");
+            Logger.WriteLine($"\tКоличество отработанных циклов: {CurrentCycle}");
         }
 
         public void Clusterize()
