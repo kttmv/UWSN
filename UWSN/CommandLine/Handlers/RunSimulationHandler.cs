@@ -18,6 +18,8 @@ namespace UWSN.CommandLine.Handlers
         {
             SerializationHelper.LoadSimulation(o.FilePath);
 
+            Simulation.Instance.Result!.AllDeltas.Add(Simulation.Instance.Time, new SimulationDelta(Simulation.Instance.Time));
+
             foreach (var sensor in Simulation.Instance.Environment.Sensors)
             {
                 sensor.WakeUp();

@@ -45,6 +45,9 @@ namespace UWSN.Model.Sim
         [JsonIgnore]
         public int CurrentCycle { get; set; }
 
+        [JsonIgnore]
+        public bool ShouldSkipHello { get; set; }
+
         public double InitialSensorBattery { get; set; } = 100.0;
 
         public TimeSpan SensorSampleInterval { get; set; }
@@ -93,6 +96,8 @@ namespace UWSN.Model.Sim
             EventManager = new EventManager();
 
             Environment = new Environment();
+
+            ShouldSkipHello = false;
 
             AreaLimits = new Vector3Range(new Vector3(), new Vector3());
 

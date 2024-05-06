@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using UWSN.Model.Protocols;
 using UWSN.Model.Protocols.DataLink;
 using UWSN.Model.Sim;
+using static UWSN.Model.Protocols.NetworkProtocol;
 
 namespace UWSN.Model;
 
@@ -99,28 +100,48 @@ public class Sensor
     {
         ReceivedData.Clear();
 
-        var frame = new Frame
+        if (!Simulation.Instance.ShouldSkipHello)
         {
-            SenderId = Id,
-            SenderPosition = Position,
-            ReceiverId = -1,
-            Type = Frame.FrameType.Hello,
-            TimeSend = Simulation.Instance.Time,
-            AckIsNeeded = false,
-            NeighboursData = Network.Neighbours,
-            BatteryLeft = Battery,
-            DeadSensors = null,
-            Data = null,
-        };
+            var frame = new Frame
+            {
+                SenderId = Id,
+                SenderPosition = Position,
+                ReceiverId = -1,
+                Type = Frame.FrameType.Hello,
+                TimeSend = Simulation.Instance.Time,
+                AckIsNeeded = false,
+                NeighboursData = Network.Neighbours,
+                BatteryLeft = Battery,
+                DeadSensors = null,
+                Data = null,
+            };
 
-        Simulation.Instance.EventManager.AddEvent(
-            new Event(
-                default,
-                $"Отправка HELLO от #{frame.SenderId}",
-                () => DataLink.SendFrame(frame)
-            )
-        );
+            Simulation.Instance.EventManager.AddEvent(
+                new Event(
+                    default,
+                    $"Отправка HELLO от #{frame.SenderId}",
+                    () => DataLink.SendFrame(frame)
+                )
+            );
+        }
+        else
+        {
+            List<Neighbour> neighbours = new();
 
+            foreach (var sensor in Simulation.Instance.Environment.Sensors)
+            {
+                var n = new Neighbour
+                {
+                    Position = sensor.Position,
+                    Id = sensor.Id,
+                };
+                neighbours.Add(n);
+            }
+
+            Network.Neighbours = neighbours;
+            Network.Clusterize();
+        }
+        
         for (int i = 1; i < 1000; i++)
         {
             int k = i;
@@ -128,7 +149,7 @@ public class Sensor
             Simulation.Instance.EventManager.AddEvent(
                 new Event(
                     Simulation.Instance.StartSamplingTime.Add(Simulation.Instance.SensorSampleInterval * i),
-                    $"Отправка DATA от #{frame.SenderId}",
+                    $"Отправка DATA от #{Id}",
                     () =>
                         {
                             Simulation.Instance.CurrentCycle = k;

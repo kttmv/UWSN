@@ -228,7 +228,7 @@ public class NetworkProtocol : ProtocolBase
 
     public void SendFrame(Frame frame) { }
 
-    private void Clusterize()
+    internal void Clusterize()
     {
         if (Sensor.NextClusterization == null)
         {
