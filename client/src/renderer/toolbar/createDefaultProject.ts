@@ -11,7 +11,10 @@ export function createDefaultProject() {
             InitialSensorBattery: 100,
 
             DataLinkProtocol: {
-                $type: DataLinkProtocolType.PureAloha
+                $type: DataLinkProtocolType.PureAloha,
+                Timeout: 10,
+                TimeoutRelativeDeviation: 0.5,
+                AckTimeout: 20
             },
 
             ClusterizationAlgorithm: {

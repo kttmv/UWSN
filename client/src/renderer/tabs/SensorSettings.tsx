@@ -1,9 +1,11 @@
-import { Button, Flex, FormControl, FormLabel, Tooltip } from '@chakra-ui/react'
+import { Button, Flex, FormControl, Tooltip } from '@chakra-ui/react'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { SensorSettings } from '../shared/types/sensorSettings'
 import { useProjectStore } from '../store/projectStore'
+import SensorBatterySettings from './SensorBatterySettings'
+import SensorClusterizationSettings from './SensorClusterizationSettings'
 import SensorProtocolSettings from './SensorProtocolSettings'
 
 export default function SensorSettings() {
@@ -38,21 +40,27 @@ export default function SensorSettings() {
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>
-            <Flex direction='column' gap={4}>
-                <FormControl>
-                    <FormLabel>Протоколы</FormLabel>
+            <FormControl>
+                <Flex direction='column' gap={4}>
                     <SensorProtocolSettings form={form} />
-                </FormControl>
-                <Tooltip
-                    isDisabled={project.Result === undefined}
-                    label='Внимание! Данное действие удалит результаты симуляции'
+                    <SensorClusterizationSettings form={form} />
+                    <SensorBatterySettings form={form} />
+                </Flex>
+            </FormControl>
+            <Tooltip
+                isDisabled={project.Result === undefined}
+                label='Внимание! Данное действие удалит результаты симуляции'
+            >
+                <Button
+                    marginTop={10}
+                    width='100%'
+                    isDisabled={!form.formState.isDirty}
+                    type='submit'
                 >
-                    <Button isDisabled={!form.formState.isDirty} type='submit'>
-                        <IconDeviceFloppy />
-                        Сохранить изменения настройки сенсоров
-                    </Button>
-                </Tooltip>
-            </Flex>
+                    <IconDeviceFloppy />
+                    Сохранить изменения настройки сенсоров
+                </Button>
+            </Tooltip>
         </form>
     )
 }

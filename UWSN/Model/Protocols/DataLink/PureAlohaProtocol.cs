@@ -7,9 +7,10 @@ namespace UWSN.Model.Protocols.DataLink
     public class PureAloha : DataLinkProtocol
     {
         private const int CHANNEL_ID = 0;
-        private const int CHANNEL_TIMEOUT_IN_SECONDS = 10;
-        private const double CHANNEL_TIMEOUT_RELATIVE_DEVIATION = 0.5;
-        private const int ACK_TIMEOUT_IN_SECONDS = 20;
+
+        public int Timeout { get; set; } = 10;
+        public double TimeoutRelativeDeviation { get; set; } = 0.5;
+        public int AckTimeout { get; set; } = 20;
 
         [JsonIgnore]
         private Event? WaitingForAckEvent { get; set; }
@@ -109,10 +110,8 @@ namespace UWSN.Model.Protocols.DataLink
             if (Simulation.Instance.ChannelManager.IsChannelBusy(CHANNEL_ID) || ackIsBlocking)
             {
                 double rngTimeout =
-                    (new Random().NextDouble() - 0.5)
-                    * CHANNEL_TIMEOUT_IN_SECONDS
-                    * CHANNEL_TIMEOUT_RELATIVE_DEVIATION;
-                double timeout = CHANNEL_TIMEOUT_IN_SECONDS + rngTimeout;
+                    (new Random().NextDouble() - 0.5) * Timeout * TimeoutRelativeDeviation;
+                double timeout = Timeout + rngTimeout;
 
                 if (ackIsBlocking)
                     Logger.WriteSensorLine(
@@ -190,11 +189,11 @@ namespace UWSN.Model.Protocols.DataLink
         {
             Logger.WriteSensorLine(
                 Sensor,
-                $"(PureAloha) жду ACK от #{frame.ReceiverId} в течение {ACK_TIMEOUT_IN_SECONDS} сек."
+                $"(PureAloha) жду ACK от #{frame.ReceiverId} в течение {AckTimeout} сек."
             );
 
             WaitingForAckEvent = new Event(
-                Simulation.Instance.Time.AddSeconds(ACK_TIMEOUT_IN_SECONDS),
+                Simulation.Instance.Time.AddSeconds(AckTimeout),
                 $"Проверка получения ACK сенсором #{Sensor.Id}",
                 () => ResendFrame(frame, attemptsLeft)
             );

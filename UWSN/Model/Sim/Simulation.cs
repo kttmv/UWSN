@@ -8,7 +8,7 @@ namespace UWSN.Model.Sim;
 public class Simulation
 {
     private const int MAX_PROCESSED_EVENTS = 1_000_000;
-    public const int MAX_CYCLES = 10_000;
+    public const int MAX_CYCLES = 1_000;
 
     #region Simulation Singleton
 
