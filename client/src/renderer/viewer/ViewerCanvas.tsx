@@ -41,24 +41,7 @@ export default function ViewerCanvas() {
                     ))}
 
                     {simulationState.Signals.map((signal, i) => {
-                        const sender =
-                            project.Environment.Sensors[signal.SenderId]
-                        const receiver =
-                            project.Environment.Sensors[signal.ReceiverId]
-
-                        const from = {
-                            X: sender.Position.X / scale,
-                            Y: sender.Position.Y / scale,
-                            Z: sender.Position.Z / scale
-                        }
-
-                        const to = {
-                            X: receiver.Position.X / scale,
-                            Y: receiver.Position.Y / scale,
-                            Z: receiver.Position.Z / scale
-                        }
-
-                        return <Signal key={i} from={from} to={to} />
+                        return <Signal key={i} signal={signal} />
                     })}
 
                     <GridRectangle

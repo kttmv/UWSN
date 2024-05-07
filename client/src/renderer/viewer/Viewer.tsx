@@ -3,7 +3,7 @@ import { IconCaretDown, IconCaretUp } from '@tabler/icons-react'
 import useViewerStore from '../store/viewerStore'
 import ViewerCanvas from './ViewerCanvas'
 import ViewerDeltaSettings from './ViewerDeltaSettings'
-import ViewerSelectedSensorInfo from './ViewerSelectedSensorInfo'
+import ViewerSelectedObjectInfo from './ViewerSelectedObjectInfo'
 import ViewerSettings from './ViewerSettings'
 
 export default function Viewer() {
@@ -23,7 +23,7 @@ export default function Viewer() {
                     <ViewerCanvas />
                     <ViewerSettings />
                     <ViewerDeltaSettings />
-                    <ViewerSelectedSensorInfo />
+                    <ViewerSelectedObjectInfo />
                 </>
             )}
 
