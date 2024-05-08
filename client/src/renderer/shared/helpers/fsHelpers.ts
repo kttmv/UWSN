@@ -7,7 +7,7 @@ export function readFile(path: string): Promise<string> {
         window.electronAPI.ipcRenderer.once('read-file-reply', (arg) => {
             const data = arg as ReadFileReply
 
-            log(data)
+            // log(data)
 
             if (data.error) {
                 reject(data.error)
@@ -29,7 +29,7 @@ export function writeFile(
         window.electronAPI.ipcRenderer.once('write-file-reply', (arg) => {
             const data = arg as WriteFileReply
 
-            log(data)
+            // log(data)
 
             if (data.error) {
                 reject(data.error)
@@ -54,7 +54,7 @@ export function showOpenFileDialog(
         window.electronAPI.ipcRenderer.once('open-file-dialog-reply', (arg) => {
             const data = arg as Electron.OpenDialogReturnValue
 
-            log(data)
+            // log(data)
 
             resolve(data)
         })
@@ -70,7 +70,7 @@ export function showSaveFileDialog(
         window.electronAPI.ipcRenderer.once('save-file-dialog-reply', (arg) => {
             const data = arg as Electron.OpenDialogReturnValue
 
-            log(data)
+            // log(data)
 
             resolve(data)
         })

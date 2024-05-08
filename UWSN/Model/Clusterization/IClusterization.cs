@@ -9,10 +9,6 @@ namespace UWSN.Model.Clusterization
 {
     public interface IClusterization
     {
-        public List<Sensor> Clusterize(
-            List<Sensor> sensors,
-            Vector3Range areaLimits,
-            int numberOfClusters
-        );
+        public List<Sensor> Clusterize();
     }
 }

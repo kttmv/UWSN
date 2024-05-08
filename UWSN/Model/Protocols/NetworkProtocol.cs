@@ -46,7 +46,7 @@ public class NetworkProtocol : ProtocolBase
 
     public void ReceiveFrame(Frame frame)
     {
-        if (Sensor.Battery < 5.0)
+        if (Sensor.Battery < Simulation.Instance.SensorSettings.BatteryDeadCharge)
         {
             if (!DeadSensors.Contains(Sensor.Id))
             {
@@ -74,7 +74,7 @@ public class NetworkProtocol : ProtocolBase
             return;
         }
 
-        if (frame.BatteryLeft < 5.0)
+        if (frame.BatteryLeft < Simulation.Instance.SensorSettings.BatteryDeadCharge)
         {
             if (!DeadSensors.Contains(frame.SenderId))
             {
@@ -175,7 +175,9 @@ public class NetworkProtocol : ProtocolBase
         {
             if (Neighbours.Count == 0)
             {
-                Neighbours.Add(new(Sensor.Id, Sensor.Position, Sensor.ClusterId, Sensor.IsReference));
+                Neighbours.Add(
+                    new(Sensor.Id, Sensor.Position, Sensor.ClusterId, Sensor.IsReference)
+                );
             }
 
             var newNeighbours =
@@ -260,12 +262,14 @@ public class NetworkProtocol : ProtocolBase
         }
 
         var time = Simulation.Instance.Time;
-        var delta = new ClusterizationDelta(
-            Sensor.Id,
-            Sensor.ClusterId.Value,
-            Sensor.IsReference.Value
-        );
+        var delta = new SensorDelta
+        {
+            Id = Sensor.Id,
+            ClusterId = Sensor.ClusterId.Value,
+            IsReference = Sensor.IsReference.Value,
+            Battery = null
+        };
 
-        Simulation.Instance.Result!.AllDeltas[time].ClusterizationDeltas.Add(delta);
+        Simulation.Instance.Result!.AllDeltas[time].SensorDeltas.Add(delta);
     }
 }

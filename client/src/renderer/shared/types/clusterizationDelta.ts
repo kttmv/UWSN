@@ -1,5 +1,6 @@
-export type ClusterizationDelta = {
-    SensorId: number
-    ClusterId: number
-    IsReference: boolean
+export type SensorDelta = {
+    Id: number
+    ClusterId: number | undefined
+    IsReference: boolean | undefined
+    Battery: number | undefined
 }

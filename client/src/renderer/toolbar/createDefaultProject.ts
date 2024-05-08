@@ -1,10 +1,32 @@
-import { NetworkProtocolType } from '../shared/types/networkProtocolType'
+import { ClusterizationAlgorithmType } from '../shared/types/clusterizationAlogirthmType'
+import { DataLinkProtocolType } from '../shared/types/dataLinkProtocolType'
 import { Project } from '../shared/types/project'
 
 export function createDefaultProject() {
     const project: Project = {
-        SensorSampleInterval: '00:10:00',
-        NetworkProtocolType: NetworkProtocolType.PureAloha,
+        SensorSettings: {
+            SensorSampleInterval: '00:10:00',
+            StartSamplingTime: '0001-01-02T00:00:00',
+
+            InitialSensorBattery: 100,
+            BatteryDeadCharge: 5,
+
+            DataLinkProtocol: {
+                $type: DataLinkProtocolType.PureAloha,
+                Timeout: 10,
+                TimeoutRelativeDeviation: 0.5,
+                AckTimeout: 20,
+                AckRetries: 3
+            },
+
+            ClusterizationAlgorithm: {
+                $type: ClusterizationAlgorithmType.RetardedClusterization,
+                NumberOfClusters: 6
+            }
+        },
+
+        DeadSensorsPercent: 0.33,
+
         AreaLimits: {
             Min: {
                 X: 0,
@@ -17,12 +39,15 @@ export function createDefaultProject() {
                 Z: 10_000
             }
         },
+
         ChannelManager: {
             NumberOfChannels: 1
         },
+
         Environment: {
             Sensors: []
         },
+
         Result: undefined
     }
 

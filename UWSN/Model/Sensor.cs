@@ -12,39 +12,37 @@ public class Sensor
     #region Properties
 
     [JsonIgnore]
-    public PhysicalProtocol Physical { get; set; }
+    public PhysicalProtocol Physical { get; set; } = new();
 
     [JsonIgnore]
     public DataLinkProtocol DataLink { get; set; }
 
     [JsonIgnore]
-    public NetworkProtocol Network { get; set; }
+    public NetworkProtocol Network { get; set; } = new();
 
     [JsonIgnore]
-    public double Battery { get; set; }
+    public double Battery { get; set; } = 100;
 
     [JsonIgnore]
     public bool IsDead
     {
-        get
-        {
-            return Battery < 100.0;
-        }
+        get { return Battery < Simulation.Instance.SensorSettings.BatteryDeadCharge; }
     }
 
     /// <summary>
     /// Данные, полученные в ходе обмена данными. Только для референсов. Для проверки
     /// </summary>
-    public List<string> ReceivedData { get; set; }
+    [JsonIgnore]
+    public List<string> ReceivedData { get; set; } = new();
 
     [JsonIgnore]
-    public int? ClusterId { get; set; }
+    public int? ClusterId { get; set; } = null;
 
     [JsonIgnore]
-    public bool? IsReference { get; set; }
+    public bool? IsReference { get; set; } = null;
 
     [JsonIgnore]
-    public NextClusterization? NextClusterization { get; set; }
+    public NextClusterization? NextClusterization { get; set; } = null;
 
     private int _id;
 
@@ -64,7 +62,7 @@ public class Sensor
         }
     }
 
-    public Vector3 Position { get; set; }
+    public Vector3 Position { get; set; } = new();
 
     [JsonIgnore]
     public List<Frame> FrameBuffer { get; set; } = new List<Frame>();
@@ -73,27 +71,18 @@ public class Sensor
 
     public Sensor(int id)
     {
-        Physical = new PhysicalProtocol();
-        DataLink = (DataLinkProtocol)(
-            Activator.CreateInstance(Simulation.Instance.DataLinkProtocolType)
-            ?? throw new NullReferenceException("Тип сетевого протокола не определен")
-        );
-        Network = new NetworkProtocol();
+        Battery = Simulation.Instance.SensorSettings.InitialSensorBattery;
+
+        DataLink = Simulation.Instance.SensorSettings.DataLinkProtocol.Clone();
+
         Id = id;
-        Battery = Simulation.Instance.InitialSensorBattery;
-        ReceivedData = new List<string>();
     }
 
     public Sensor()
     {
-        Physical = new PhysicalProtocol();
-        DataLink = (DataLinkProtocol)(
-            Activator.CreateInstance(Simulation.Instance.DataLinkProtocolType)
-            ?? throw new NullReferenceException("Тип сетевого протокола не определен")
-        );
-        Network = new NetworkProtocol();
-        Battery = Simulation.Instance.InitialSensorBattery;
-        ReceivedData = new List<string>();
+        Battery = Simulation.Instance.SensorSettings.InitialSensorBattery;
+
+        DataLink = Simulation.Instance.SensorSettings.DataLinkProtocol.Clone();
     }
 
     public void WakeUp(bool shouldSkipHello)
@@ -142,7 +131,7 @@ public class Sensor
             Network.Clusterize();
         }
         
-        for (int i = 1; i < 1000; i++)
+        for (int i = 1; i <= Simulation.MAX_CYCLES; i++)
         {
             int k = i;
 
@@ -151,13 +140,12 @@ public class Sensor
                     Simulation.Instance.StartSamplingTime.Add(Simulation.Instance.SensorSampleInterval * i),
                     $"Отправка DATA от #{Id}",
                     () =>
-                        {
-                            Simulation.Instance.CurrentCycle = k;
-                            SendData();
-                        }
-                    )
-                );
-
+                    {
+                        Simulation.Instance.CurrentCycle = k;
+                        SendData();
+                    }
+                )
+            );
         }
     }
 
@@ -220,16 +208,23 @@ public class Sensor
         if (clusterMates.Any(m => m.IsReference == null))
             throw new Exception("Свойство IsReference не должно быть null");
 
-        int idRef = clusterMates.First(m => m.IsReference != null && (bool)m.IsReference).Id;
+        int referenceId = clusterMates.First(m => m.IsReference.HasValue && m.IsReference.Value).Id;
 
-        var refPos = Network.Neighbours.First(n => n.Id == idRef).Position;
-        double distToRef = Vector3.Distance(Position, refPos);
+        var referencePosition = Network.Neighbours.First(n => n.Id == referenceId).Position;
+
+        double distanceToReference = Vector3.Distance(Position, referencePosition);
+
+        var neighboursByDistance = Network.Neighbours.OrderBy(n =>
+            Vector3.Distance(Position, n.Position)
+        );
+
         int hopId = -1;
-        var neighboursByDistance = Network.Neighbours.OrderBy(n => Vector3.Distance(Position, n.Position));
-
         foreach (var neighbour in neighboursByDistance)
         {
-            if (Vector3.Distance(neighbour.Position, refPos) < distToRef && clusterMates.Count(m => m.Id == neighbour.Id) > 0)
+            if (
+                Vector3.Distance(neighbour.Position, referencePosition) < distanceToReference
+                && clusterMates.Count(m => m.Id == neighbour.Id) > 0
+            )
             {
                 hopId = neighbour.Id;
             }

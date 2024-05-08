@@ -1,5 +1,6 @@
 import { OrbitControls, Sky } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
+import { useEffect } from 'react'
 import { useProjectStore } from '../store/projectStore'
 import useViewerStore from '../store/viewerStore'
 import GridRectangle from './GridRectangle'
@@ -9,9 +10,12 @@ import Signal from './Signal'
 export default function ViewerCanvas() {
     const { project, simulationState } = useProjectStore()
 
-    const { scale } = useViewerStore()
+    const { scale, selectedSensor, setSelectedSensor } = useViewerStore()
 
-    console.log(simulationState.Sensors)
+    useEffect(() => {
+        if (selectedSensor)
+            setSelectedSensor(simulationState.Sensors[selectedSensor.Id])
+    }, [simulationState])
 
     return (
         <Canvas>
@@ -37,24 +41,7 @@ export default function ViewerCanvas() {
                     ))}
 
                     {simulationState.Signals.map((signal, i) => {
-                        const sender =
-                            project.Environment.Sensors[signal.SenderId]
-                        const receiver =
-                            project.Environment.Sensors[signal.ReceiverId]
-
-                        const from = {
-                            X: sender.Position.X / scale,
-                            Y: sender.Position.Y / scale,
-                            Z: sender.Position.Z / scale
-                        }
-
-                        const to = {
-                            X: receiver.Position.X / scale,
-                            Y: receiver.Position.Y / scale,
-                            Z: receiver.Position.Z / scale
-                        }
-
-                        return <Signal key={i} from={from} to={to} />
+                        return <Signal key={i} signal={signal} />
                     })}
 
                     <GridRectangle

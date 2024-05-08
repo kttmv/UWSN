@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using UWSN.Model.Sim;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
@@ -19,7 +13,8 @@ public class SerializationHelper
             var serializer = new JsonSerializer
             {
                 TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Ignore
             };
             serializer.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
 

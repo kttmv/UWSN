@@ -26,21 +26,27 @@ public class SimulationResult
     public int TotalSends { get; set; }
     public int TotalReceives { get; set; }
     public int TotalCollisions { get; set; }
-    public List<Frame> AllFrames { get; set; }
-    public List<SignalResult> AllSignals { get; set; }
+    public List<Frame> AllFrames { get; set; } = new();
+    public List<SignalResult> AllSignals { get; set; } = new();
 
     [JsonIgnore]
-    public Dictionary<DateTime, SimulationDelta> AllDeltas { get; set; }
+    public Dictionary<DateTime, SimulationDelta> AllDeltas { get; set; } = new();
 
     public List<SimulationDelta> Deltas
     {
         get { return AllDeltas.ToList().Select(x => x.Value).OrderBy(x => x.Time).ToList(); }
     }
 
-    public SimulationResult()
+    public static SimulationDelta GetOrCreateSimulationDelta(DateTime time)
     {
-        AllFrames = new();
-        AllSignals = new();
-        AllDeltas = new();
+        var allDeltas = Simulation.Instance.Result!.AllDeltas;
+        if (!allDeltas.ContainsKey(time))
+        {
+            var delta = new SimulationDelta(time);
+            allDeltas.Add(time, delta);
+            return delta;
+        }
+
+        return allDeltas[time];
     }
 }

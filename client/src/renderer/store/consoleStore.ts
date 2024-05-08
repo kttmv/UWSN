@@ -11,7 +11,8 @@ const useConsoleStore = create<State>((set, state) => ({
     consoleOutput: [],
     isOpen: false,
     addLineToConsoleOutput: (value: string) => {
-        state().consoleOutput.push(value)
+        //state().consoleOutput.push(value)
+        set((state) => ({ consoleOutput: [...state.consoleOutput, value] }))
     },
     setIsOpen: (value: boolean) => set({ isOpen: value })
 }))

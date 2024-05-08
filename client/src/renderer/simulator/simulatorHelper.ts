@@ -1,4 +1,4 @@
-import { SensorPlacementDistributionType } from '../tabs/SensorPlacement'
+import { RandomStepDistributionType } from '../tabs/SensorPlacement'
 
 export function runSimulatorShell(args: string): Promise<void> {
     return new Promise((resolve) => {
@@ -25,7 +25,7 @@ export function runSimulation(projectPath: string): Promise<void> {
 }
 
 export function runPlaceSensorsRandomStep(
-    distributionType: SensorPlacementDistributionType,
+    distributionType: RandomStepDistributionType,
     countX: number,
     countY: number,
     countZ: number,
@@ -33,18 +33,18 @@ export function runPlaceSensorsRandomStep(
     uniformB: number,
     projectPath: string
 ): Promise<void> {
-    const distr = SensorPlacementDistributionType[distributionType]
+    const distr = RandomStepDistributionType[distributionType]
     let args = ''
 
     switch (Number(distributionType)) {
-        case SensorPlacementDistributionType.Normal: {
+        case RandomStepDistributionType.Normal: {
             args +=
                 `placeSensorsRndStep ${distr} ` +
                 `${countX} ${countY} ${countZ} ` +
                 `-f "${projectPath}"`
             break
         }
-        case SensorPlacementDistributionType.Uniform: {
+        case RandomStepDistributionType.Uniform: {
             args +=
                 `placeSensorsRndStep ${distr} ` +
                 `${countX} ${countY} ${countZ} ${uniformA} ${uniformB} 32 ` +

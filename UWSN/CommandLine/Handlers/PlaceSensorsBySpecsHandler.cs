@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 using UWSN.CommandLine.Options;
 using UWSN.Model;
-using UWSN.Model.Modems;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
 
@@ -19,20 +13,22 @@ namespace UWSN.CommandLine.Handlers
             SerializationHelper.LoadSimulation(o.FilePath);
             var sensors = new List<Sensor>();
 
-            Simulation.Instance.AvailableModems = new List<ModemBase>() { new AquaCommMako(), new AquaCommMarlin(), new AquaCommOrca(),
-                                                  new AquaModem1000(), new AquaModem500(), new MicronModem(), new SMTUTestModem()};
+            var selectedModem = Simulation.Instance.AvailableModems.FirstOrDefault(m =>
+                m.Name == o.ModemModel
+            );
 
-            var selectedModem = Simulation.Instance.AvailableModems.FirstOrDefault(m => m.Name == o.ModemModel);
             if (selectedModem == null)
             {
                 throw new ArgumentException("Неверное название модема");
             }
 
-            Simulation.Instance.Modem = selectedModem;
+            Simulation.Instance.SensorSettings.Modem = selectedModem;
 
             var al = Simulation.Instance.AreaLimits;
 
-            double rMax = DeliveryProbabilityCalculator.CaulculateSensorDistance(selectedModem, al) * o.DistanceCoeff;
+            double rMax =
+                DeliveryProbabilityCalculator.CaulculateSensorDistance(selectedModem, al)
+                * o.DistanceCoeff;
 
             double areaLength = al.Max.X - al.Min.X;
             double areaDepth = al.Max.Y - al.Min.Y;
@@ -76,7 +72,13 @@ namespace UWSN.CommandLine.Handlers
             SerializationHelper.SaveSimulation(o.FilePath);
         }
 
-        private static List<Sensor> PlaceNormal(List<Sensor> sensors, double stepRange, int countX, int countY, int countZ)
+        private static List<Sensor> PlaceNormal(
+            List<Sensor> sensors,
+            double stepRange,
+            int countX,
+            int countY,
+            int countZ
+        )
         {
             var al = Simulation.Instance.AreaLimits;
 

@@ -5,6 +5,7 @@ namespace UWSN.Model.Protocols;
 
 public abstract class ProtocolBase
 {
+    [JsonIgnore]
     public int? SensorId { get; set; }
 
     [JsonIgnore]

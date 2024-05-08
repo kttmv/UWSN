@@ -5,4 +5,5 @@ export type Sensor = {
     Position: Vector3
     ClusterId: number
     IsReference: boolean
+    Battery: number
 }

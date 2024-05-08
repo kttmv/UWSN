@@ -46,9 +46,7 @@ function runShell(
         ? isWindows
             ? 'simulator\\UWSN.exe'
             : 'simulator/UWSN'
-        : isWindows
-          ? '..\\UWSN\\bin\\Debug\\net7.0\\UWSN.exe'
-          : 'dotnet run --project ../UWSN --'
+        : 'dotnet run --project ../UWSN --'
 
     const child = spawn(`${path} ${args}`, [], {
         shell: true
@@ -92,27 +90,31 @@ on('run-shell-simulation', (event, args) => {
 
         const line = data.toString() as string
 
-        const matchEvent = line.match(/\[(.+)\] Событие №(\d+)/)
-        if (matchEvent) {
-            const time = matchEvent[1]
-            const number = parseInt(matchEvent[2])
-            if (number % SEND_REPLIES_EVERY_NTH_EVENT === 0) {
-                reply(
-                    event,
-                    'run-shell-reply',
-                    `Обработано событий: ${number}. Время симуляции: ${time}`
-                )
+        if (line.includes('Событие №')) {
+            const matchEvent = line.match(/\[(.+)\] Событие №(\d+)/)
+            if (matchEvent) {
+                const time = matchEvent[1]
+                const number = parseInt(matchEvent[2])
+                if (number % SEND_REPLIES_EVERY_NTH_EVENT === 0) {
+                    reply(
+                        event,
+                        'run-shell-reply',
+                        `Обработано событий: ${number}. Время симуляции: ${time}`
+                    )
+                }
             }
         }
 
-        const matchStop = line.match(/\[(.+)\] Симуляция остановлена./)
-        if (matchStop) {
-            const time = matchStop[1]
-            reply(
-                event,
-                'run-shell-reply',
-                `Симуляция остановлена. Конечное время симуляции: ${time}`
-            )
+        if (line.includes('Симуляция остановлена')) {
+            const matchStop = line.match(/\[(.+)\] Симуляция остановлена./)
+            if (matchStop) {
+                const time = matchStop[1]
+                reply(
+                    event,
+                    'run-shell-reply',
+                    `Симуляция остановлена. Конечное время симуляции: ${time}`
+                )
+            }
         }
 
         if (line.includes('Был достигнут лимит событий')) {

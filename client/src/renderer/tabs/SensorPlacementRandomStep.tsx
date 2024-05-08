@@ -1,7 +1,7 @@
 import { Flex, FormLabel, Grid, Input, Select, Text } from '@chakra-ui/react'
 import { FormState, UseFormRegister, UseFormWatch } from 'react-hook-form'
 import {
-    SensorPlacementDistributionType,
+    RandomStepDistributionType,
     SensorPlacementInputs
 } from './SensorPlacement'
 
@@ -9,6 +9,15 @@ type Props = {
     formState: FormState<SensorPlacementInputs>
     register: UseFormRegister<SensorPlacementInputs>
     watch: UseFormWatch<SensorPlacementInputs>
+}
+
+export type RandomStepParameters = {
+    distributionType: RandomStepDistributionType
+    uniformA: number
+    uniformB: number
+    countX: number
+    countY: number
+    countZ: number
 }
 
 export default function SensorPlacementRandomStep({
@@ -24,20 +33,20 @@ export default function SensorPlacementRandomStep({
                 <Text minWidth='150px'>Тип распределения</Text>
                 <Select
                     title='Выбор типа распределения'
-                    {...register('distributionType')}
-                    defaultValue={SensorPlacementDistributionType.Normal}
+                    {...register('randomStepParameters.distributionType')}
+                    defaultValue={RandomStepDistributionType.Normal}
                 >
-                    <option value={SensorPlacementDistributionType.Normal}>
+                    <option value={RandomStepDistributionType.Normal}>
                         Нормальное
                     </option>
-                    <option value={SensorPlacementDistributionType.Uniform}>
+                    <option value={RandomStepDistributionType.Uniform}>
                         Равномерное
                     </option>
                 </Select>
             </Flex>
 
-            {Number(watch('distributionType')) ===
-                SensorPlacementDistributionType.Uniform && (
+            {Number(watch('randomStepParameters.distributionType')) ===
+                RandomStepDistributionType.Uniform && (
                 <>
                     <FormLabel mt='30px'>
                         Параметры равномерного распределения
@@ -47,11 +56,14 @@ export default function SensorPlacementRandomStep({
                             <Text>A</Text>
                             <Input
                                 type='number'
-                                defaultValue={0}
-                                isInvalid={errors.uniformA?.type === 'required'}
-                                {...register('uniformA', {
+                                isInvalid={
+                                    errors.randomStepParameters?.uniformA
+                                        ?.type === 'required'
+                                }
+                                {...register('randomStepParameters.uniformA', {
                                     required:
-                                        'Отсутствует значение параметра A равномерного распределения'
+                                        'Отсутствует значение параметра A ' +
+                                        'равномерного распределения'
                                 })}
                             />
                         </Flex>
@@ -60,11 +72,14 @@ export default function SensorPlacementRandomStep({
                             <Text>B</Text>
                             <Input
                                 type='number'
-                                defaultValue={0}
-                                isInvalid={errors.uniformB?.type === 'required'}
-                                {...register('uniformB', {
+                                isInvalid={
+                                    errors.randomStepParameters?.uniformB
+                                        ?.type === 'required'
+                                }
+                                {...register('randomStepParameters.uniformB', {
                                     required:
-                                        'Отсутствует значение параметра B равномерного распределения'
+                                        'Отсутствует значение параметра B ' +
+                                        'равномерного распределения'
                                 })}
                             />
                         </Flex>
@@ -78,8 +93,11 @@ export default function SensorPlacementRandomStep({
                     <Text>x</Text>
                     <Input
                         type='number'
-                        isInvalid={errors.countX?.type === 'required'}
-                        {...register('countX', {
+                        isInvalid={
+                            errors.randomStepParameters?.countX?.type ===
+                            'required'
+                        }
+                        {...register('randomStepParameters.countX', {
                             required: 'Отсутствует значение параметра X'
                         })}
                     />
@@ -89,8 +107,11 @@ export default function SensorPlacementRandomStep({
                     <Text>y</Text>
                     <Input
                         type='number'
-                        isInvalid={errors.countY?.type === 'required'}
-                        {...register('countY', {
+                        isInvalid={
+                            errors.randomStepParameters?.countY?.type ===
+                            'required'
+                        }
+                        {...register('randomStepParameters.countY', {
                             required: 'Отсутствует значение параметра Y'
                         })}
                     />
@@ -100,8 +121,11 @@ export default function SensorPlacementRandomStep({
                     <Text>z</Text>
                     <Input
                         type='number'
-                        isInvalid={errors.countZ?.type === 'required'}
-                        {...register('countZ', {
+                        isInvalid={
+                            errors.randomStepParameters?.countZ?.type ===
+                            'required'
+                        }
+                        {...register('randomStepParameters.countZ', {
                             required: 'Отсутствует значение параметра Z'
                         })}
                     />
@@ -111,7 +135,9 @@ export default function SensorPlacementRandomStep({
             {formState.isValid && (
                 <Text mt='30px'>
                     Количество сенсоров, которое будет расставлено:{' '}
-                    {watch('countX') * watch('countY') * watch('countZ')}
+                    {watch('randomStepParameters.countX') *
+                        watch('randomStepParameters.countY') *
+                        watch('randomStepParameters.countZ')}
                 </Text>
             )}
         </>
