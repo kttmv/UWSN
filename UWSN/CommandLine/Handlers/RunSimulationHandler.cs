@@ -22,7 +22,7 @@ namespace UWSN.CommandLine.Handlers
 
             foreach (var sensor in Simulation.Instance.Environment.Sensors)
             {
-                sensor.WakeUp();
+                sensor.WakeUp(Simulation.Instance.ShouldSkipHello);
             }
 
             Simulation.Instance.Run();

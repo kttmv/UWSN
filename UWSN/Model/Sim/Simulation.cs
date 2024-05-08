@@ -48,7 +48,7 @@ namespace UWSN.Model.Sim
         [JsonIgnore]
         public bool ShouldSkipHello { get; set; }
 
-        public double InitialSensorBattery { get; set; } = 100.0;
+        public double InitialSensorBattery { get; set; } = 864000.0;
 
         public TimeSpan SensorSampleInterval { get; set; }
 

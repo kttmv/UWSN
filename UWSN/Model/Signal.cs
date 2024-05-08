@@ -34,7 +34,7 @@ public class Signal
         if (modem == null)
             throw new NullReferenceException("Не указан тип модема");
 
-        double transmissionTime = Frame.FRAME_SIZE_IN_BITS / (modem.Bitrate * 1024.0);
+        double transmissionTime = Frame.FRAME_SIZE_IN_BITS / modem.Bitrate;
 
         var timeEndReceivingMax = default(DateTime);
 
@@ -75,7 +75,7 @@ public class Signal
 
             // создание событий начала и окончания приема сообщения
             var startReceiving = CreateStartReceivingEvent(sensor, timeStartReceiving);
-            var endReceiving = CreateEndReceivingEvent(sensor, timeEndReceiving, id);
+            var endReceiving = CreateEndReceivingEvent(sensor, timeEndReceiving, id, transmissionTime);
 
             ReceivingEvents.Add(new(sensor, startReceiving, endReceiving));
         }
@@ -125,7 +125,11 @@ public class Signal
         EndSending = new Event(
             Simulation.Instance.Time.AddSeconds(transmissionTime),
             $"Окончание отправки кадра сенсором #{Emitter.Id}",
-            () => Emitter.Physical.EndSending(Frame)
+            () =>
+            {
+                Emitter.Physical.EndSending(Frame);
+                Emitter.Battery -= Simulation.Instance.Modem.PowerTX * transmissionTime;
+            }
         );
 
         Simulation.Instance.EventManager.AddEvent(EndSending);
@@ -165,20 +169,22 @@ public class Signal
         }
     }
 
-    private Event CreateEndReceivingEvent(Sensor sensor, DateTime timeEndReceiving, int id)
+    private Event CreateEndReceivingEvent(Sensor sensor, DateTime timeEndReceiving, int id, double transmitionTime)
     {
         var endReceiving = new Event(
             timeEndReceiving,
             $"Окончание получения сенсором #{sensor.Id} кадра от #{Emitter.Id}",
-            () => EndReceivingAction(sensor, timeEndReceiving, id)
+            () => EndReceivingAction(sensor, timeEndReceiving, id, transmitionTime)
         );
 
         Simulation.Instance.EventManager.AddEvent(endReceiving);
         return endReceiving;
     }
 
-    private void EndReceivingAction(Sensor sensor, DateTime timeEndReceiving, int id)
+    private void EndReceivingAction(Sensor sensor, DateTime timeEndReceiving, int id, double transmitionTime)
     {
+        sensor.Battery -= Simulation.Instance.Modem.PowerRX * transmitionTime;
+
         var delta = GetOrCreateSignalDelta(timeEndReceiving);
         delta.SignalDeltas.Add(new(id, SimulationDelta.SignalDeltaType.Remove));
 

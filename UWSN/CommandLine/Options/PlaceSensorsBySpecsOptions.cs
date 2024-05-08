@@ -10,5 +10,8 @@ namespace UWSN.CommandLine.Options
         [Value(0, Required = true, HelpText = "Коэффициент максимального допустимого расстояния между модемами, " +
                                               "чтобы не растягивать их на максимум их возможностей (от 0 до 1)")]
         public double DistanceCoeff { get; set; }
+
+        [Value(0, Required = true, HelpText = "Тип распределения сенсоров")]
+        public string DistributionType { get; set; }
     }
 }

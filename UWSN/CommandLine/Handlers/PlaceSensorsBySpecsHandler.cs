@@ -50,8 +50,28 @@ namespace UWSN.CommandLine.Handlers
                 sensors.Add(new Sensor(i));
             }
 
-            Simulation.Instance.Environment.Sensors =
-            PlaceNormal(sensors, rMax, countX, countY, countZ);
+            switch (o.DistributionType)
+            {
+                case "rndStepNormal":
+                    Simulation.Instance.Environment.Sensors =
+                        PlaceNormal(sensors, rMax, countX, countY, countZ);
+
+                    break;
+
+                case "orth":
+                    Simulation.Instance.Environment.Sensors =
+                        PlaceOrth(sensors, rMax, countX, countY, countZ);
+
+                    break;
+
+                case "rndStepUni":
+
+                    break;
+
+                default:
+                    throw new Exception("Указан не поддерживаемый тип распределения сенсоров");
+            }
+            
 
             SerializationHelper.SaveSimulation(o.FilePath);
         }
@@ -63,7 +83,6 @@ namespace UWSN.CommandLine.Handlers
             var rnd = new Random();
 
             int placedCount = 0;
-            //int cubicEdge = (int)(Math.Ceiling(Math.Pow(sensors.Count, 1.0 / 3.0)));
 
             for (int i = 0; i < countX; i++)
             {
@@ -71,11 +90,6 @@ namespace UWSN.CommandLine.Handlers
                 {
                     for (int k = 0; k < countZ; k++)
                     {
-                        //if (placedCount >= sensors.Count)
-                        //{
-                        //    break;
-                        //}
-
                         var x = al.Min.X + (float)((i * stepRange) + NextDouble(rnd, -stepRange / 2, stepRange / 2));
                         var y = al.Min.Y + (float)((j * stepRange) + NextDouble(rnd, -stepRange / 2, stepRange / 2));
                         var z = al.Min.Z + (float)((k * stepRange) + NextDouble(rnd, -stepRange / 2, stepRange / 2));
@@ -100,7 +114,38 @@ namespace UWSN.CommandLine.Handlers
                 }
             }
 
-            Console.WriteLine($"Расстановка сенсоров ({countX * countY * countZ}) по нормальному распределению прошла успешно.");
+            Console.WriteLine($"Расстановка сенсоров ({countX * countY * countZ}) в узлах " +
+                $"ортогональной решетки с нормальным отклонением прошла успешно.");
+
+            return sensors;
+        }
+
+        private static List<Sensor> PlaceOrth(List<Sensor> sensors, double stepRange, int countX, int countY, int countZ)
+        {
+            var al = Simulation.Instance.AreaLimits;
+
+            var rnd = new Random();
+
+            int placedCount = 0;
+
+            for (int i = 0; i < countX; i++)
+            {
+                for (int j = 0; j < countY; j++)
+                {
+                    for (int k = 0; k < countZ; k++)
+                    {
+                        var x = al.Min.X + (float)(i * stepRange);
+                        var y = al.Min.Y + (float)(j * stepRange);
+                        var z = al.Min.Z + (float)(k * stepRange);
+
+                        sensors[placedCount].Position = new Vector3(x, y, z);
+
+                        placedCount++;
+                    }
+                }
+            }
+
+            Console.WriteLine($"Расстановка сенсоров ({countX * countY * countZ}) в узлах ортогональной решетки прошла успешно.");
 
             return sensors;
         }

@@ -16,9 +16,9 @@ namespace UWSN.Model.Modems
             Bandwidth = 16.0;
             Bitrate = 13900.0;
             Range = 3.5;
-            PowerTX = 35.0;
-            PowerRX = 0.72;
-            PowerSP = double.NaN;
+            PowerTX = 25.0;
+            PowerRX = 0.3;
+            PowerSP = 0.3;
             PowerATWU = double.NaN;
         }
     }

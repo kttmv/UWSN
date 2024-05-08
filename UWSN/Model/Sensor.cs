@@ -28,7 +28,7 @@ public class Sensor
     {
         get
         {
-            return Battery < 5.0;
+            return Battery < 100.0;
         }
     }
 
@@ -96,11 +96,11 @@ public class Sensor
         ReceivedData = new List<string>();
     }
 
-    public void WakeUp()
+    public void WakeUp(bool shouldSkipHello)
     {
         ReceivedData.Clear();
 
-        if (!Simulation.Instance.ShouldSkipHello)
+        if (!shouldSkipHello)
         {
             var frame = new Frame
             {
@@ -163,6 +163,8 @@ public class Sensor
 
     public void SendData()
     {
+        Battery -= Simulation.Instance.Modem.PowerSP * 0.02;
+
         if (IsReference == null)
             return;
 
@@ -215,7 +217,10 @@ public class Sensor
     public int CalculateNextHop()
     {
         var clusterMates = Simulation.Instance.Environment.Sensors.Where(s => s.ClusterId == ClusterId).ToList();
-        int idRef = clusterMates.First(m => (bool)m.IsReference).Id;
+        if (clusterMates.Any(m => m.IsReference == null))
+            throw new Exception("Свойство IsReference не должно быть null");
+
+        int idRef = clusterMates.First(m => m.IsReference != null && (bool)m.IsReference).Id;
 
         var refPos = Network.Neighbours.First(n => n.Id == idRef).Position;
         double distToRef = Vector3.Distance(Position, refPos);
