@@ -8,8 +8,8 @@ public class SensorSettings
 {
     public ModemBase Modem { get; set; } = new AquaModem1000();
 
-    public double InitialSensorBattery { get; set; } = 100.0;
-    public double BatteryDeadCharge { get; set; } = 5.0;
+    public double InitialSensorBattery { get; set; } = 864_000.0;
+    public double BatteryDeadCharge { get; set; } = 100.0;
 
     public TimeSpan SensorSampleInterval { get; set; } = TimeSpan.FromMinutes(10);
 

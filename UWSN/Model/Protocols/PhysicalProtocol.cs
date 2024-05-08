@@ -39,18 +39,6 @@ namespace UWSN.Model.Protocols
 
             CurrentState = State.Receiving;
 
-
-            var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
-            delta.SensorDeltas.Add(
-                new SensorDelta
-                {
-                    Id = Sensor.Id,
-                    ClusterId = null,
-                    IsReference = null,
-                    Battery = -0.1
-                }
-            );
-
             Logger.WriteSensorLine(Sensor, $"(Physical) начал принимать кадр от #{frame.SenderId}");
         }
 
@@ -85,18 +73,6 @@ namespace UWSN.Model.Protocols
                     Sensor,
                     $"(Physical) начал отправку кадра для #{frame.ReceiverId}"
                 );
-
-
-            var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
-            delta.SensorDeltas.Add(
-                new SensorDelta
-                {
-                    Id = Sensor.Id,
-                    ClusterId = null,
-                    IsReference = null,
-                    Battery = -0.15
-                }
-            );
 
             _ = new Signal(Sensor, frame, channelId);
         }

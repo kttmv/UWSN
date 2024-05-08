@@ -137,7 +137,7 @@ public class Sensor
 
             Simulation.Instance.EventManager.AddEvent(
                 new Event(
-                    Simulation.Instance.StartSamplingTime.Add(Simulation.Instance.SensorSampleInterval * i),
+                    Simulation.Instance.SensorSettings.StartSamplingTime.Add(Simulation.Instance.SensorSettings.SensorSampleInterval * i),
                     $"Отправка DATA от #{Id}",
                     () =>
                     {
@@ -151,7 +151,7 @@ public class Sensor
 
     public void SendData()
     {
-        Battery -= Simulation.Instance.Modem.PowerSP * 0.02;
+        Battery -= Simulation.Instance.SensorSettings.Modem.PowerSP * 0.02;
 
         if (IsReference == null)
             return;

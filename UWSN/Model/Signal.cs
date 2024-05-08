@@ -129,7 +129,19 @@ public class Signal
             () =>
             {
                 Emitter.Physical.EndSending(Frame);
-                Emitter.Battery -= Simulation.Instance.Modem.PowerTX * transmissionTime;
+                Emitter.Battery -= Simulation.Instance.SensorSettings.Modem.PowerTX * transmissionTime;
+
+                var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
+                delta.SensorDeltas.Add(
+                    new SensorDelta
+                    {
+                        Id = Emitter.Id,
+                        ClusterId = null,
+                        IsReference = null,
+                        Battery = -Simulation.Instance.SensorSettings.Modem.PowerTX * transmissionTime
+                    }
+                );
+
             }
         );
 
@@ -189,7 +201,18 @@ public class Signal
             new SignalDelta { SignalId = id, Type = SimulationDelta.SignalDeltaType.Remove }
         );
 
-        sensor.Battery -= Simulation.Instance.Modem.PowerRX * transmitionTime;
+        sensor.Battery -= Simulation.Instance.SensorSettings.Modem.PowerRX * transmitionTime;
+
+        var deltaBattery = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
+        deltaBattery.SensorDeltas.Add(
+            new SensorDelta
+            {
+                Id = sensor.Id,
+                ClusterId = null,
+                IsReference = null,
+                Battery = -Simulation.Instance.SensorSettings.Modem.PowerRX * transmitionTime
+            }
+        );
 
         sensor.Physical.EndReceiving(Frame);
     }
