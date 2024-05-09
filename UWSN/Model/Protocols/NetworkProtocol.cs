@@ -20,35 +20,6 @@ public class NetworkProtocol : ProtocolBase
 
     public void ReceiveFrame(Frame frame)
     {
-        if (frame.BatteryLeft < Simulation.Instance.SensorSettings.BatteryDeadCharge)
-        {
-            if (!DeadSensors.Contains(frame.SenderId))
-            {
-                DeadSensors.Add(frame.SenderId);
-            }
-
-            var newFrame = new Frame
-            {
-                SenderId = Sensor.Id,
-                SenderPosition = Sensor.Position,
-                ReceiverId = -1,
-                Type = Frame.FrameType.Warning,
-                TimeSend = Simulation.Instance.Time,
-                AckIsNeeded = false,
-                NeighboursData = Sensor.Network.Neighbours,
-                BatteryLeft = Sensor.Battery,
-                DeadSensors = Sensor.Network.DeadSensors,
-                Data = null,
-            };
-
-            SendFrameToAll(newFrame);
-
-            Sensor.StopAllAction();
-            Clusterize();
-
-            return;
-        }
-
         if (frame.Type == Frame.FrameType.Data && frame.ReceiverId == Sensor.Id)
         {
             if (Sensor.IsReference.HasValue && Sensor.IsReference.Value)
@@ -109,9 +80,9 @@ public class NetworkProtocol : ProtocolBase
                 Data = null,
             };
 
+            Sensor.StopAllAction();
             SendFrameToAll(newFrame);
 
-            Sensor.StopAllAction();
             Clusterize();
 
             return;
@@ -303,5 +274,6 @@ public class NetworkProtocol : ProtocolBase
         };
 
         SendFrameToAll(frame);
+        Clusterize();
     }
 }

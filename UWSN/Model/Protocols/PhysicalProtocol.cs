@@ -46,7 +46,7 @@ namespace UWSN.Model.Protocols
 
         public void StartSending(Frame frame, int channelId)
         {
-            if (Sensor.IsDead)
+            if (Sensor.IsDead && frame.Type != Frame.FrameType.Warning)
                 return;
 
             OriginalState = Sensor.Physical.CurrentState;

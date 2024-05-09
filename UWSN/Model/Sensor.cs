@@ -50,9 +50,11 @@ public class Sensor
 
             _battery = value;
 
-            if (IsDead)
+            if (!IsDead && _battery < Simulation.Instance.SensorSettings.BatteryDeadCharge)
             {
                 Logger.WriteSensorLine(this, "Осталось мало зарядки");
+                IsDead = true;
+
                 Network.SendDeathWarning();
                 StopAllAction();
             }
@@ -60,10 +62,7 @@ public class Sensor
     }
 
     [JsonIgnore]
-    public bool IsDead
-    {
-        get { return Battery < Simulation.Instance.SensorSettings.BatteryDeadCharge; }
-    }
+    public bool IsDead { get; set; }
 
     /// <summary>
     /// Данные, полученные в ходе обмена данными. Только для референсов. Для проверки
@@ -245,7 +244,7 @@ public class Sensor
 
     public void Clusterize()
     {
-        if (NextClusterization == null)
+        if (IsDead || NextClusterization == null)
         {
             Simulation.Instance.Clusterize();
         }
