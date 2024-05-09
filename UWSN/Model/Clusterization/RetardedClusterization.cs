@@ -49,8 +49,9 @@ namespace UWSN.Model.Clusterization
             {
                 if (sensor.IsDead)
                 {
-                    sensor.NextClusterization!.ClusterId = -1;
-                    sensor.NextClusterization!.IsReference = false;
+                    sensor.NextClusterization = new();
+                    sensor.NextClusterization.ClusterId = -1;
+                    sensor.NextClusterization.IsReference = false;
                     continue;
                 }
 
