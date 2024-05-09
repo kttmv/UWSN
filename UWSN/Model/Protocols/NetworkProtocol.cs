@@ -144,7 +144,8 @@ public class NetworkProtocol : ProtocolBase
         }
     }
 
-    public void StopAllAction() { }
+    public void StopAllAction()
+    { }
 
     public void SendFrameWithRouting(Frame frame)
     {
@@ -208,8 +209,16 @@ public class NetworkProtocol : ProtocolBase
         {
             var sensor = Simulation.Instance.Environment.Sensors.First(s => s.Id == neighbour.Id);
 
-            neighbour.ClusterId = sensor.ClusterId;
-            neighbour.IsReference = sensor.IsReference;
+            if (sensor.NextClusterization != null)
+            {
+                neighbour.ClusterId = sensor.NextClusterization.ClusterId;
+                neighbour.IsReference = sensor.NextClusterization.IsReference;
+            }
+            else
+            {
+                neighbour.ClusterId = sensor.ClusterId;
+                neighbour.IsReference = sensor.IsReference;
+            }
         }
     }
 
