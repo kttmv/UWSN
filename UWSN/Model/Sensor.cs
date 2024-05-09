@@ -214,9 +214,9 @@ public class Sensor
             Network.SendCollectedData();
     }
 
-    public void Clusterize()
+    public List<Neighbour> Clusterize()
     {
-        if (IsDead || NextClusterization == null)
+        if (IsDead || Simulation.Instance.Environment.Sensors.Any(s => s.NextClusterization == null))
         {
             Simulation.Instance.Clusterize();
         }
@@ -226,9 +226,32 @@ public class Sensor
             throw new NullReferenceException("Что-то пошло не так в процессе кластеризации");
         }
 
+        var neighbours = new List<Neighbour>();
+        foreach (var sensor in Simulation.Instance.Environment.Sensors)
+        {
+            var neighbour = new Neighbour
+            {
+                Id = sensor.Id,
+                Position = sensor.Position,
+                ClusterId = sensor.NextClusterization!.ClusterId,
+                IsReference = sensor.NextClusterization!.IsReference
+            };
+            neighbours.Add(neighbour);
+        }
+
         ClusterId = NextClusterization.ClusterId;
         IsReference = NextClusterization.IsReference;
         NextClusterization = null;
+
+        var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
+        delta.SensorDeltas.Add(
+            new SensorDelta
+            {
+                Id = Id,
+                ClusterId = ClusterId.Value,
+                IsReference = IsReference.Value,
+            }
+        );
 
         if (IsReference.Value)
         {
@@ -242,14 +265,6 @@ public class Sensor
             Logger.WriteSensorLine(this, $"Определил себя к кластеру {ClusterId}.");
         }
 
-        var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
-        delta.SensorDeltas.Add(
-            new SensorDelta
-            {
-                Id = Id,
-                ClusterId = ClusterId.Value,
-                IsReference = IsReference.Value,
-            }
-        );
+        return neighbours;
     }
 }

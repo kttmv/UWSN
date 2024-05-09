@@ -188,7 +188,7 @@ public class Simulation
         Logger.WriteLine("Результаты симуляции:");
 
         Logger.WriteLine(
-            $"Реальное время, потраченное на симуляцию: "
+            $"\tРеальное время, потраченное на симуляцию: "
                 + $"{Result!.RealTimeToSimulate:hh\\:mm\\:ss}"
         );
 

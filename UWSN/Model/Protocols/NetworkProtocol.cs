@@ -109,7 +109,7 @@ public class NetworkProtocol : ProtocolBase
             bool shouldSendToAll = false;
             foreach (var neighbour in newNeighbours)
             {
-                if (!Neighbours.Contains(neighbour))
+                if (!Neighbours.Any(n => n.Id == neighbour.Id))
                 {
                     Neighbours.Add(neighbour);
                     shouldSendToAll = true;
@@ -203,23 +203,7 @@ public class NetworkProtocol : ProtocolBase
 
     private void Clusterize()
     {
-        Sensor.Clusterize();
-
-        foreach (var neighbour in Neighbours)
-        {
-            var sensor = Simulation.Instance.Environment.Sensors.First(s => s.Id == neighbour.Id);
-
-            if (sensor.NextClusterization != null)
-            {
-                neighbour.ClusterId = sensor.NextClusterization.ClusterId;
-                neighbour.IsReference = sensor.NextClusterization.IsReference;
-            }
-            else
-            {
-                neighbour.ClusterId = sensor.ClusterId;
-                neighbour.IsReference = sensor.IsReference;
-            }
-        }
+        Neighbours = Sensor.Clusterize();
     }
 
     public void SendCollectedData()
