@@ -7,7 +7,7 @@ namespace UWSN.Model.Sim;
 
 public class Simulation
 {
-    private const int MAX_PROCESSED_EVENTS = 1_000_000;
+    private const int MAX_PROCESSED_EVENTS = 10000;
     public const int MAX_CYCLES = 1_000;
 
     #region Simulation Singleton
@@ -95,6 +95,11 @@ public class Simulation
     public void Run()
     {
         Result = new SimulationResult();
+
+        foreach (var sensor in Instance.Environment.Sensors)
+        {
+            sensor.WakeUp();
+        }
 
         int i = 1;
         while (i < MAX_PROCESSED_EVENTS)
