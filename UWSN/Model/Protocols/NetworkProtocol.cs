@@ -22,6 +22,11 @@ public class NetworkProtocol : ProtocolBase
     {
         if (Sensor.IsDead)
         {
+            Logger.WriteSensorLine(
+                Sensor,
+                "(Network) у меня мало зарядки, начинаю отправку предсмертного фрейма"
+            );
+
             if (!DeadSensors.Contains(Sensor.Id))
             {
                 DeadSensors.Add(Sensor.Id);
@@ -43,7 +48,7 @@ public class NetworkProtocol : ProtocolBase
 
             SendFrame(newFrame);
 
-            StopAction();
+            StopAllAction();
 
             return;
         }
@@ -71,7 +76,7 @@ public class NetworkProtocol : ProtocolBase
 
             SendFrame(newFrame);
 
-            StopAction();
+            StopAllAction();
 
             return;
         }
@@ -139,7 +144,7 @@ public class NetworkProtocol : ProtocolBase
 
                 SendFrame(newFrame);
 
-                StopAction();
+                StopAllAction();
 
                 return;
             }
@@ -199,11 +204,10 @@ public class NetworkProtocol : ProtocolBase
         }
     }
 
-    private void StopAction()
+    public void StopAllAction()
     {
         Sensor.Physical.CurrentState = PhysicalProtocol.State.Idle;
         Sensor.DataLink.StopAllAction();
-        Sensor.Physical.ShouldReceiveMessages = false;
 
         Clusterize();
     }

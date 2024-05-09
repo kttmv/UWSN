@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
-using static UWSN.Model.Sim.SimulationDelta;
 
 namespace UWSN.Model.Protocols
 {
@@ -25,14 +19,10 @@ namespace UWSN.Model.Protocols
 
         [JsonIgnore]
         public State OriginalState { get; set; }
-        public bool ShouldReceiveMessages { get; set; } = true;
 
         public void StartReceiving(Frame frame)
         {
             if (Sensor.IsDead)
-                return;
-
-            if (!ShouldReceiveMessages)
                 return;
 
             OriginalState = Sensor.Physical.CurrentState;
@@ -44,9 +34,6 @@ namespace UWSN.Model.Protocols
 
         public void EndReceiving(Frame frame)
         {
-            if (!ShouldReceiveMessages)
-                return;
-
             CurrentState = OriginalState;
 
             Logger.WriteSensorLine(Sensor, $"(Physical) принял кадр от #{frame.SenderId}");

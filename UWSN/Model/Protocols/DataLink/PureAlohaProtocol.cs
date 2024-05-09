@@ -26,11 +26,8 @@ namespace UWSN.Model.Protocols.DataLink
 
         public override void StopAllAction()
         {
-            if (WaitingForAckEvent == null)
-                return;
-
-            Simulation.Instance.EventManager.RemoveEvent(WaitingForAckEvent);
             WaitingForAckEvent = null;
+            SensorsAwaitingAck = new();
         }
 
         public override void ReceiveFrame(Frame frame)
@@ -136,7 +133,7 @@ namespace UWSN.Model.Protocols.DataLink
                             + $"начинаю ожидание в {timeout} сек."
                     );
 
-                Simulation.Instance.EventManager.AddEvent(
+                Sensor.AddEvent(
                     new Event(
                         Simulation.Instance.Time.AddSeconds(timeout),
                         $"Повторная попытка отправки кадра сенсором #{Sensor.Id}",
@@ -207,7 +204,7 @@ namespace UWSN.Model.Protocols.DataLink
                 () => ResendFrame(frame, attemptsLeft)
             );
 
-            Simulation.Instance.EventManager.AddEvent(WaitingForAckEvent);
+            Sensor.AddEvent(WaitingForAckEvent);
         }
     }
 }

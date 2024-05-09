@@ -49,6 +49,13 @@ public class Sensor
             );
 
             _battery = value;
+
+            if (IsDead)
+            {
+                RemoveAllEvents();
+                DataLink.StopAllAction();
+                Network.StopAllAction();
+            }
         }
     }
 
@@ -96,6 +103,8 @@ public class Sensor
     [JsonIgnore]
     public List<Frame> FrameBuffer { get; set; } = new List<Frame>();
 
+    public List<Event> Events { get; set; } = new();
+
     #endregion Properties
 
     public Sensor()
@@ -103,6 +112,37 @@ public class Sensor
         _battery = Simulation.Instance.SensorSettings.InitialSensorBattery;
 
         DataLink = Simulation.Instance.SensorSettings.DataLinkProtocol.Clone();
+    }
+
+    public void AddEvent(Event e)
+    {
+        Events.Add(e);
+
+        Simulation.Instance.EventManager.AddEvent(
+            new Event(
+                e.Time,
+                e.Description,
+                () =>
+                {
+                    Events.Remove(e);
+                    e.Invoke();
+                }
+            )
+        );
+    }
+
+    public void RemoveEvent(Event e)
+    {
+        Events.Remove(e);
+        Simulation.Instance.EventManager.RemoveEvent(e);
+    }
+
+    public void RemoveAllEvents()
+    {
+        foreach (var e in Events)
+        {
+            Simulation.Instance.EventManager.RemoveEvent(e);
+        }
     }
 
     public void WakeUp()
@@ -125,7 +165,7 @@ public class Sensor
                 Data = null,
             };
 
-            Simulation.Instance.EventManager.AddEvent(
+            AddEvent(
                 new Event(
                     default,
                     $"Отправка HELLO от #{frame.SenderId}",
@@ -158,7 +198,7 @@ public class Sensor
         {
             int k = i;
 
-            Simulation.Instance.EventManager.AddEvent(
+            AddEvent(
                 new Event(
                     Simulation.Instance.SensorSettings.StartSamplingTime.Add(
                         Simulation.Instance.SensorSettings.SensorSampleInterval * i
@@ -166,7 +206,7 @@ public class Sensor
                     $"Сбор данных с датчиков сенсором #{Id}",
                     () =>
                     {
-                        if(!IsDead)
+                        if (!IsDead)
                         {
                             Simulation.Instance.CurrentCycle = k;
                             CollectData();
