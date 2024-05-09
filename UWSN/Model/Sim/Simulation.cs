@@ -94,6 +94,8 @@ public class Simulation
     /// </summary>
     public void Run(bool verbose)
     {
+        var timeStart = DateTime.Now;
+
         Result = new SimulationResult();
 
         foreach (var sensor in Instance.Environment.Sensors)
@@ -146,10 +148,13 @@ public class Simulation
             Logger.WriteLine("Был достигнут лимит событий.");
         }
 
+        Logger.WriteLine("\nСимуляция остановлена.", true);
+
         Result.TotalEvents = eventNumber;
         Result.TotalCycles = CurrentCycle;
 
-        Logger.WriteLine("\nСимуляция остановлена.", true);
+        var timeFinish = DateTime.Now;
+        Result.RealTimeToSimulate = timeFinish - timeStart;
 
         PrintResults();
     }
@@ -158,14 +163,22 @@ public class Simulation
     {
         Logger.WriteLine($"\n=============================");
         Logger.WriteLine("Результаты симуляции:");
+
         Logger.WriteLine(
-            $"\tКоличество обработанных событий: {Result!.TotalEvents}"
+            $"Реальное время, потраченное на симуляцию: "
+                + $"{Result!.RealTimeToSimulate:hh\\:mm\\:ss}"
+        );
+
+        Logger.WriteLine(
+            $"\tКоличество обработанных событий: {Result.TotalEvents}"
                 + (Result.TotalEvents >= MAX_PROCESSED_EVENTS ? " (был достигнут лимит)" : "")
         );
+
         Logger.WriteLine(
             $"\tКоличество отработанных сетью циклов: {Result.TotalCycles}"
                 + (Result.TotalCycles >= MAX_CYCLES ? " (был достигнут лимит)" : "")
         );
+
         Logger.WriteLine($"\tКоличество отправленных сообщений: {Result.TotalSends}");
         Logger.WriteLine($"\tКоличество полученных сообщений: {Result.TotalReceives}");
         Logger.WriteLine($"\tКоличество коллизий: {Result.TotalCollisions}");

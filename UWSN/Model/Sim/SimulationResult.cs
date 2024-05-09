@@ -18,6 +18,7 @@ public class SimulationResult
         }
     }
 
+    public TimeSpan RealTimeToSimulate { get; set; }
     public int TotalEvents { get; set; }
     public int TotalCycles { get; set; }
     public int TotalSends { get; set; }
