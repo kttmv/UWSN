@@ -59,8 +59,6 @@ public class Simulation
 
     public bool ShouldSkipHello { get; set; } = false;
 
-    public double InitialSensorBattery { get; set; } = 864000.0;
-
     public ChannelManager ChannelManager { get; set; } = new();
 
     /// <summary>
