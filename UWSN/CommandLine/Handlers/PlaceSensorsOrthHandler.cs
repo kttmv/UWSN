@@ -10,6 +10,9 @@ public class PlaceSensorsOrthHandler
     public static void Handle(PlaceSensorsOrthOptions o)
     {
         SerializationHelper.LoadSimulation(o.FilePath);
+
+        Simulation.Instance.Result = null;
+
         var sensors = new List<Sensor>();
 
         for (int i = 0; i < o.SensorsCount; i++)

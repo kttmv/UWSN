@@ -12,6 +12,9 @@ public class PlaceSensorsPoissonHandler
     public static void Handle(PlaceSensorsPoissonOptions o)
     {
         SerializationHelper.LoadSimulation(o.FilePath);
+
+        Simulation.Instance.Result = null;
+
         var sensors = new List<Sensor>();
 
         for (int i = 0; i < o.SensorsCount; i++)

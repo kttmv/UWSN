@@ -11,6 +11,9 @@ namespace UWSN.CommandLine.Handlers
         public static void Handle(PlaceSensorsBySpecsOptions o)
         {
             SerializationHelper.LoadSimulation(o.FilePath);
+
+            Simulation.Instance.Result = null;
+
             var sensors = new List<Sensor>();
 
             var selectedModem = Simulation.Instance.AvailableModems.FirstOrDefault(m =>

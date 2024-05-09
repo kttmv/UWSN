@@ -12,6 +12,9 @@ public class PlaceSensorsRandomStepHandler
     public static void Handle(PlaceSensorsRandomStepOptions o)
     {
         SerializationHelper.LoadSimulation(o.FilePath);
+
+        Simulation.Instance.Result = null;
+
         var sensors = new List<Sensor>();
 
         int sensorsCount = o.Count_X * o.Count_Y * o.Count_Z;

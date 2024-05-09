@@ -11,6 +11,9 @@ public class PlaceSensorsFromFileHandler
     public static void Handle(PlaceSensorsFromFileOptions o)
     {
         SerializationHelper.LoadSimulation(o.FilePath);
+
+        Simulation.Instance.Result = null;
+
         var environment = Simulation.Instance.Environment;
 
         environment.Sensors = PlaceSensors(o.SensorsFilePath);
