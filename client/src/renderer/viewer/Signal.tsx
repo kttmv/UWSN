@@ -29,17 +29,17 @@ export default function Signal({ signal }: Props) {
 
     const vertexColors: [number, number, number][] = isSelected
         ? [
-              [0.25, 0.35, 0.25],
-              [0.3, 0.6, 0.3]
+              [0.3, 0.6, 0.3],
+              [0.25, 0.35, 0.25]
           ]
         : hovered
           ? [
-                [0.2, 0.2, 0.2],
-                [0.3, 0.4, 0.3]
+                [0.3, 0.4, 0.3],
+                [0.2, 0.2, 0.2]
             ]
           : [
-                [0.05, 0.05, 0.05],
-                [0.2, 0.3, 0.3]
+                [0.2, 0.3, 0.3],
+                [0.05, 0.05, 0.05]
             ]
 
     const sender = project.Environment.Sensors[signal.SenderId]

@@ -1,52 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using UWSN.Model.Protocols;
+﻿using System.Numerics;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
-using static UWSN.Model.Sim.SimulationDelta;
 
 namespace UWSN.Model.Protocols;
 
 public class NetworkProtocol : ProtocolBase
 {
-    public struct Neighbour
+    public class Neighbour
     {
-        public int Id { get; set; }
-        public Vector3 Position { get; set; }
-        public int? ClusterId { get; set; }
-        public bool? IsReference { get; set; }
-
-        public Neighbour(int id, Vector3 position, int? clusterId, bool? isReference)
-        {
-            Id = id;
-            Position = position;
-            ClusterId = clusterId;
-            IsReference = isReference;
-        }
+        public required int Id { get; set; }
+        public required Vector3 Position { get; set; }
+        public required int? ClusterId { get; set; }
+        public required bool? IsReference { get; set; }
     }
 
-    public List<Neighbour> Neighbours;
+    public List<Neighbour> Neighbours { get; set; } = new();
 
-    //public int ClusterId;
-
-
-    public List<int> DeadSensors;
-
-    public NetworkProtocol()
-    {
-        Neighbours = new();
-
-        //ClusterId = -1;
-        DeadSensors = new();
-    }
+    public List<int> DeadSensors { get; set; } = new();
 
     public void ReceiveFrame(Frame frame)
     {
-        if (Sensor.Battery < Simulation.Instance.SensorSettings.BatteryDeadCharge)
+        if (Sensor.IsDead)
         {
             if (!DeadSensors.Contains(Sensor.Id))
             {
@@ -67,7 +41,7 @@ public class NetworkProtocol : ProtocolBase
                 Data = null,
             };
 
-            Sensor.DataLink.SendFrame(newFrame);
+            SendFrame(newFrame);
 
             StopAction();
 
@@ -95,7 +69,7 @@ public class NetworkProtocol : ProtocolBase
                 Data = null,
             };
 
-            Sensor.DataLink.SendFrame(newFrame);
+            SendFrame(newFrame);
 
             StopAction();
 
@@ -104,16 +78,16 @@ public class NetworkProtocol : ProtocolBase
 
         if (frame.Type == Frame.FrameType.Data && frame.ReceiverId == Sensor.Id)
         {
-            if ((bool)Sensor.IsReference)
+            if (Sensor.IsReference.HasValue && Sensor.IsReference.Value)
             {
-                Sensor.ReceivedData.Add(frame.Data);
+                Sensor.ReceivedData.Add(frame.Data!);
 
                 return;
             }
 
-            int hopId = Sensor.CalculateNextHop();
+            int hopId = CalculateNextHop();
             if (hopId < 0)
-                throw new Exception("Дефолтный id = -1(ничего не вычислилось)");
+                throw new Exception("Не удалось вычислить HopId");
 
             var newFrame = new Frame
             {
@@ -129,7 +103,7 @@ public class NetworkProtocol : ProtocolBase
                 Data = frame.Data,
             };
 
-            Sensor.DataLink.SendFrame(newFrame);
+            SendFrame(newFrame);
         }
 
         if (frame.Type == Frame.FrameType.Warning)
@@ -163,7 +137,7 @@ public class NetworkProtocol : ProtocolBase
                     Data = null,
                 };
 
-                Sensor.DataLink.SendFrame(newFrame);
+                SendFrame(newFrame);
 
                 StopAction();
 
@@ -176,7 +150,13 @@ public class NetworkProtocol : ProtocolBase
             if (Neighbours.Count == 0)
             {
                 Neighbours.Add(
-                    new(Sensor.Id, Sensor.Position, Sensor.ClusterId, Sensor.IsReference)
+                    new Neighbour
+                    {
+                        Id = Sensor.Id,
+                        Position = Sensor.Position,
+                        ClusterId = Sensor.ClusterId,
+                        IsReference = Sensor.IsReference
+                    }
                 );
             }
 
@@ -209,7 +189,7 @@ public class NetworkProtocol : ProtocolBase
                     Data = null,
                 };
 
-                Sensor.DataLink.SendFrame(newFrame);
+                SendFrame(newFrame);
             }
 
             if (Neighbours.Count == Simulation.Instance.Environment.Sensors.Count)
@@ -228,48 +208,90 @@ public class NetworkProtocol : ProtocolBase
         Clusterize();
     }
 
-    public void SendFrame(Frame frame) { }
-
-    internal void Clusterize()
+    public void SendFrame(Frame frame)
     {
-        if (Sensor.NextClusterization == null)
-        {
-            Simulation.Instance.Clusterize();
-        }
+        Sensor.DataLink.SendFrame(frame);
+    }
 
-        if (Sensor.NextClusterization == null)
-        {
-            throw new NullReferenceException("Что-то пошло не так в процессе кластеризации");
-        }
+    private void Clusterize()
+    {
+        Sensor.Clusterize();
 
-        Sensor.ClusterId = Sensor.NextClusterization.ClusterId;
-        Sensor.IsReference = Sensor.NextClusterization.IsReference;
-        Sensor.NextClusterization = null;
+        foreach (var neighbour in Neighbours)
+        {
+            var sensor = Simulation.Instance.Environment.Sensors.First(s => s.Id == neighbour.Id);
 
-        if (Sensor.IsReference.Value)
-        {
-            Logger.WriteSensorLine(
-                Sensor,
-                $"(Network) определил себя новым референсным узлом кластера {Sensor.ClusterId}"
-            );
+            neighbour.ClusterId = sensor.ClusterId;
+            neighbour.IsReference = sensor.IsReference;
         }
-        else
+    }
+
+    public void SendCollectedData()
+    {
+        if (Sensor.IsReference == null || Sensor.ClusterId == null)
         {
-            Logger.WriteSensorLine(
-                Sensor,
-                $"(Network) определил себя к кластеру {Sensor.ClusterId}."
+            throw new Exception(
+                "Невозможно отправить данные с датчиков, так как не определена кластеризация"
             );
         }
 
-        var time = Simulation.Instance.Time;
-        var delta = new SensorDelta
+        if ((bool)Sensor.IsReference)
         {
-            Id = Sensor.Id,
-            ClusterId = Sensor.ClusterId.Value,
-            IsReference = Sensor.IsReference.Value,
-            Battery = null
+            Sensor.ReceivedData.Add($"D_{Sensor.Id}");
+
+            return;
+        }
+
+        int hopId = CalculateNextHop();
+        if (hopId < 0)
+            throw new Exception("Не удалось вычислить HopId");
+
+        var frame = new Frame
+        {
+            SenderId = Sensor.Id,
+            SenderPosition = Sensor.Position,
+            ReceiverId = hopId,
+            Type = Frame.FrameType.Data,
+            TimeSend = Simulation.Instance.Time,
+            AckIsNeeded = true,
+            NeighboursData = null,
+            BatteryLeft = Sensor.Battery,
+            DeadSensors = null,
+            Data = $"D_{Sensor.Id}",
         };
 
-        Simulation.Instance.Result!.AllDeltas[time].SensorDeltas.Add(delta);
+        SendFrame(frame);
+    }
+
+    private int CalculateNextHop()
+    {
+        var clusterMates = Neighbours.Where(s => s.ClusterId == Sensor.ClusterId).ToList();
+
+        if (clusterMates.Any(m => m.IsReference == null))
+            throw new Exception("Свойство IsReference не должно быть null");
+
+        int referenceId = clusterMates.First(m => m.IsReference.HasValue && m.IsReference.Value).Id;
+
+        var referencePosition = Neighbours.First(n => n.Id == referenceId).Position;
+
+        double distanceToReference = Vector3.Distance(Sensor.Position, referencePosition);
+
+        var neighboursByDistance = Neighbours.OrderBy(n =>
+            Vector3.Distance(Sensor.Position, n.Position)
+        );
+
+        int hopId = -1;
+        foreach (var neighbour in neighboursByDistance)
+        {
+            if (
+                Vector3.Distance(neighbour.Position, referencePosition) < distanceToReference
+                && clusterMates.Count(m => m.Id == neighbour.Id) > 0
+            )
+            {
+                hopId = neighbour.Id;
+            }
+        }
+
+        return hopId;
     }
 }

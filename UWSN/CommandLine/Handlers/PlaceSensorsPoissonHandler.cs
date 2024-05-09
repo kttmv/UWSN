@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using CommandLine;
+﻿using System.Numerics;
 using Dew.Math;
 using UWSN.CommandLine.Options;
 using UWSN.Model;
@@ -22,14 +16,16 @@ public class PlaceSensorsPoissonHandler
 
         for (int i = 0; i < o.SensorsCount; i++)
         {
-            sensors.Add(new Sensor(i));
+            sensors.Add(new Sensor() { Id = i });
         }
 
         var areaLimits = Simulation.Instance.AreaLimits;
 
         Simulation.Instance.Environment.Sensors = PlaceSensors(sensors, areaLimits);
 
-        Console.WriteLine($"Расстановка сенсоров ({o.SensorsCount}) по закону Пуассона прошла успешно.");
+        Console.WriteLine(
+            $"Расстановка сенсоров ({o.SensorsCount}) по закону Пуассона прошла успешно."
+        );
 
         SerializationHelper.SaveSimulation(o.FilePath);
     }
@@ -94,10 +90,13 @@ public class PlaceSensorsPoissonHandler
         }
 
         return sensors;
-
     }
 
-    private static List<Sensor> PlaceSensors(List<Sensor> sensors, double lambdaParameter, Vector3Range areaLimits)
+    private static List<Sensor> PlaceSensors(
+        List<Sensor> sensors,
+        double lambdaParameter,
+        Vector3Range areaLimits
+    )
     {
         var rng = new TRngStream();
 
@@ -109,10 +108,7 @@ public class PlaceSensorsPoissonHandler
 
         rng.NewStream(0, seed);
 
-        var dst = new TVecInt
-        {
-            Length = sensors.Count * 3
-        };
+        var dst = new TVecInt { Length = sensors.Count * 3 };
 
         rng.RandomPoisson(dst, lambdaParameter);
 
@@ -120,9 +116,21 @@ public class PlaceSensorsPoissonHandler
 
         for (int i = 0; i < sensors.Count; i++)
         {
-            float x = (float)PoissonDouble(dst.IValues[dstIndex + 0], areaLimits.Min.X, areaLimits.Max.X);
-            float y = (float)PoissonDouble(dst.IValues[dstIndex + 1], areaLimits.Min.Y, areaLimits.Max.Y);
-            float z = (float)PoissonDouble(dst.IValues[dstIndex + 2], areaLimits.Min.Z, areaLimits.Max.Z);
+            float x = (float)PoissonDouble(
+                dst.IValues[dstIndex + 0],
+                areaLimits.Min.X,
+                areaLimits.Max.X
+            );
+            float y = (float)PoissonDouble(
+                dst.IValues[dstIndex + 1],
+                areaLimits.Min.Y,
+                areaLimits.Max.Y
+            );
+            float z = (float)PoissonDouble(
+                dst.IValues[dstIndex + 2],
+                areaLimits.Min.Z,
+                areaLimits.Max.Z
+            );
 
             sensors[i].Position = new Vector3(x, y, z);
 

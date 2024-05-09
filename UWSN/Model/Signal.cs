@@ -43,7 +43,7 @@ public class Signal
             if (sensor == Emitter)
                 continue;
 
-            if (sensor.Battery < Simulation.Instance.SensorSettings.BatteryDeadCharge)
+            if (sensor.IsDead)
             {
                 continue;
             }
@@ -76,7 +76,12 @@ public class Signal
 
             // создание событий начала и окончания приема сообщения
             var startReceiving = CreateStartReceivingEvent(sensor, timeStartReceiving);
-            var endReceiving = CreateEndReceivingEvent(sensor, timeEndReceiving, id, transmissionTime);
+            var endReceiving = CreateEndReceivingEvent(
+                sensor,
+                timeEndReceiving,
+                id,
+                transmissionTime
+            );
 
             ReceivingEvents.Add(new(sensor, startReceiving, endReceiving));
         }
@@ -129,19 +134,8 @@ public class Signal
             () =>
             {
                 Emitter.Physical.EndSending(Frame);
-                Emitter.Battery -= Simulation.Instance.SensorSettings.Modem.PowerTX * transmissionTime;
-
-                var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
-                delta.SensorDeltas.Add(
-                    new SensorDelta
-                    {
-                        Id = Emitter.Id,
-                        ClusterId = null,
-                        IsReference = null,
-                        Battery = -Simulation.Instance.SensorSettings.Modem.PowerTX * transmissionTime
-                    }
-                );
-
+                Emitter.Battery -=
+                    Simulation.Instance.SensorSettings.Modem.PowerTX * transmissionTime;
             }
         );
 
@@ -182,7 +176,12 @@ public class Signal
         }
     }
 
-    private Event CreateEndReceivingEvent(Sensor sensor, DateTime timeEndReceiving, int id, double transmitionTime)
+    private Event CreateEndReceivingEvent(
+        Sensor sensor,
+        DateTime timeEndReceiving,
+        int id,
+        double transmitionTime
+    )
     {
         var endReceiving = new Event(
             timeEndReceiving,
@@ -194,7 +193,12 @@ public class Signal
         return endReceiving;
     }
 
-    private void EndReceivingAction(Sensor sensor, DateTime timeEndReceiving, int id, double transmitionTime)
+    private void EndReceivingAction(
+        Sensor sensor,
+        DateTime timeEndReceiving,
+        int id,
+        double transmitionTime
+    )
     {
         var delta = SimulationResult.GetOrCreateSimulationDelta(timeEndReceiving);
         delta.SignalDeltas.Add(
@@ -202,17 +206,6 @@ public class Signal
         );
 
         sensor.Battery -= Simulation.Instance.SensorSettings.Modem.PowerRX * transmitionTime;
-
-        var deltaBattery = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
-        deltaBattery.SensorDeltas.Add(
-            new SensorDelta
-            {
-                Id = sensor.Id,
-                ClusterId = null,
-                IsReference = null,
-                Battery = -Simulation.Instance.SensorSettings.Modem.PowerRX * transmitionTime
-            }
-        );
 
         sensor.Physical.EndReceiving(Frame);
     }

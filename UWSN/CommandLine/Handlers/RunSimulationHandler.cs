@@ -12,12 +12,21 @@ namespace UWSN.CommandLine.Handlers
 
             foreach (var sensor in Simulation.Instance.Environment.Sensors)
             {
-                sensor.WakeUp(Simulation.Instance.ShouldSkipHello);
+                sensor.WakeUp();
             }
 
-            Simulation.Instance.Run();
+            try
+            {
+                Simulation.Instance.Run();
+            }
+            catch (Exception e)
+            {
+                Logger.Save();
+                throw e;
+            }
 
             SerializationHelper.SaveSimulation(o.FilePath);
+            Logger.Save();
         }
     }
 }

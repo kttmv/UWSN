@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UWSN.CommandLine.Options;
+﻿using UWSN.CommandLine.Options;
 using UWSN.Model;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
@@ -19,12 +14,14 @@ public class PlaceSensorsOrthHandler
 
         for (int i = 0; i < o.SensorsCount; i++)
         {
-            sensors.Add(new Sensor(i));
+            sensors.Add(new Sensor() { Id = i });
         }
 
         Simulation.Instance.Environment.Sensors = PlaceSensors(sensors, o.OrthogonalStep);
 
-        Console.WriteLine($"Расстановка сенсоров ({o.SensorsCount}) на ортогональной сетке прошла успешно.");
+        Console.WriteLine(
+            $"Расстановка сенсоров ({o.SensorsCount}) на ортогональной сетке прошла успешно."
+        );
 
         SerializationHelper.SaveSimulation(o.FilePath);
     }
@@ -45,7 +42,11 @@ public class PlaceSensorsOrthHandler
                         break;
                     }
 
-                    sensors[placedCount].Position = new System.Numerics.Vector3(i * step, j * step, k * step);
+                    sensors[placedCount].Position = new System.Numerics.Vector3(
+                        i * step,
+                        j * step,
+                        k * step
+                    );
                     placedCount++;
                 }
             }

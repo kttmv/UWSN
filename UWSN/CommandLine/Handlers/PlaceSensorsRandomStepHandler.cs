@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 using Dew.Math;
 using UWSN.CommandLine.Options;
 using UWSN.Model;
@@ -24,7 +18,7 @@ public class PlaceSensorsRandomStepHandler
 
         for (int i = 0; i < sensorsCount; i++)
         {
-            sensors.Add(new Sensor(i));
+            sensors.Add(new Sensor() { Id = i });
         }
 
         Simulation.Instance.Environment.Sensors = PlaceSensors(

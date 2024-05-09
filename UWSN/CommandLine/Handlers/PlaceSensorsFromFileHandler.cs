@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 using UWSN.CommandLine.Options;
 using UWSN.Model;
 using UWSN.Model.Sim;
@@ -19,8 +14,10 @@ public class PlaceSensorsFromFileHandler
         var environment = Simulation.Instance.Environment;
 
         environment.Sensors = PlaceSensors(o.SensorsFilePath);
-        Console.WriteLine($"Расстановка сенсоров ({environment.Sensors.Count}) " +
-            $"из пользовательского файла прошла успешно.");
+        Console.WriteLine(
+            $"Расстановка сенсоров ({environment.Sensors.Count}) "
+                + $"из пользовательского файла прошла успешно."
+        );
 
         SerializationHelper.SaveSimulation(o.FilePath);
     }
@@ -33,7 +30,7 @@ public class PlaceSensorsFromFileHandler
 
         for (int i = 0; i < lines.Length; i++)
         {
-            sensors.Add(new Sensor(i));
+            sensors.Add(new Sensor() { Id = i });
         }
 
         try
@@ -41,7 +38,11 @@ public class PlaceSensorsFromFileHandler
             for (int i = 0; i < lines.Length; i++)
             {
                 var split = lines[i].Split(" ");
-                sensors[i].Position = new Vector3(float.Parse(split[0]), float.Parse(split[1]), float.Parse(split[2]));
+                sensors[i].Position = new Vector3(
+                    float.Parse(split[0]),
+                    float.Parse(split[1]),
+                    float.Parse(split[2])
+                );
             }
         }
         catch

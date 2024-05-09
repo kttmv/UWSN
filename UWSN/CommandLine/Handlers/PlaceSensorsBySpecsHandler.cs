@@ -43,20 +43,30 @@ namespace UWSN.CommandLine.Handlers
 
             for (int i = 0; i < sensorsCount; i++)
             {
-                sensors.Add(new Sensor(i));
+                sensors.Add(new Sensor() { Id = i });
             }
 
             switch (o.DistributionType)
             {
                 case "rndStepNormal":
-                    Simulation.Instance.Environment.Sensors =
-                        PlaceNormal(sensors, rMax, countX, countY, countZ);
+                    Simulation.Instance.Environment.Sensors = PlaceNormal(
+                        sensors,
+                        rMax,
+                        countX,
+                        countY,
+                        countZ
+                    );
 
                     break;
 
                 case "orth":
-                    Simulation.Instance.Environment.Sensors =
-                        PlaceOrth(sensors, rMax, countX, countY, countZ);
+                    Simulation.Instance.Environment.Sensors = PlaceOrth(
+                        sensors,
+                        rMax,
+                        countX,
+                        countY,
+                        countZ
+                    );
 
                     break;
 
@@ -67,7 +77,6 @@ namespace UWSN.CommandLine.Handlers
                 default:
                     throw new Exception("Указан не поддерживаемый тип распределения сенсоров");
             }
-            
 
             SerializationHelper.SaveSimulation(o.FilePath);
         }
@@ -92,9 +101,21 @@ namespace UWSN.CommandLine.Handlers
                 {
                     for (int k = 0; k < countZ; k++)
                     {
-                        var x = al.Min.X + (float)((i * stepRange) + NextDouble(rnd, -stepRange / 2, stepRange / 2));
-                        var y = al.Min.Y + (float)((j * stepRange) + NextDouble(rnd, -stepRange / 2, stepRange / 2));
-                        var z = al.Min.Z + (float)((k * stepRange) + NextDouble(rnd, -stepRange / 2, stepRange / 2));
+                        var x =
+                            al.Min.X
+                            + (float)(
+                                (i * stepRange) + NextDouble(rnd, -stepRange / 2, stepRange / 2)
+                            );
+                        var y =
+                            al.Min.Y
+                            + (float)(
+                                (j * stepRange) + NextDouble(rnd, -stepRange / 2, stepRange / 2)
+                            );
+                        var z =
+                            al.Min.Z
+                            + (float)(
+                                (k * stepRange) + NextDouble(rnd, -stepRange / 2, stepRange / 2)
+                            );
 
                         if (x < al.Min.X)
                             x = al.Min.X;
@@ -116,13 +137,21 @@ namespace UWSN.CommandLine.Handlers
                 }
             }
 
-            Console.WriteLine($"Расстановка сенсоров ({countX * countY * countZ}) в узлах " +
-                $"ортогональной решетки с нормальным отклонением прошла успешно.");
+            Console.WriteLine(
+                $"Расстановка сенсоров ({countX * countY * countZ}) в узлах "
+                    + $"ортогональной решетки с нормальным отклонением прошла успешно."
+            );
 
             return sensors;
         }
 
-        private static List<Sensor> PlaceOrth(List<Sensor> sensors, double stepRange, int countX, int countY, int countZ)
+        private static List<Sensor> PlaceOrth(
+            List<Sensor> sensors,
+            double stepRange,
+            int countX,
+            int countY,
+            int countZ
+        )
         {
             var al = Simulation.Instance.AreaLimits;
 
@@ -147,7 +176,9 @@ namespace UWSN.CommandLine.Handlers
                 }
             }
 
-            Console.WriteLine($"Расстановка сенсоров ({countX * countY * countZ}) в узлах ортогональной решетки прошла успешно.");
+            Console.WriteLine(
+                $"Расстановка сенсоров ({countX * countY * countZ}) в узлах ортогональной решетки прошла успешно."
+            );
 
             return sensors;
         }

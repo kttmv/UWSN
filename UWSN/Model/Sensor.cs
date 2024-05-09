@@ -3,9 +3,17 @@ using Newtonsoft.Json;
 using UWSN.Model.Protocols;
 using UWSN.Model.Protocols.DataLink;
 using UWSN.Model.Sim;
+using UWSN.Utilities;
 using static UWSN.Model.Protocols.NetworkProtocol;
+using static UWSN.Model.Sim.SimulationDelta;
 
 namespace UWSN.Model;
+
+public class NextClusterization
+{
+    public int ClusterId { get; set; }
+    public bool IsReference { get; set; }
+}
 
 public class Sensor
 {
@@ -21,7 +29,28 @@ public class Sensor
     public NetworkProtocol Network { get; set; } = new();
 
     [JsonIgnore]
-    public double Battery { get; set; } = 100;
+    private double _battery;
+
+    [JsonIgnore]
+    public double Battery
+    {
+        get { return _battery; }
+        set
+        {
+            var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
+            delta.SensorDeltas.Add(
+                new SensorDelta
+                {
+                    Id = Id,
+                    ClusterId = null,
+                    IsReference = null,
+                    Battery = -(_battery - value)
+                }
+            );
+
+            _battery = value;
+        }
+    }
 
     [JsonIgnore]
     public bool IsDead
@@ -69,27 +98,18 @@ public class Sensor
 
     #endregion Properties
 
-    public Sensor(int id)
-    {
-        Battery = Simulation.Instance.SensorSettings.InitialSensorBattery;
-
-        DataLink = Simulation.Instance.SensorSettings.DataLinkProtocol.Clone();
-
-        Id = id;
-    }
-
     public Sensor()
     {
-        Battery = Simulation.Instance.SensorSettings.InitialSensorBattery;
+        _battery = Simulation.Instance.SensorSettings.InitialSensorBattery;
 
         DataLink = Simulation.Instance.SensorSettings.DataLinkProtocol.Clone();
     }
 
-    public void WakeUp(bool shouldSkipHello)
+    public void WakeUp()
     {
         ReceivedData.Clear();
 
-        if (!shouldSkipHello)
+        if (!Simulation.Instance.ShouldSkipHello)
         {
             var frame = new Frame
             {
@@ -115,6 +135,8 @@ public class Sensor
         }
         else
         {
+            Clusterize();
+
             List<Neighbour> neighbours = new();
 
             foreach (var sensor in Simulation.Instance.Environment.Sensors)
@@ -123,119 +145,79 @@ public class Sensor
                 {
                     Position = sensor.Position,
                     Id = sensor.Id,
+                    ClusterId = sensor.ClusterId,
+                    IsReference = sensor.IsReference
                 };
                 neighbours.Add(n);
             }
 
             Network.Neighbours = neighbours;
-            Network.Clusterize();
         }
-        
+
         for (int i = 1; i <= Simulation.MAX_CYCLES; i++)
         {
             int k = i;
 
             Simulation.Instance.EventManager.AddEvent(
                 new Event(
-                    Simulation.Instance.SensorSettings.StartSamplingTime.Add(Simulation.Instance.SensorSettings.SensorSampleInterval * i),
-                    $"Отправка DATA от #{Id}",
+                    Simulation.Instance.SensorSettings.StartSamplingTime.Add(
+                        Simulation.Instance.SensorSettings.SensorSampleInterval * i
+                    ),
+                    $"Сбор данных с датчиков сенсором #{Id}",
                     () =>
                     {
                         Simulation.Instance.CurrentCycle = k;
-                        SendData();
+                        CollectData();
                     }
                 )
             );
         }
     }
 
-    public void SendData()
+    public void CollectData()
     {
         Battery -= Simulation.Instance.SensorSettings.Modem.PowerSP * 0.02;
 
-        if (IsReference == null)
-            return;
+        Network.SendCollectedData();
+    }
 
-        if ((bool)IsReference)
+    public void Clusterize()
+    {
+        if (NextClusterization == null)
         {
-            ReceivedData.Add($"D_{Id}");
-
-            return;
+            Simulation.Instance.Clusterize();
         }
 
-        int hopId = CalculateNextHop();
-
-        var frame = new Frame
+        if (NextClusterization == null)
         {
-            SenderId = Id,
-            SenderPosition = Position,
-            ReceiverId = hopId,
-            Type = Frame.FrameType.Data,
-            TimeSend = Simulation.Instance.Time,
-            AckIsNeeded = true,
-            NeighboursData = null,
-            BatteryLeft = Battery,
-            DeadSensors = null,
-            Data = $"D_{Id}",
+            throw new NullReferenceException("Что-то пошло не так в процессе кластеризации");
+        }
+
+        ClusterId = NextClusterization.ClusterId;
+        IsReference = NextClusterization.IsReference;
+        NextClusterization = null;
+
+        if (IsReference.Value)
+        {
+            Logger.WriteSensorLine(
+                this,
+                $"Определил себя новым референсным узлом кластера {ClusterId}"
+            );
+        }
+        else
+        {
+            Logger.WriteSensorLine(this, $"Определил себя к кластеру {ClusterId}.");
+        }
+
+        var time = Simulation.Instance.Time;
+        var delta = new SensorDelta
+        {
+            Id = Id,
+            ClusterId = ClusterId.Value,
+            IsReference = IsReference.Value,
+            Battery = null
         };
 
-        if (Id == 9)
-        {
-            var specialFrame = new Frame
-            {
-                SenderId = Id,
-                SenderPosition = Position,
-                ReceiverId = hopId,
-                Type = Frame.FrameType.Data,
-                TimeSend = Simulation.Instance.Time,
-                AckIsNeeded = true,
-                NeighboursData = null,
-                BatteryLeft = Battery,
-                DeadSensors = null,
-                Data = $"D_{Id}q",
-            };
-
-            DataLink.SendFrame(specialFrame);
-            return;
-        }
-
-        DataLink.SendFrame(frame);
+        Simulation.Instance.Result!.AllDeltas[time].SensorDeltas.Add(delta);
     }
-
-    public int CalculateNextHop()
-    {
-        var clusterMates = Simulation.Instance.Environment.Sensors.Where(s => s.ClusterId == ClusterId).ToList();
-        if (clusterMates.Any(m => m.IsReference == null))
-            throw new Exception("Свойство IsReference не должно быть null");
-
-        int referenceId = clusterMates.First(m => m.IsReference.HasValue && m.IsReference.Value).Id;
-
-        var referencePosition = Network.Neighbours.First(n => n.Id == referenceId).Position;
-
-        double distanceToReference = Vector3.Distance(Position, referencePosition);
-
-        var neighboursByDistance = Network.Neighbours.OrderBy(n =>
-            Vector3.Distance(Position, n.Position)
-        );
-
-        int hopId = -1;
-        foreach (var neighbour in neighboursByDistance)
-        {
-            if (
-                Vector3.Distance(neighbour.Position, referencePosition) < distanceToReference
-                && clusterMates.Count(m => m.Id == neighbour.Id) > 0
-            )
-            {
-                hopId = neighbour.Id;
-            }
-        }
-
-        return hopId;
-    }
-}
-
-public class NextClusterization
-{
-    public int ClusterId { get; set; }
-    public bool IsReference { get; set; }
 }

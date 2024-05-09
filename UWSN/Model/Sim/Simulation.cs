@@ -34,7 +34,17 @@ public class Simulation
     public SensorSettings SensorSettings { get; set; } = new();
 
     [JsonIgnore]
-    public List<ModemBase> AvailableModems { get; set; } = new();
+    public List<ModemBase> AvailableModems { get; set; } =
+        new List<ModemBase>()
+        {
+            new AquaCommMako(),
+            new AquaCommMarlin(),
+            new AquaCommOrca(),
+            new AquaModem1000(),
+            new AquaModem500(),
+            new MicronModem(),
+            new SMTUTestModem()
+        };
 
     /// <summary>
     /// % мёртвых сенсоров, при достижении которого мы считаем сеть мертвой
@@ -47,10 +57,9 @@ public class Simulation
     public Vector3Range AreaLimits { get; set; } =
         new() { Min = new Vector3(0, 0, 0), Max = new Vector3(10_000, 10_000, 10_000) };
 
-        [JsonIgnore]
-        public bool ShouldSkipHello { get; set; }
+    public bool ShouldSkipHello { get; set; } = false;
 
-        public double InitialSensorBattery { get; set; } = 864000.0;
+    public double InitialSensorBattery { get; set; } = 864000.0;
 
     public ChannelManager ChannelManager { get; set; } = new();
 
@@ -78,17 +87,6 @@ public class Simulation
             throw new Exception("Экземпляр класса Simulation уже создан.");
 
         SimulationInstance = this;
-
-        AvailableModems = new List<ModemBase>()
-        {
-            new AquaCommMako(),
-            new AquaCommMarlin(),
-            new AquaCommOrca(),
-            new AquaModem1000(),
-            new AquaModem500(),
-            new MicronModem(),
-            new SMTUTestModem()
-        };
     }
 
     /// <summary>
