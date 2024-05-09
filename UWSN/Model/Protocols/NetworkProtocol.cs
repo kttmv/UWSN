@@ -265,6 +265,9 @@ public class NetworkProtocol : ProtocolBase
 
     private int CalculateNextHop()
     {
+        if (!Sensor.ClusterId.HasValue)
+            throw new Exception("Не определена кластеризация для данного сенсора");
+
         var clusterMates = Neighbours.Where(s => s.ClusterId == Sensor.ClusterId).ToList();
 
         if (clusterMates.Any(m => m.IsReference == null))

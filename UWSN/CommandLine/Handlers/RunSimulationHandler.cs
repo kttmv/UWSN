@@ -15,15 +15,7 @@ namespace UWSN.CommandLine.Handlers
                 sensor.WakeUp();
             }
 
-            try
-            {
-                Simulation.Instance.Run();
-            }
-            catch (Exception e)
-            {
-                Logger.Save();
-                throw e;
-            }
+            Simulation.Instance.Run();
 
             SerializationHelper.SaveSimulation(o.FilePath);
             Logger.Save();
