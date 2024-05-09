@@ -145,8 +145,8 @@ public class Sensor
                 {
                     Position = sensor.Position,
                     Id = sensor.Id,
-                    ClusterId = sensor.ClusterId,
-                    IsReference = sensor.IsReference
+                    ClusterId = sensor.ClusterId ?? sensor.NextClusterization!.ClusterId,
+                    IsReference = sensor.IsReference ?? sensor.NextClusterization!.IsReference
                 };
                 neighbours.Add(n);
             }
@@ -210,15 +210,15 @@ public class Sensor
             Logger.WriteSensorLine(this, $"Определил себя к кластеру {ClusterId}.");
         }
 
-        var time = Simulation.Instance.Time;
-        var delta = new SensorDelta
-        {
-            Id = Id,
-            ClusterId = ClusterId.Value,
-            IsReference = IsReference.Value,
-            Battery = null
-        };
-
-        Simulation.Instance.Result!.AllDeltas[time].SensorDeltas.Add(delta);
+        var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
+        delta.SensorDeltas.Add(
+            new SensorDelta
+            {
+                Id = Id,
+                ClusterId = ClusterId.Value,
+                IsReference = IsReference.Value,
+                Battery = null
+            }
+        );
     }
 }

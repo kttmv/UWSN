@@ -265,6 +265,9 @@ public class NetworkProtocol : ProtocolBase
 
     private int CalculateNextHop()
     {
+        if (!Sensor.ClusterId.HasValue)
+            throw new Exception("Не определена кластеризация для данного сенсора");
+
         // если сенсор мертв и алгоритм кластеризации присвоил ему специальный кластер для мертвых сенсоров
         if (Sensor.ClusterId == -1)
             return -1;

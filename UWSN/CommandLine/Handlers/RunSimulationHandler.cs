@@ -10,20 +10,7 @@ namespace UWSN.CommandLine.Handlers
         {
             SerializationHelper.LoadSimulation(o.FilePath);
 
-            foreach (var sensor in Simulation.Instance.Environment.Sensors)
-            {
-                sensor.WakeUp();
-            }
-
-            try
-            {
-                Simulation.Instance.Run();
-            }
-            catch (Exception e)
-            {
-                Logger.Save();
-                throw e;
-            }
+            Simulation.Instance.Run();
 
             SerializationHelper.SaveSimulation(o.FilePath);
             Logger.Save();
