@@ -244,7 +244,7 @@ public class NetworkProtocol : ProtocolBase
 
         int hopId = CalculateNextHop();
         if (hopId < 0)
-            throw new Exception("Не удалось вычислить HopId");
+            return;
 
         var frame = new Frame
         {

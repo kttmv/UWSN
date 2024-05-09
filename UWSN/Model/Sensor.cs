@@ -166,8 +166,11 @@ public class Sensor
                     $"Сбор данных с датчиков сенсором #{Id}",
                     () =>
                     {
-                        Simulation.Instance.CurrentCycle = k;
-                        CollectData();
+                        if(!IsDead)
+                        {
+                            Simulation.Instance.CurrentCycle = k;
+                            CollectData();
+                        }
                     }
                 )
             );
