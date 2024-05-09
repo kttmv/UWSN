@@ -36,7 +36,7 @@ namespace UWSN.Model.Protocols.DataLink
                 && frame.ReceiverId == Sensor.Id
             )
             {
-                Sensor.StopAllAction();
+                WaitingForAckEvent = null;
                 Sensor.Physical.CurrentState = PhysicalProtocol.State.Listening;
                 Logger.WriteSensorLine(
                     Sensor,
@@ -137,7 +137,7 @@ namespace UWSN.Model.Protocols.DataLink
                 else
                     Logger.WriteSensorLine(
                         Sensor,
-                        "(MultiChanneledAloha)Все каналы заняты, "
+                        "(MultiChanneledAloha) Все каналы заняты, "
                             + $"начинаю ожидание в {timeout} сек."
                     );
 
