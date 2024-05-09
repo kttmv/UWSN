@@ -11,16 +11,10 @@ public class SensorSettings
     public double InitialSensorBattery { get; set; } = 864_000.0;
     public double BatteryDeadCharge { get; set; } = 100.0;
 
-    public TimeSpan SensorSampleInterval { get; set; } = TimeSpan.FromMinutes(10);
-
-    public DateTime StartSamplingTime { get; set; } = new DateTime().AddDays(1);
+    public TimeSpan SampleInterval { get; set; } = TimeSpan.FromMinutes(30);
 
     public DataLinkProtocol DataLinkProtocol { get; set; } = new PureAloha();
 
     public IClusterization ClusterizationAlgorithm { get; set; } =
-        new RetardedClusterization() 
-        { 
-            XClusterCount = 3,
-            ZClusterCount = 2
-        };
+        new RetardedClusterization() { XClusterCount = 3, ZClusterCount = 2 };
 }

@@ -89,6 +89,11 @@ public class Simulation
         SimulationInstance = this;
     }
 
+    public void Clusterize()
+    {
+        SensorSettings.ClusterizationAlgorithm.Clusterize();
+    }
+
     /// <summary>
     /// Метод запуска симуляции
     /// </summary>
@@ -116,9 +121,34 @@ public class Simulation
             var eventToInvoke = EventManager.PopFirst();
             if (eventToInvoke == null)
             {
-                Logger.ShouldWriteToConsole = true;
                 Logger.WriteLine("Больше событий нет.");
-                break;
+
+                if (CurrentCycle >= MAX_CYCLES)
+                {
+                    Logger.ShouldWriteToConsole = true;
+                    Logger.WriteLine("Достигнуто максимальное количество циклов.");
+                    break;
+                }
+
+                CurrentCycle++;
+
+                var time = Time.RoundUpToNearest(SensorSettings.SampleInterval);
+
+                foreach (var sensor in Environment.Sensors.Shuffle())
+                {
+                    if (sensor.IsDead)
+                        continue;
+
+                    var e = new Event(
+                        time,
+                        $"Сбор данных с датчиков сенсором #{sensor.Id}",
+                        () => sensor.CollectData()
+                    );
+
+                    sensor.AddEvent(e);
+                }
+
+                continue;
             }
 
             Time = eventToInvoke.Time;
@@ -182,10 +212,5 @@ public class Simulation
         Logger.WriteLine($"\tКоличество отправленных сообщений: {Result.TotalSends}");
         Logger.WriteLine($"\tКоличество полученных сообщений: {Result.TotalReceives}");
         Logger.WriteLine($"\tКоличество коллизий: {Result.TotalCollisions}");
-    }
-
-    public void Clusterize()
-    {
-        SensorSettings.ClusterizationAlgorithm.Clusterize();
     }
 }

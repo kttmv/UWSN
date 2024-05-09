@@ -207,20 +207,6 @@ public class Sensor
         for (int i = 1; i <= Simulation.MAX_CYCLES; i++)
         {
             int k = i;
-
-            AddEvent(
-                new Event(
-                    Simulation.Instance.SensorSettings.StartSamplingTime.Add(
-                        Simulation.Instance.SensorSettings.SensorSampleInterval * i
-                    ),
-                    $"Сбор данных с датчиков сенсором #{Id}",
-                    () =>
-                    {
-                        Simulation.Instance.CurrentCycle = k;
-                        CollectData();
-                    }
-                )
-            );
         }
     }
 
