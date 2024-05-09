@@ -10,7 +10,9 @@ namespace UWSN.CommandLine.Handlers
         {
             SerializationHelper.LoadSimulation(o.FilePath);
 
-            Simulation.Instance.Run();
+            Logger.ShouldWriteToConsole = o.Verbose;
+
+            Simulation.Instance.Run(o.Verbose);
 
             SerializationHelper.SaveSimulation(o.FilePath);
             Logger.Save();

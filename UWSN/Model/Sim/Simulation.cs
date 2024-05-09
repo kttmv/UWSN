@@ -10,6 +10,8 @@ public class Simulation
     private const int MAX_PROCESSED_EVENTS = 1_000_000;
     public const int MAX_CYCLES = 1_000;
 
+    private const int PRINT_EVERY_NTH_EVENT = 1000;
+
     #region Simulation Singleton
 
     private static Simulation? SimulationInstance { get; set; }
@@ -90,7 +92,7 @@ public class Simulation
     /// <summary>
     /// Метод запуска симуляции
     /// </summary>
-    public void Run()
+    public void Run(bool verbose)
     {
         Result = new SimulationResult();
 
@@ -99,54 +101,74 @@ public class Simulation
             sensor.WakeUp();
         }
 
-        int i = 1;
-        while (i < MAX_PROCESSED_EVENTS)
+        int eventNumber = 1;
+        while (eventNumber < MAX_PROCESSED_EVENTS)
         {
-            var e = EventManager.RemoveFirst();
-
-            if (e == null)
+            if (!verbose && eventNumber % PRINT_EVERY_NTH_EVENT == 0)
             {
+                Console.WriteLine($"Обработано событий: {eventNumber}.");
+                Console.WriteLine($"Текущее время симуляции: {Time:dd.MM.yyyy HH:mm:ss.fff}");
+                Console.WriteLine($"Текущий цикл сбора данных: {CurrentCycle}");
+            }
+
+            var eventToInvoke = EventManager.PopFirst();
+            if (eventToInvoke == null)
+            {
+                Logger.ShouldWriteToConsole = true;
                 Logger.WriteLine("Больше событий нет.");
                 break;
             }
 
-            Time = e.Time;
+            Time = eventToInvoke.Time;
 
-            Logger.WriteLine($"=============================");
-            Logger.WriteLine($"Событие №{i}. {e.Description}", true);
+            Logger.WriteLine($"\n=============================");
+            Logger.WriteLine($"Событие №{eventNumber}. {eventToInvoke.Description}", true);
 
-            e.Invoke();
+            // обрабатываем событие
+            eventToInvoke.Invoke();
+            eventNumber++;
 
-            Logger.WriteLine("");
+            // проверяем, жива ли сеть
+            int deadSensorsCount = Environment.Sensors.Where(s => s.IsDead).Count();
 
-            i++;
-
-            if (
-                Environment.Sensors.Where(s => s.IsDead).Count() / (double)Environment.Sensors.Count
-                >= DeadSensorsPercent
-            )
+            if (deadSensorsCount / (double)Environment.Sensors.Count >= DeadSensorsPercent)
             {
+                Logger.ShouldWriteToConsole = true;
                 Logger.WriteLine("Сеть мертва");
 
                 break;
             }
         }
 
-        if (i >= MAX_PROCESSED_EVENTS)
+        if (eventNumber >= MAX_PROCESSED_EVENTS)
         {
+            Logger.ShouldWriteToConsole = true;
             Logger.WriteLine("Был достигнут лимит событий.");
         }
 
-        Logger.WriteLine("");
-        Logger.WriteLine("Симуляция остановлена.", true);
+        Result.TotalEvents = eventNumber;
+        Result.TotalCycles = CurrentCycle;
 
-        Logger.WriteLine("");
-        Logger.WriteLine($"=============================");
+        Logger.WriteLine("\nСимуляция остановлена.", true);
+
+        PrintResults();
+    }
+
+    public void PrintResults()
+    {
+        Logger.WriteLine($"\n=============================");
         Logger.WriteLine("Результаты симуляции:");
+        Logger.WriteLine(
+            $"\tКоличество обработанных событий: {Result!.TotalEvents}"
+                + (Result.TotalEvents >= MAX_PROCESSED_EVENTS ? " (был достигнут лимит)" : "")
+        );
+        Logger.WriteLine(
+            $"\tКоличество отработанных сетью циклов: {Result.TotalCycles}"
+                + (Result.TotalCycles >= MAX_CYCLES ? " (был достигнут лимит)" : "")
+        );
         Logger.WriteLine($"\tКоличество отправленных сообщений: {Result.TotalSends}");
         Logger.WriteLine($"\tКоличество полученных сообщений: {Result.TotalReceives}");
         Logger.WriteLine($"\tКоличество коллизий: {Result.TotalCollisions}");
-        Logger.WriteLine($"\tКоличество отработанных циклов: {CurrentCycle}");
     }
 
     public void Clusterize()

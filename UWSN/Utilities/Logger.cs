@@ -7,14 +7,18 @@ public class Logger
 {
     private static List<string> Lines { get; set; } = new();
 
+    public static bool ShouldWriteToConsole { get; set; } = false;
+
     public static void WriteLine(string value, bool withTime = false)
     {
         string str = withTime ? $"[{Simulation.Instance.Time:dd.MM.yyyy HH:mm:ss.fff}] " : "";
 
         str += value;
 
-        Console.WriteLine(str);
         Lines.Add(str);
+
+        if (ShouldWriteToConsole)
+            Console.WriteLine(str);
     }
 
     public static void WriteSensorLine(Sensor sensor, string value)
