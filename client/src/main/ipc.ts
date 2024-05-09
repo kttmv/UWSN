@@ -1,4 +1,4 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
+import { spawn } from 'child_process'
 import {
     app,
     dialog,
@@ -35,10 +35,10 @@ function reply(event: IpcMainEvent, channel: ReplyChannels, arg: unknown) {
 }
 // -----------------------------------------------------------------------------
 
-function runShell(
-    event: IpcMainEvent,
-    args: string
-): ChildProcessWithoutNullStreams {
+on('run-shell', (event, args) => {
+    console.log('\nRUN SIMULATOR')
+    console.log('ARGS: ', args)
+
     const isWindows = os.platform() === 'win32'
     const isLinux = os.platform() === 'linux'
 
@@ -57,69 +57,14 @@ function runShell(
         reply(event, 'run-shell-reply', data.toString())
     })
 
-    child.on('close', (code) => {
-        console.log(`child process exited with code ${code}`)
-        reply(event, 'run-shell-close', code)
-    })
-
-    return child
-}
-
-on('run-shell', (event, args) => {
-    console.log('\nRUN SIMULATOR')
-    console.log('ARGS: ', args)
-
-    const child = runShell(event, args as string)
-
     child.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`)
         reply(event, 'run-shell-reply', data.toString())
     })
-})
 
-const SEND_REPLIES_EVERY_NTH_EVENT = 10_000
-
-on('run-shell-simulation', (event, args) => {
-    console.log('\nRUN SIMULATOR (NO STDOUT)')
-    console.log('ARGS: ', args)
-
-    const child = runShell(event, args as string)
-
-    child.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`)
-
-        const line = data.toString() as string
-
-        if (line.includes('Событие №')) {
-            const matchEvent = line.match(/\[(.+)\] Событие №(\d+)/)
-            if (matchEvent) {
-                const time = matchEvent[1]
-                const number = parseInt(matchEvent[2])
-                if (number % SEND_REPLIES_EVERY_NTH_EVENT === 0) {
-                    reply(
-                        event,
-                        'run-shell-reply',
-                        `Обработано событий: ${number}. Время симуляции: ${time}`
-                    )
-                }
-            }
-        }
-
-        if (line.includes('Симуляция остановлена')) {
-            const matchStop = line.match(/\[(.+)\] Симуляция остановлена./)
-            if (matchStop) {
-                const time = matchStop[1]
-                reply(
-                    event,
-                    'run-shell-reply',
-                    `Симуляция остановлена. Конечное время симуляции: ${time}`
-                )
-            }
-        }
-
-        if (line.includes('Был достигнут лимит событий')) {
-            reply(event, 'run-shell-reply', line)
-        }
+    child.on('close', (code) => {
+        console.log(`child process exited with code ${code}`)
+        reply(event, 'run-shell-close', code)
     })
 })
 

@@ -25,9 +25,11 @@ public class EventManager
     {
         if (e.Time < Simulation.Instance.Time)
         {
-            throw new ArgumentException("Была произведена попытка создания события в прошлом." +
-                $"Текущее время симуляции: {Simulation.Instance.Time:dd.MM.yyyy HH:mm:ss.fff}." +
-                $"Время добавляемого события: {e.Time:dd.MM.yyyy HH:mm:ss.fff}");
+            throw new ArgumentException(
+                "Была произведена попытка создания события в прошлом."
+                    + $"Текущее время симуляции: {Simulation.Instance.Time:dd.MM.yyyy HH:mm:ss.fff}."
+                    + $"Время добавляемого события: {e.Time:dd.MM.yyyy HH:mm:ss.fff}"
+            );
         }
 
         Events.Add(e);
@@ -49,7 +51,7 @@ public class EventManager
     /// Получить ближайшее по времени событие и удалить его из планировщика
     /// </summary>
     /// <returns>Ближайшее по времени событие</returns>
-    public Event? RemoveFirst()
+    public Event? PopFirst()
     {
         if (Events.Count == 0)
         {
