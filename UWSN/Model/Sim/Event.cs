@@ -2,6 +2,10 @@
 {
     public class Event
     {
+        private static int LastEventId { get; set; } = 0;
+
+        public int Id { get; }
+
         /// <summary>
         /// Время
         /// </summary>
@@ -10,7 +14,7 @@
         /// <summary>
         /// Действие, вызываемое в момент исполнения события
         /// </summary>
-        private Action Action { get; }
+        private Action Action { get; set; }
 
         /// <summary>
         /// Описание события
@@ -19,9 +23,21 @@
 
         public Event(DateTime time, string description, Action action)
         {
+            Id = LastEventId + 1;
+            LastEventId += 1;
+
             Time = time;
-            Action = action;
             Description = description;
+            Action = action;
+        }
+
+        /// <summary>
+        /// Метод переназначения действия события. Очень опасно, использовать
+        /// с осторожностью.
+        /// </summary>
+        public void SetAction(Action action)
+        {
+            Action = action;
         }
 
         public void Invoke()

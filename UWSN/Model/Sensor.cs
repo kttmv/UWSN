@@ -116,19 +116,28 @@ public class Sensor
 
     public void AddEvent(Event e)
     {
-        Events.Add(e);
+        // создаем ивент, который будет оболочкой, которая будет удалять себя сама при исполнении
+        // чтобы удалить ивент нужна ссылка на него. поэтому, чтобы получить ссылку на объект ивента,
+        // мы создаем его с дефолтным пустым действием, а затем меняем это действие на нормальное.
+        var wrapperEvent = new Event(
+            e.Time,
+            e.Description,
+            () =>
+            {
+                throw new Exception("Действие события не задано");
+            });
 
-        Simulation.Instance.EventManager.AddEvent(
-            new Event(
-                e.Time,
-                e.Description,
-                () =>
-                {
-                    Events.Remove(e);
-                    e.Invoke();
-                }
-            )
-        );
+        void action()
+        {
+            Events.Remove(wrapperEvent);
+            e.Invoke();
+        }
+
+        wrapperEvent.SetAction(action);
+
+        Events.Add(wrapperEvent);
+
+        Simulation.Instance.EventManager.AddEvent(wrapperEvent);
     }
 
     public void RemoveEvent(Event e)
@@ -139,9 +148,9 @@ public class Sensor
 
     public void RemoveAllEvents()
     {
-        foreach (var e in Events)
+        while (Events.Count > 0)
         {
-            Simulation.Instance.EventManager.RemoveEvent(e);
+            RemoveEvent(Events.First());
         }
     }
 
