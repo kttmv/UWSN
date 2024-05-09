@@ -52,9 +52,9 @@ public class Sensor
 
             if (IsDead)
             {
-                RemoveAllEvents();
-                DataLink.StopAllAction();
-                Network.StopAllAction();
+                Logger.WriteSensorLine(this, "Осталось мало зарядки");
+                Network.SendDeathWarning();
+                StopAllAction();
             }
         }
     }
@@ -114,6 +114,14 @@ public class Sensor
         DataLink = Simulation.Instance.SensorSettings.DataLinkProtocol.Clone();
     }
 
+    public void StopAllAction()
+    {
+        RemoveAllEvents();
+        DataLink.StopAllAction();
+        Network.StopAllAction();
+        Physical.CurrentState = PhysicalProtocol.State.Idle;
+    }
+
     public void AddEvent(Event e)
     {
         // создаем ивент, который будет оболочкой, которая будет удалять себя сама при исполнении
@@ -125,7 +133,8 @@ public class Sensor
             () =>
             {
                 throw new Exception("Действие события не задано");
-            });
+            }
+        );
 
         void action()
         {

@@ -38,7 +38,7 @@ namespace UWSN.Model.Protocols.DataLink
                 && frame.ReceiverId == Sensor.Id
             )
             {
-                StopAllAction();
+                Sensor.StopAllAction();
                 Sensor.Physical.CurrentState = PhysicalProtocol.State.Listening;
                 Logger.WriteSensorLine(Sensor, $"(PureAloha) получил ACK от #{frame.SenderId}");
 

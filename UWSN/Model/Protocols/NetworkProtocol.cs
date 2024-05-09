@@ -20,39 +20,6 @@ public class NetworkProtocol : ProtocolBase
 
     public void ReceiveFrame(Frame frame)
     {
-        if (Sensor.IsDead)
-        {
-            Logger.WriteSensorLine(
-                Sensor,
-                "(Network) у меня мало зарядки, начинаю отправку предсмертного фрейма"
-            );
-
-            if (!DeadSensors.Contains(Sensor.Id))
-            {
-                DeadSensors.Add(Sensor.Id);
-            }
-
-            var newFrame = new Frame
-            {
-                SenderId = Sensor.Id,
-                SenderPosition = Sensor.Position,
-                ReceiverId = -1,
-                Type = Frame.FrameType.Warning,
-                TimeSend = Simulation.Instance.Time,
-                AckIsNeeded = false,
-                NeighboursData = Sensor.Network.Neighbours,
-                BatteryLeft = Sensor.Battery,
-                DeadSensors = Sensor.Network.DeadSensors,
-                Data = null,
-            };
-
-            SendFrame(newFrame);
-
-            StopAllAction();
-
-            return;
-        }
-
         if (frame.BatteryLeft < Simulation.Instance.SensorSettings.BatteryDeadCharge)
         {
             if (!DeadSensors.Contains(frame.SenderId))
@@ -74,9 +41,10 @@ public class NetworkProtocol : ProtocolBase
                 Data = null,
             };
 
-            SendFrame(newFrame);
+            SendFrameToAll(newFrame);
 
-            StopAllAction();
+            Sensor.StopAllAction();
+            Clusterize();
 
             return;
         }
@@ -90,15 +58,11 @@ public class NetworkProtocol : ProtocolBase
                 return;
             }
 
-            int hopId = CalculateNextHop();
-            if (hopId < 0)
-                throw new Exception("Не удалось вычислить HopId");
-
             var newFrame = new Frame
             {
                 SenderId = Sensor.Id,
                 SenderPosition = Sensor.Position,
-                ReceiverId = hopId,
+                ReceiverId = -1,
                 Type = Frame.FrameType.Data,
                 TimeSend = Simulation.Instance.Time,
                 AckIsNeeded = true,
@@ -108,7 +72,9 @@ public class NetworkProtocol : ProtocolBase
                 Data = frame.Data,
             };
 
-            SendFrame(newFrame);
+            SendFrameWithRouting(newFrame);
+
+            return;
         }
 
         if (frame.Type == Frame.FrameType.Warning)
@@ -116,38 +82,39 @@ public class NetworkProtocol : ProtocolBase
             var newDeads =
                 frame.DeadSensors ?? throw new NullReferenceException("Неправильный тип данных");
 
-            bool shouldSendToAll = false;
+            bool shouldSendWarning = false;
             foreach (var dead in newDeads)
             {
                 if (!DeadSensors.Contains(dead))
                 {
                     DeadSensors.Add(dead);
-                    shouldSendToAll = true;
+                    shouldSendWarning = true;
                 }
             }
 
-            if (shouldSendToAll)
-            {
-                var newFrame = new Frame
-                {
-                    SenderId = Sensor.Id,
-                    SenderPosition = Sensor.Position,
-                    ReceiverId = -1,
-                    Type = Frame.FrameType.Warning,
-                    TimeSend = Simulation.Instance.Time,
-                    AckIsNeeded = false,
-                    NeighboursData = Sensor.Network.Neighbours,
-                    BatteryLeft = Sensor.Battery,
-                    DeadSensors = Sensor.Network.DeadSensors,
-                    Data = null,
-                };
-
-                SendFrame(newFrame);
-
-                StopAllAction();
-
+            if (!shouldSendWarning)
                 return;
-            }
+
+            var newFrame = new Frame
+            {
+                SenderId = Sensor.Id,
+                SenderPosition = Sensor.Position,
+                ReceiverId = -1,
+                Type = Frame.FrameType.Warning,
+                TimeSend = Simulation.Instance.Time,
+                AckIsNeeded = false,
+                NeighboursData = Sensor.Network.Neighbours,
+                BatteryLeft = Sensor.Battery,
+                DeadSensors = Sensor.Network.DeadSensors,
+                Data = null,
+            };
+
+            SendFrameToAll(newFrame);
+
+            Sensor.StopAllAction();
+            Clusterize();
+
+            return;
         }
 
         if (frame.Type == Frame.FrameType.Hello)
@@ -178,93 +145,49 @@ public class NetworkProtocol : ProtocolBase
                 }
             }
 
-            if (shouldSendToAll)
-            {
-                var newFrame = new Frame
-                {
-                    SenderId = Sensor.Id,
-                    SenderPosition = Sensor.Position,
-                    ReceiverId = -1,
-                    Type = Frame.FrameType.Hello,
-                    TimeSend = Simulation.Instance.Time,
-                    AckIsNeeded = false,
-                    NeighboursData = Sensor.Network.Neighbours,
-                    BatteryLeft = Sensor.Battery,
-                    DeadSensors = null,
-                    Data = null,
-                };
+            if (!shouldSendToAll)
+                return;
 
-                SendFrame(newFrame);
-            }
+            var newFrame = new Frame
+            {
+                SenderId = Sensor.Id,
+                SenderPosition = Sensor.Position,
+                ReceiverId = -1,
+                Type = Frame.FrameType.Hello,
+                TimeSend = Simulation.Instance.Time,
+                AckIsNeeded = false,
+                NeighboursData = Sensor.Network.Neighbours,
+                BatteryLeft = Sensor.Battery,
+                DeadSensors = null,
+                Data = null,
+            };
+
+            SendFrameToAll(newFrame);
 
             if (Neighbours.Count == Simulation.Instance.Environment.Sensors.Count)
             {
                 Clusterize();
             }
+
+            return;
         }
     }
 
-    public void StopAllAction()
-    {
-        Sensor.Physical.CurrentState = PhysicalProtocol.State.Idle;
-        Sensor.DataLink.StopAllAction();
+    public void StopAllAction() { }
 
-        Clusterize();
-    }
-
-    public void SendFrame(Frame frame)
+    public void SendFrameWithRouting(Frame frame)
     {
+        int hopId = CalculateNextHop();
+
+        if (hopId != -1)
+            frame.ReceiverId = hopId;
+
         Sensor.DataLink.SendFrame(frame);
     }
 
-    private void Clusterize()
+    public void SendFrameToAll(Frame frame)
     {
-        Sensor.Clusterize();
-
-        foreach (var neighbour in Neighbours)
-        {
-            var sensor = Simulation.Instance.Environment.Sensors.First(s => s.Id == neighbour.Id);
-
-            neighbour.ClusterId = sensor.ClusterId;
-            neighbour.IsReference = sensor.IsReference;
-        }
-    }
-
-    public void SendCollectedData()
-    {
-        if (Sensor.IsReference == null || Sensor.ClusterId == null)
-        {
-            throw new Exception(
-                "Невозможно отправить данные с датчиков, так как не определена кластеризация"
-            );
-        }
-
-        if ((bool)Sensor.IsReference)
-        {
-            Sensor.ReceivedData.Add($"D_{Sensor.Id}");
-
-            return;
-        }
-
-        int hopId = CalculateNextHop();
-        if (hopId < 0)
-            return;
-
-        var frame = new Frame
-        {
-            SenderId = Sensor.Id,
-            SenderPosition = Sensor.Position,
-            ReceiverId = hopId,
-            Type = Frame.FrameType.Data,
-            TimeSend = Simulation.Instance.Time,
-            AckIsNeeded = true,
-            NeighboursData = null,
-            BatteryLeft = Sensor.Battery,
-            DeadSensors = null,
-            Data = $"D_{Sensor.Id}",
-        };
-
-        SendFrame(frame);
+        Sensor.DataLink.SendFrame(frame);
     }
 
     private int CalculateNextHop()
@@ -304,5 +227,81 @@ public class NetworkProtocol : ProtocolBase
         }
 
         return hopId;
+    }
+
+    private void Clusterize()
+    {
+        Sensor.Clusterize();
+
+        foreach (var neighbour in Neighbours)
+        {
+            var sensor = Simulation.Instance.Environment.Sensors.First(s => s.Id == neighbour.Id);
+
+            neighbour.ClusterId = sensor.ClusterId;
+            neighbour.IsReference = sensor.IsReference;
+        }
+    }
+
+    public void SendCollectedData()
+    {
+        if (Sensor.IsReference == null || Sensor.ClusterId == null)
+        {
+            throw new Exception(
+                "Невозможно отправить данные с датчиков, так как не определена кластеризация"
+            );
+        }
+
+        if ((bool)Sensor.IsReference)
+        {
+            Sensor.ReceivedData.Add($"D_{Sensor.Id}");
+
+            return;
+        }
+
+        int hopId = CalculateNextHop();
+        if (hopId < 0)
+            throw new Exception("Не удалось определить, кому отправлять фрейм");
+
+        var frame = new Frame
+        {
+            SenderId = Sensor.Id,
+            SenderPosition = Sensor.Position,
+            ReceiverId = hopId,
+            Type = Frame.FrameType.Data,
+            TimeSend = Simulation.Instance.Time,
+            AckIsNeeded = true,
+            NeighboursData = null,
+            BatteryLeft = Sensor.Battery,
+            DeadSensors = null,
+            Data = $"D_{Sensor.Id}",
+        };
+
+        SendFrameWithRouting(frame);
+    }
+
+    public void SendDeathWarning()
+    {
+        Logger.WriteSensorLine(Sensor, "(Network) начинаю отправку предсмертного фрейма");
+
+        if (!DeadSensors.Contains(Sensor.Id))
+        {
+            DeadSensors.Add(Sensor.Id);
+        }
+
+        var frame = new Frame
+        {
+            SenderId = Sensor.Id,
+            SenderPosition = Sensor.Position,
+            ReceiverId = -1,
+            Type = Frame.FrameType.Warning,
+            TimeSend = Simulation.Instance.Time,
+            AckIsNeeded = false,
+            NeighboursData = Neighbours,
+            BatteryLeft = Sensor.Battery,
+            DeadSensors = DeadSensors,
+            Data = null,
+        };
+
+        SendFrameToAll(frame);
     }
 }
