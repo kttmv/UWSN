@@ -1,14 +1,10 @@
-import { Flex, TabPanel } from '@chakra-ui/react'
-import { useProjectStore } from '../store/projectStore'
+import { TabPanel } from '@chakra-ui/react'
+import SimulationSettings from './SimulationSettings'
 
 export default function SimulationTab() {
-    const { project, setProject } = useProjectStore()
-
     return (
         <TabPanel>
-            <form>
-                <Flex direction='column' gap={4}></Flex>
-            </form>
+            <SimulationSettings />
         </TabPanel>
     )
 }

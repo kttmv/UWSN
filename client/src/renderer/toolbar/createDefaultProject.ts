@@ -30,7 +30,15 @@ export function createDefaultProject() {
             }
         },
 
-        DeadSensorsPercent: 0.33,
+        SimulationSettings: {
+            DeadSensorsPercent: 33,
+
+            MaxProcessedEvents: 5_000_000,
+            MaxCycles: 1_000,
+            PrintEveryNthEvent: 10_000,
+
+            ShouldSkipHello: true
+        },
 
         AreaLimits: {
             Min: {

@@ -159,7 +159,7 @@ public class Sensor
     {
         ReceivedData.Clear();
 
-        if (!Simulation.Instance.ShouldSkipHello)
+        if (!Simulation.Instance.SimulationSettings.ShouldSkipHello)
         {
             var frame = new Frame
             {
@@ -202,11 +202,6 @@ public class Sensor
             }
 
             Network.Neighbours = neighbours;
-        }
-
-        for (int i = 1; i <= Simulation.MAX_CYCLES; i++)
-        {
-            int k = i;
         }
     }
 

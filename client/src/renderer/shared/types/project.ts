@@ -3,12 +3,13 @@ import { SensorData } from './sensorData'
 import { SensorSettings } from './sensorSettings'
 import { Signal } from './signal'
 import { SimulationDelta } from './simulationDelta'
+import { SimulationSettings } from './simulationSettings'
 import { Vector3 } from './vector3'
 
 export type Project = {
     SensorSettings: SensorSettings
 
-    DeadSensorsPercent: number
+    SimulationSettings: SimulationSettings
 
     AreaLimits: {
         Min: Vector3

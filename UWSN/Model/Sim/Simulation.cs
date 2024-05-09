@@ -7,11 +7,6 @@ namespace UWSN.Model.Sim;
 
 public class Simulation
 {
-    private const int MAX_PROCESSED_EVENTS = 1_000_000;
-    public const int MAX_CYCLES = 1_000;
-
-    private const int PRINT_EVERY_NTH_EVENT = 1000;
-
     #region Simulation Singleton
 
     private static Simulation? SimulationInstance { get; set; }
@@ -35,31 +30,10 @@ public class Simulation
 
     public SensorSettings SensorSettings { get; set; } = new();
 
-    [JsonIgnore]
-    public List<ModemBase> AvailableModems { get; set; } =
-        new List<ModemBase>()
-        {
-            new AquaCommMako(),
-            new AquaCommMarlin(),
-            new AquaCommOrca(),
-            new AquaModem1000(),
-            new AquaModem500(),
-            new MicronModem(),
-            new SMTUTestModem()
-        };
-
-    /// <summary>
-    /// % мёртвых сенсоров, при достижении которого мы считаем сеть мертвой
-    /// </summary>
-    public double DeadSensorsPercent { get; set; } = 0.33;
-
-    [JsonIgnore]
-    public int CurrentCycle { get; set; } = 0;
+    public SimulationSettings SimulationSettings { get; set; } = new();
 
     public Vector3Range AreaLimits { get; set; } =
         new() { Min = new Vector3(0, 0, 0), Max = new Vector3(10_000, 10_000, 10_000) };
-
-    public bool ShouldSkipHello { get; set; } = false;
 
     public ChannelManager ChannelManager { get; set; } = new();
 
@@ -73,11 +47,27 @@ public class Simulation
     [JsonIgnore]
     public EventManager EventManager { get; set; } = new();
 
+    [JsonIgnore]
+    public int CurrentCycle { get; set; } = 0;
+
     /// <summary>
     /// Текущее время симуляции
     /// </summary>
     [JsonIgnore]
     public DateTime Time { get; set; }
+
+    [JsonIgnore]
+    public List<ModemBase> AvailableModems { get; set; } =
+        new List<ModemBase>()
+        {
+            new AquaCommMako(),
+            new AquaCommMarlin(),
+            new AquaCommOrca(),
+            new AquaModem1000(),
+            new AquaModem500(),
+            new MicronModem(),
+            new SMTUTestModem()
+        };
 
     #endregion Properties
 
@@ -109,9 +99,9 @@ public class Simulation
         }
 
         int eventNumber = 1;
-        while (eventNumber < MAX_PROCESSED_EVENTS)
+        while (eventNumber < SimulationSettings.MaxProcessedEvents)
         {
-            if (!verbose && eventNumber % PRINT_EVERY_NTH_EVENT == 0)
+            if (!verbose && eventNumber % SimulationSettings.PrintEveryNthEvent == 0)
             {
                 Console.WriteLine($"Обработано событий: {eventNumber}.");
                 Console.WriteLine($"Текущее время симуляции: {Time:dd.MM.yyyy HH:mm:ss.fff}");
@@ -123,7 +113,7 @@ public class Simulation
             {
                 Logger.WriteLine("Больше событий нет.");
 
-                if (CurrentCycle >= MAX_CYCLES)
+                if (CurrentCycle >= SimulationSettings.MaxCycles)
                 {
                     Logger.ShouldWriteToConsole = true;
                     Logger.WriteLine("Достигнуто максимальное количество циклов.");
@@ -163,7 +153,10 @@ public class Simulation
             // проверяем, жива ли сеть
             int deadSensorsCount = Environment.Sensors.Where(s => s.IsDead).Count();
 
-            if (deadSensorsCount / (double)Environment.Sensors.Count >= DeadSensorsPercent)
+            if (
+                deadSensorsCount / (double)Environment.Sensors.Count
+                >= (double)SimulationSettings.DeadSensorsPercent / 100
+            )
             {
                 Logger.ShouldWriteToConsole = true;
                 Logger.WriteLine("Сеть мертва");
@@ -172,7 +165,7 @@ public class Simulation
             }
         }
 
-        if (eventNumber >= MAX_PROCESSED_EVENTS)
+        if (eventNumber >= SimulationSettings.MaxProcessedEvents)
         {
             Logger.ShouldWriteToConsole = true;
             Logger.WriteLine("Был достигнут лимит событий.");
@@ -201,12 +194,20 @@ public class Simulation
 
         Logger.WriteLine(
             $"\tКоличество обработанных событий: {Result.TotalEvents}"
-                + (Result.TotalEvents >= MAX_PROCESSED_EVENTS ? " (был достигнут лимит)" : "")
+                + (
+                    Result.TotalEvents >= SimulationSettings.MaxProcessedEvents
+                        ? " (был достигнут лимит)"
+                        : ""
+                )
         );
 
         Logger.WriteLine(
             $"\tКоличество отработанных сетью циклов: {Result.TotalCycles}"
-                + (Result.TotalCycles >= MAX_CYCLES ? " (был достигнут лимит)" : "")
+                + (
+                    Result.TotalCycles >= SimulationSettings.MaxCycles
+                        ? " (был достигнут лимит)"
+                        : ""
+                )
         );
 
         Logger.WriteLine($"\tКоличество отправленных сообщений: {Result.TotalSends}");
