@@ -176,6 +176,7 @@ public class Sensor
 
     public void CollectData()
     {
+        // тут надо выяснить сколько по времени сенсор собирает данные
         Battery -= Simulation.Instance.SensorSettings.Modem.PowerSP * 0.02;
 
         Network.SendCollectedData();

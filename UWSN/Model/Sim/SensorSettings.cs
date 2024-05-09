@@ -18,5 +18,9 @@ public class SensorSettings
     public DataLinkProtocol DataLinkProtocol { get; set; } = new PureAloha();
 
     public IClusterization ClusterizationAlgorithm { get; set; } =
-        new RetardedClusterization() { NumberOfClusters = 6 };
+        new RetardedClusterization() 
+        { 
+            XClusterCount = 3,
+            ZClusterCount = 2
+        };
 }
