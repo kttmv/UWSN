@@ -102,6 +102,7 @@ public class Sensor
     [JsonIgnore]
     public List<Frame> FrameBuffer { get; set; } = new List<Frame>();
 
+    [JsonIgnore]
     public List<Event> Events { get; set; } = new();
 
     #endregion Properties
@@ -223,11 +224,8 @@ public class Sensor
                     $"Сбор данных с датчиков сенсором #{Id}",
                     () =>
                     {
-                        if (!IsDead)
-                        {
-                            Simulation.Instance.CurrentCycle = k;
-                            CollectData();
-                        }
+                        Simulation.Instance.CurrentCycle = k;
+                        CollectData();
                     }
                 )
             );
@@ -239,7 +237,8 @@ public class Sensor
         // тут надо выяснить сколько по времени сенсор собирает данные
         Battery -= Simulation.Instance.SensorSettings.Modem.PowerSP * 0.02;
 
-        Network.SendCollectedData();
+        if (!IsDead)
+            Network.SendCollectedData();
     }
 
     public void Clusterize()
