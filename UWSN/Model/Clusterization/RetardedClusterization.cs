@@ -78,6 +78,9 @@ namespace UWSN.Model.Clusterization
             var groups = sensors.GroupBy(s => s.NextClusterization!.ClusterId);
             foreach (var gr in groups)
             {
+                if (gr.Key == -1)
+                    continue;
+
                 gr.OrderBy(s => s.Position.Y).Last().NextClusterization!.IsReference = true;
 
                 foreach (var s in gr)
