@@ -6,6 +6,7 @@ import { SensorSettings } from '../shared/types/sensorSettings'
 import { useProjectStore } from '../store/projectStore'
 import SensorBatterySettings from './SensorBatterySettings'
 import SensorClusterizationSettings from './SensorClusterizationSettings'
+import SensorModemSettings from './SensorModemSettings'
 import SensorProtocolSettings from './SensorProtocolSettings'
 
 export default function SensorSettings() {
@@ -43,7 +44,11 @@ export default function SensorSettings() {
             <FormControl>
                 <Flex direction='column' gap={4}>
                     <SensorProtocolSettings form={form} />
+
                     <SensorClusterizationSettings form={form} />
+
+                    <SensorModemSettings form={form} />
+
                     <SensorBatterySettings form={form} />
                 </Flex>
             </FormControl>

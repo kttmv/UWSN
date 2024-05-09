@@ -1,15 +1,20 @@
 import { ClusterizationAlgorithmType } from '../shared/types/clusterizationAlogirthmType'
 import { DataLinkProtocolType } from '../shared/types/dataLinkProtocolType'
+import { ModemType } from '../shared/types/modem'
 import { Project } from '../shared/types/project'
 
 export function createDefaultProject() {
     const project: Project = {
         SensorSettings: {
+            Modem: {
+                $type: ModemType.AquaModem1000
+            },
+
             SensorSampleInterval: '00:10:00',
             StartSamplingTime: '0001-01-02T00:00:00',
 
-            InitialSensorBattery: 100,
-            BatteryDeadCharge: 5,
+            InitialSensorBattery: 864_000,
+            BatteryDeadCharge: 100,
 
             DataLinkProtocol: {
                 $type: DataLinkProtocolType.PureAloha,

@@ -10,16 +10,18 @@ interface Props {
 export default function GridRectangle({ v1, v2 }: Props) {
     const { scale } = useViewerStore()
 
+    const padding = 0.5
+
     const v1Scaled = {
-        X: v1.X / scale,
-        Y: v1.Y / scale,
-        Z: v1.Z / scale
+        X: v1.X / scale - padding,
+        Y: v1.Y / scale - padding,
+        Z: v1.Z / scale - padding
     }
 
     const v2Scaled = {
-        X: v2.X / scale,
-        Y: v2.Y / scale,
-        Z: v2.Z / scale
+        X: v2.X / scale + padding,
+        Y: v2.Y / scale + padding,
+        Z: v2.Z / scale + padding
     }
 
     const lengthX = Math.abs(v2Scaled.X - v1Scaled.X)
