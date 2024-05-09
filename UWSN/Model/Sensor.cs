@@ -38,15 +38,7 @@ public class Sensor
         set
         {
             var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
-            delta.SensorDeltas.Add(
-                new SensorDelta
-                {
-                    Id = Id,
-                    ClusterId = null,
-                    IsReference = null,
-                    Battery = -(_battery - value)
-                }
-            );
+            delta.SensorDeltas.Add(new SensorDelta { Id = Id, Battery = -(_battery - value) });
 
             _battery = value;
 
@@ -276,7 +268,6 @@ public class Sensor
                 Id = Id,
                 ClusterId = ClusterId.Value,
                 IsReference = IsReference.Value,
-                Battery = null
             }
         );
     }

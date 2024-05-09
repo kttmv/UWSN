@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using UWSN.Model.Sim;
+﻿using UWSN.Model.Sim;
 using UWSN.Utilities;
+using static UWSN.Model.Sim.SimulationDelta;
 
 namespace UWSN.Model.Protocols
 {
@@ -14,10 +14,20 @@ namespace UWSN.Model.Protocols
             Emitting
         }
 
-        [JsonIgnore]
-        public State CurrentState { get; set; } = State.Listening;
+        private State _currentState;
+        public State CurrentState
+        {
+            get { return _currentState; }
+            set
+            {
+                _currentState = value;
+                var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
+                delta.SensorDeltas.Add(
+                    new SensorDelta { Id = Sensor.Id, PhysicalProtocolState = value }
+                );
+            }
+        }
 
-        [JsonIgnore]
         public State OriginalState { get; set; }
 
         public void StartReceiving(Frame frame)

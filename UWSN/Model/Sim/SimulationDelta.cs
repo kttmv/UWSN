@@ -1,4 +1,7 @@
-﻿namespace UWSN.Model.Sim;
+﻿using Newtonsoft.Json;
+using UWSN.Model.Protocols;
+
+namespace UWSN.Model.Sim;
 
 public class SimulationDelta
 {
@@ -16,15 +19,38 @@ public class SimulationDelta
 
     public struct SensorDelta
     {
-        public required int Id { get; set; }
-        public required int? ClusterId { get; set; }
-        public required bool? IsReference { get; set; }
-        public required double? Battery { get; set; }
+        public int Id { get; set; }
+        public int? ClusterId { get; set; }
+        public bool? IsReference { get; set; }
+        public double? Battery { get; set; }
+        public PhysicalProtocol.State? PhysicalProtocolState { get; set; }
     }
 
     public DateTime Time { get; set; } = new();
-    public List<SignalDelta> SignalDeltas { get; set; } = new();
-    public List<SensorDelta> SensorDeltas { get; set; } = new();
+
+    private List<SignalDelta>? _signalDeltas;
+    public List<SignalDelta> SignalDeltas
+    {
+        get
+        {
+            if (_signalDeltas == null)
+                _signalDeltas = new();
+
+            return _signalDeltas;
+        }
+    }
+
+    private List<SensorDelta>? _sensorDeltas;
+    public List<SensorDelta> SensorDeltas
+    {
+        get
+        {
+            if (_sensorDeltas == null)
+                _sensorDeltas = new();
+
+            return _sensorDeltas;
+        }
+    }
 
     public SimulationDelta(DateTime time)
     {
