@@ -10,18 +10,26 @@ namespace UWSN.Model.Clusterization
 {
     public class RetardedClusterization : IClusterization
     {
-        public int NumberOfClusters { get; set; }
+        public int XClusterCount { get; set; }
+        public int ZClusterCount { get; set; }
 
         public List<Sensor> Clusterize()
         {
-            if (NumberOfClusters <= 0)
+            int numberOfClusters = XClusterCount * ZClusterCount;
+            if (numberOfClusters <= 0)
             {
                 throw new ArgumentException("Количество кластеров должно быть больше нуля");
             }
 
-            if (NumberOfClusters % 2 == 1)
+            var rndClusterIds = new List<int>();
+            for (int i = 0; i < numberOfClusters; i++)
             {
-                throw new ArgumentException("Количество кластеров есть чотное число");
+                int newRndId = new Random().Next(0, 100);
+                while (rndClusterIds.Contains(newRndId))
+                {
+                    newRndId = new Random().Next(0, 100);
+                }
+                rndClusterIds.Add(newRndId);
             }
 
             var areaLimits = Simulation.Instance.AreaLimits;
@@ -32,13 +40,20 @@ namespace UWSN.Model.Clusterization
 
             // эта единица на конце - по сути сколько угодно малое число еписилон,
             // чтобы сенсоры, расположенные на границах, не образовывали новый кластер
-            double clusterLength = areaLength / (NumberOfClusters / 2) + 1;
-            double clusterWidth = areaWidth / (NumberOfClusters / 2) + 1;
+            double clusterLength = areaLength / XClusterCount + 1;
+            double clusterWidth = areaWidth / ZClusterCount + 1;
 
             var clusterIdEncoder = new List<string>();
 
             foreach (var sensor in sensors)
             {
+                if (sensor.IsDead)
+                {
+                    sensor.NextClusterization!.ClusterId = -1;
+                    sensor.NextClusterization!.IsReference = false;
+                    continue;
+                }
+
                 // уравнение по n
                 // areaLimits.Min.X + clusterLength * n = sensor.Position.x
                 // n = (sensor.position.x - areaLimints.Min.X) div ClusterLength
@@ -64,6 +79,11 @@ namespace UWSN.Model.Clusterization
             foreach (var gr in groups)
             {
                 gr.OrderBy(s => s.Position.Y).Last().NextClusterization!.IsReference = true;
+
+                foreach (var s in gr)
+                {
+                    s.NextClusterization!.ClusterId = rndClusterIds[gr.Key];
+                }
             }
 
             return sensors;

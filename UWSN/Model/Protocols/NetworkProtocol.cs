@@ -265,6 +265,10 @@ public class NetworkProtocol : ProtocolBase
 
     private int CalculateNextHop()
     {
+        // если сенсор мертв и алгоритм кластеризации присвоил ему специальный кластер для мертвых сенсоров
+        if (Sensor.ClusterId == -1)
+            return -1;
+
         var clusterMates = Neighbours.Where(s => s.ClusterId == Sensor.ClusterId).ToList();
 
         if (clusterMates.Any(m => m.IsReference == null))
