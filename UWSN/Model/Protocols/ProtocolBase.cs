@@ -9,15 +9,23 @@ public abstract class ProtocolBase
     public int? SensorId { get; set; }
 
     [JsonIgnore]
+    private Sensor? _sensor;
+
+    [JsonIgnore]
     public Sensor Sensor
     {
         get
         {
-            if (!SensorId.HasValue)
-                throw new Exception("Не указан ID сенсора");
+            if (_sensor == null)
+            {
+                if (!SensorId.HasValue)
+                    throw new Exception("Не указан ID сенсора");
 
-            return Simulation.Instance.Environment.Sensors.FirstOrDefault(s => s.Id == SensorId)
-                ?? throw new Exception("Не удалось найти сенсор с указанным ID");
+                _sensor = Simulation.Instance.Environment.Sensors.FirstOrDefault(s => s.Id == SensorId)
+                    ?? throw new Exception("Не удалось найти сенсор с указанным ID");
+            }
+
+            return _sensor;
         }
     }
 }

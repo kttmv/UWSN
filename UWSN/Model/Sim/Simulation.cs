@@ -123,9 +123,25 @@ public class Simulation
         {
             if (!verbose && eventNumber % SimulationSettings.PrintEveryNthEvent == 0)
             {
-                Console.WriteLine($"Обработано событий: {eventNumber}.");
+                Console.WriteLine($"\nОбработано событий: {eventNumber}.");
                 Console.WriteLine($"Текущее время симуляции: {Time:dd.MM.yyyy HH:mm:ss.fff}");
                 Console.WriteLine($"Текущий цикл сбора данных: {CurrentCycle}");
+
+                int deadCount = Environment.Sensors.Where(s => s.IsDead).Count();
+                double deadPercentage = (double)deadCount / Environment.Sensors.Count * 100;
+
+                Console.WriteLine($"Количество мертвых сенсоров: {deadCount} ({deadPercentage:0.#} %)");
+
+                double totalInitialEnergy = Environment.Sensors.Count * SensorSettings.InitialSensorBattery;
+                double totalEnergy = 0;
+                foreach (var sensor in Environment.Sensors)
+                {
+                    totalEnergy += sensor.Battery;
+                }
+
+                double totalEnergyPercentage = (double)totalEnergy / totalInitialEnergy * 100;
+
+                Console.WriteLine($"Остаточное количество энергии в сенсорах: {totalEnergy} Дж ({totalEnergyPercentage:0.#} %)");
             }
 
             var eventToInvoke = EventManager.PopFirst();
@@ -226,11 +242,6 @@ public class Simulation
                     //var maxAvgCost = avgCycle.BatteryChange.Where(b => !b.Key.IsDead).OrderBy(b => b.Value).Last();
                     // maxAvgCost.Value * 2 - это сколько батареи мы хотим оставить,
                     // чтобы досчитать остаток вручную и посмотреть на то, как умирают сенсоры
-
-                    //var maxAvgCostSensor = Instance.Environment.Sensors.First(s => s.Id == maxAvgCost.Key.Id);
-                    //var availableEnergy = maxAvgCostSensor.Battery - SensorSettings.BatteryDeadCharge - maxAvgCost.Value * 2;
-
-                    //int skippedCycles = (int)Math.Floor(availableEnergy / maxAvgCost.Value);
 
                     if (minSkipsCount > 0 && minSkipsCount != int.MaxValue)
                     {

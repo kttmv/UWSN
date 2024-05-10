@@ -9,12 +9,11 @@ namespace UWSN.Model.Sim;
 
 public class EventManager
 {
-    private List<Event> Events { get; set; }
+    private SortedDictionary<DateTime, List<Event>> Events { get; set; }
 
     public EventManager()
     {
-        Events = new List<Event>();
-        //EventScheduler = new SortedList<DateTime, Event>(new DuplicateKeyComparer<DateTime>());
+        Events = new();
     }
 
     /// <summary>
@@ -32,7 +31,14 @@ public class EventManager
             );
         }
 
-        Events.Add(e);
+        if (!Events.TryGetValue(e.Time, out List<Event>? eventsList))
+        {
+            Events.Add(e.Time, new() { e });
+        }
+        else
+        {
+            eventsList.Add(e);
+        }
     }
 
     /// <summary>
@@ -41,9 +47,19 @@ public class EventManager
     /// <param name="e">Событие</param>
     public void RemoveEvent(Event e)
     {
-        if (!Events.Remove(e))
+        if (!Events.TryGetValue(e.Time, out List<Event>? eventsList))
         {
             throw new KeyNotFoundException("Указанное для удаления событие не было найдено.");
+        }
+
+        if (!eventsList.Remove(e))
+        {
+            throw new KeyNotFoundException("Указанное для удаления событие не было найдено.");
+        }
+
+        if (eventsList.Count == 0)
+        {
+            Events.Remove(e.Time);
         }
     }
 
@@ -58,8 +74,8 @@ public class EventManager
             return null;
         }
 
-        var e = Events.OrderBy(x => x.Time).First();
-        Events.Remove(e);
+        var e = Events.First().Value.First();
+        RemoveEvent(e);
 
         return e;
     }

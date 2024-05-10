@@ -29,24 +29,24 @@ public class SimulationDelta
     public DateTime Time { get; set; } = new();
 
     private List<SignalDelta>? _signalDeltas;
+
     public List<SignalDelta> SignalDeltas
     {
         get
         {
-            if (_signalDeltas == null)
-                _signalDeltas = new();
+            _signalDeltas ??= new();
 
             return _signalDeltas;
         }
     }
 
     private List<SensorDelta>? _sensorDeltas;
+
     public List<SensorDelta> SensorDeltas
     {
         get
         {
-            if (_sensorDeltas == null)
-                _sensorDeltas = new();
+            _sensorDeltas ??= new();
 
             return _sensorDeltas;
         }

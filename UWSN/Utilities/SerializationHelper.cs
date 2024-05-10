@@ -35,6 +35,9 @@ public class SerializationHelper
 
     public static void LoadSimulation(string path)
     {
+        Console.WriteLine("Загружается файл симуляции. Это может "
+            + "занять длительное время при большом размере файла.");
+
         if (!File.Exists(path))
         {
             throw new FileNotFoundException("Не удалось найти указанный файл.");
