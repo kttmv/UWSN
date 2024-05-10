@@ -8,6 +8,7 @@ public class Logger
 {
     public static readonly StreamWriter File;
     public static bool ShouldWriteToConsole { get; set; } = false;
+    public static bool SaveOutput { get; set; } = false;
 
     static Logger()
     {
@@ -23,7 +24,8 @@ public class Logger
         string str = withTime ? $"[{Simulation.Instance.Time:dd.MM.yyyy HH:mm:ss.fff}] " : "";
         str += value;
 
-        File.WriteLine(str);
+        if (SaveOutput)
+            File.WriteLine(str);
 
         if (ShouldWriteToConsole)
             Console.WriteLine(str);
