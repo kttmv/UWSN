@@ -28,28 +28,18 @@ public class SimulationDelta
 
     public DateTime Time { get; set; } = new();
 
-    private List<SignalDelta>? _signalDeltas;
+    public List<SignalDelta> SignalDeltas { get; set; } = new();
 
-    public List<SignalDelta> SignalDeltas
+    public bool ShouldSerializeSignalDeltas()
     {
-        get
-        {
-            _signalDeltas ??= new();
-
-            return _signalDeltas;
-        }
+        return SignalDeltas.Count > 0;
     }
 
-    private List<SensorDelta>? _sensorDeltas;
+    public List<SensorDelta> SensorDeltas { get; set; } = new();
 
-    public List<SensorDelta> SensorDeltas
+    public bool ShouldSerializeSensorDeltas()
     {
-        get
-        {
-            _sensorDeltas ??= new();
-
-            return _sensorDeltas;
-        }
+        return SensorDeltas.Count > 0;
     }
 
     public SimulationDelta(DateTime time)
