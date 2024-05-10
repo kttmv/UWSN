@@ -19,6 +19,9 @@ namespace UWSN.Model.Protocols.DataLink
         [JsonIgnore]
         private List<int> SensorsAwaitingAck { get; set; }
 
+        [JsonIgnore]
+        private static readonly Random Random = new();
+
         public PureAloha()
         {
             SensorsAwaitingAck = new List<int>();
@@ -107,8 +110,7 @@ namespace UWSN.Model.Protocols.DataLink
             // если канал занят или необходимо отправить ACK, то ждем и повторяем попытку
             if (Simulation.Instance.ChannelManager.IsChannelBusy(CHANNEL_ID) || ackIsBlocking)
             {
-                double rngTimeout =
-                    (new Random().NextDouble() - 0.5) * Timeout * TimeoutRelativeDeviation;
+                double rngTimeout = (Random.NextDouble() - 0.5) * Timeout * TimeoutRelativeDeviation;
                 double timeout = Timeout + rngTimeout;
 
                 if (timeout <= 0)

@@ -17,6 +17,9 @@ namespace UWSN.Model.Protocols.DataLink
         [JsonIgnore]
         private List<int> SensorsAwaitingAck { get; set; }
 
+        [JsonIgnore]
+        private static readonly Random Random = new();
+
         public MultiChanneledAloha()
         {
             SensorsAwaitingAck = new List<int>();
@@ -112,8 +115,7 @@ namespace UWSN.Model.Protocols.DataLink
             bool ackIsBlocking = SensorsAwaitingAck.Count > 0 && frame.Type != Frame.FrameType.Ack;
 
             // таймаут для ожидания, если появится необходимость подождать
-            double rngTimeout =
-                (new Random().NextDouble() - 0.5) * Timeout * TimeoutRelativeDeviation;
+            double rngTimeout = (Random.NextDouble() - 0.5) * Timeout * TimeoutRelativeDeviation;
             double timeout = Timeout + rngTimeout;
 
             if (timeout <= 0)
