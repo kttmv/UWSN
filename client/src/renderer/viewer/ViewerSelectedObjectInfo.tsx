@@ -6,7 +6,8 @@ import {
     Grid,
     Heading,
     IconButton,
-    useBreakpointValue
+    useBreakpointValue,
+    useTheme
 } from '@chakra-ui/react'
 import { IconX } from '@tabler/icons-react'
 import { useProjectStore } from '../store/projectStore'
@@ -26,6 +27,9 @@ export default function ViewerSelectedObjectInfo() {
         base: '5px',
         lg: '31px'
     })
+
+    const theme = useTheme()
+    const bg = theme.__cssMap['colors.chakra-body-bg'].value
 
     const { project } = useProjectStore()
     if (!project) {
@@ -49,7 +53,12 @@ export default function ViewerSelectedObjectInfo() {
             overflowY='auto'
             maxHeight={{ base: '20vh', lg: '50vh' }}
         >
-            <CardHeader>
+            <CardHeader
+                position='sticky'
+                top={0}
+                backgroundColor={bg}
+                zIndex={100}
+            >
                 <Flex alignItems='center'>
                     <Heading flexGrow={1} size='md'>
                         {selectedSensor && `Сенсор #${selectedSensor.Id}`}

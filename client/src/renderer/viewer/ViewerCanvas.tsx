@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import { useEffect } from 'react'
 import { useProjectStore } from '../store/projectStore'
 import useViewerStore from '../store/viewerStore'
+import FramePath from './FramePath'
 import GridRectangle from './GridRectangle'
 import SensorNode from './SensorNode'
 import Signal from './Signal'
@@ -34,6 +35,7 @@ export default function ViewerCanvas() {
                 intensity={Math.PI}
             />
             <OrbitControls makeDefault />
+
             {project && (
                 <>
                     {simulationState.Sensors.map((sensor) => (
@@ -43,6 +45,8 @@ export default function ViewerCanvas() {
                     {simulationState.Signals.map((signal, i) => {
                         return <Signal key={i} signal={signal} />
                     })}
+
+                    <FramePath />
 
                     <GridRectangle
                         v1={project.AreaLimits.Min}

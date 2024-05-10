@@ -1,7 +1,13 @@
-import { Neighbour } from './neighbour'
+import { CollectedData } from './collectedData'
 import { Vector3 } from './vector3'
 
-export type FrameType = 'RegularFrame' | 'Ack' | 'Data' | 'Hello'
+export enum FrameType {
+    RegularFrame = 'RegularFrame',
+    Ack = 'Ack',
+    Data = 'Data',
+    Hello = 'Hello',
+    Warning = 'Warning'
+}
 
 export type Frame = {
     Type: FrameType
@@ -10,5 +16,7 @@ export type Frame = {
     ReceiverId: number
     TimeSend: string
     AckIsNeeded: boolean
-    NeighboursData: Neighbour[] | undefined
+    CollectedData: CollectedData | undefined
+    //NeighboursData: Neighbour[] | undefined
+    //DeadSensors: number[] | undefined
 }
