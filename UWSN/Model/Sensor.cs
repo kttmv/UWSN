@@ -216,7 +216,7 @@ public class Sensor
 
     public List<Neighbour> Clusterize()
     {
-        if (IsDead || Simulation.Instance.Environment.Sensors.Any(s => s.NextClusterization == null))
+        if (IsDead || NextClusterization == null)
         {
             Simulation.Instance.Clusterize();
         }
@@ -233,8 +233,12 @@ public class Sensor
             {
                 Id = sensor.Id,
                 Position = sensor.Position,
-                ClusterId = sensor.NextClusterization!.ClusterId,
-                IsReference = sensor.NextClusterization!.IsReference
+                ClusterId = sensor.NextClusterization != null
+                    ? sensor.NextClusterization!.ClusterId
+                    : sensor.ClusterId,
+                IsReference = sensor.NextClusterization != null
+                    ? sensor.NextClusterization!.IsReference
+                    : sensor.IsReference
             };
             neighbours.Add(neighbour);
         }
