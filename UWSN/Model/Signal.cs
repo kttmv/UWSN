@@ -16,11 +16,13 @@ public class Signal
     private int ChannelId { get; }
 
     public Event? EndSending { get; set; }
+
     public List<(
         Sensor Receiver,
         Event StartReceiving,
         Event EndReceiving
-    )> ReceivingEvents { get; }
+    )> ReceivingEvents
+    { get; }
 
     public Signal(Sensor emitter, Frame frame, int channelId, bool pointSend)
     {
@@ -29,10 +31,7 @@ public class Signal
         ChannelId = channelId;
         ReceivingEvents = new();
 
-        var modem = Simulation.Instance.SensorSettings.Modem;
-
-        if (modem == null)
-            throw new NullReferenceException("Не указан тип модема");
+        var modem = Simulation.Instance.SensorSettings.Modem ?? throw new NullReferenceException("Не указан тип модема");
 
         double transmissionTime = Frame.FRAME_SIZE_IN_BITS / modem.Bitrate;
 

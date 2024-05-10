@@ -18,19 +18,14 @@ namespace UWSN.CommandLine.Handlers
 
             var selectedModem = Simulation.Instance.AvailableModems.FirstOrDefault(m =>
                 m.Name == o.ModemModel
-            );
-
-            if (selectedModem == null)
-            {
-                throw new ArgumentException("Неверное название модема");
-            }
+            ) ?? throw new ArgumentException("Неверное название модема");
 
             Simulation.Instance.SensorSettings.Modem = selectedModem;
 
             var al = Simulation.Instance.AreaLimits;
 
             double rMax =
-                DeliveryProbabilityCalculator.CaulculateSensorDistance(selectedModem, al)
+                DeliveryProbabilityCalculator.CaulculateSensorDistance(selectedModem)
                 * o.DistanceCoeff;
 
             double areaLength = al.Max.X - al.Min.X;
@@ -49,38 +44,24 @@ namespace UWSN.CommandLine.Handlers
                 sensors.Add(new Sensor() { Id = i });
             }
 
-            switch (o.DistributionType)
+            Simulation.Instance.Environment.Sensors = o.DistributionType switch
             {
-                case "rndStepNormal":
-                    Simulation.Instance.Environment.Sensors = PlaceNormal(
-                        sensors,
-                        rMax,
-                        countX,
-                        countY,
-                        countZ
-                    );
-
-                    break;
-
-                case "orth":
-                    Simulation.Instance.Environment.Sensors = PlaceOrth(
-                        sensors,
-                        rMax,
-                        countX,
-                        countY,
-                        countZ
-                    );
-
-                    break;
-
-                case "rndStepUni":
-
-                    break;
-
-                default:
-                    throw new Exception("Указан не поддерживаемый тип распределения сенсоров");
-            }
-
+                PlaceSensorsBySpecsOptions.DistrType.rndStepNormal => PlaceNormal(
+                                        sensors,
+                                        rMax,
+                                        countX,
+                                        countY,
+                                        countZ
+                                    ),
+                PlaceSensorsBySpecsOptions.DistrType.orth => PlaceOrth(
+                                        sensors,
+                                        rMax,
+                                        countX,
+                                        countY,
+                                        countZ
+                                    ),
+                _ => throw new Exception("Указан не поддерживаемый тип распределения сенсоров"),
+            };
             SerializationHelper.SaveSimulation(o.FilePath);
         }
 
@@ -157,8 +138,6 @@ namespace UWSN.CommandLine.Handlers
         )
         {
             var al = Simulation.Instance.AreaLimits;
-
-            var rnd = new Random();
 
             int placedCount = 0;
 

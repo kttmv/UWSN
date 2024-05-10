@@ -32,7 +32,7 @@ public class Frame
 
     public required CollectedData? CollectedData { get; set; }
 
-    public required List<Neighbour>? NeighboursData { get; set; }
+    public required Dictionary<int, Neighbour>? NeighboursData { get; set; }
 
     public required List<int>? DeadSensors { get; set; }
 }

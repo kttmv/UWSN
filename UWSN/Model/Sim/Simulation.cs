@@ -53,6 +53,7 @@ public class Simulation
 
     [JsonIgnore]
     private DateTime _time;
+
     /// <summary>
     /// Текущее время симуляции
     /// </summary>
@@ -60,7 +61,7 @@ public class Simulation
     public DateTime Time
     {
         get { return _time; }
-        set 
+        set
         {
             if (value < _time)
                 throw new Exception("Невозможно назначить время меньше текущего");
@@ -131,7 +132,7 @@ public class Simulation
             if (eventToInvoke == null)
             {
                 Logger.WriteLine("Больше событий нет.");
-                
+
                 if (CurrentCycle == 0)
                 {
                     foreach (var s in Instance.Environment.Sensors)
@@ -159,11 +160,6 @@ public class Simulation
                     }
 
                     var cycleTimeSpent = timeAfterCycle - timeBeforeCycle;
-
-                    if (cycleTimeSpent < TimeSpan.Zero)
-                    {
-                        int a = 3 - 3;
-                    }
 
                     cycleData.CycleTime = cycleTimeSpent;
                     cycles.Add(cycleData);
@@ -195,7 +191,7 @@ public class Simulation
                             double newBc = avgBatteriesChange.First(b => b.Key.Id == id).Value + bc.Value;
                             avgBatteriesChange.Remove(bc.Key);
                             avgBatteriesChange.Add(bc.Key, newBc);
-                        } 
+                        }
                     }
 
                     // среднее арифметическое
@@ -245,7 +241,6 @@ public class Simulation
 
                             double cycleCost = avgCycle.BatteryChange.First(i => i.Key.Id == s.Id).Value;
                             s.Battery -= cycleCost * minSkipsCount;
-                            var b = 1;
                         }
 
                         Instance.Time += avgCycle.CycleTime * minSkipsCount;
@@ -264,7 +259,7 @@ public class Simulation
                         timeBeforeCycle = Instance.Time;
                     }
                 }
-                
+
                 if (CurrentCycle >= SimulationSettings.MaxCycles)
                 {
                     Logger.ShouldWriteToConsole = true;

@@ -205,7 +205,7 @@ public class Sensor
         }
     }
 
-    public List<Neighbour> Clusterize()
+    public Dictionary<int, Neighbour> Clusterize()
     {
         if (IsDead || NextClusterization == null)
         {
@@ -217,7 +217,7 @@ public class Sensor
             throw new NullReferenceException("Что-то пошло не так в процессе кластеризации");
         }
 
-        var neighbours = new List<Neighbour>();
+        var neighbours = new Dictionary<int, Neighbour>();
         foreach (var sensor in Simulation.Instance.Environment.Sensors)
         {
             var neighbour = new Neighbour
@@ -233,7 +233,7 @@ public class Sensor
                         ? sensor.NextClusterization!.IsReference
                         : sensor.IsReference
             };
-            neighbours.Add(neighbour);
+            neighbours.Add(neighbour.Id, neighbour);
         }
 
         ClusterId = NextClusterization.ClusterId;

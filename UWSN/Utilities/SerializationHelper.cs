@@ -40,10 +40,8 @@ public class SerializationHelper
             throw new FileNotFoundException("Не удалось найти указанный файл.");
         }
 
-        using (var sr = new StreamReader(path))
-        using (var reader = new JsonTextReader(sr))
-        {
-            Serializer.Deserialize<Simulation>(reader);
-        }
+        using var sr = new StreamReader(path);
+        using var reader = new JsonTextReader(sr);
+        Serializer.Deserialize<Simulation>(reader);
     }
 }

@@ -14,7 +14,7 @@ public class NetworkProtocol : ProtocolBase
         public required bool? IsReference { get; set; }
     }
 
-    public List<Neighbour> Neighbours { get; set; } = new();
+    public Dictionary<int, Neighbour> Neighbours { get; set; } = new();
 
     public List<int> DeadSensors { get; set; } = new();
 
@@ -93,6 +93,7 @@ public class NetworkProtocol : ProtocolBase
             if (Neighbours.Count == 0)
             {
                 Neighbours.Add(
+                    Sensor.Id,
                     new Neighbour
                     {
                         Id = Sensor.Id,
@@ -109,9 +110,15 @@ public class NetworkProtocol : ProtocolBase
             bool shouldSendToAll = false;
             foreach (var neighbour in newNeighbours)
             {
-                if (!Neighbours.Any(n => n.Id == neighbour.Id))
+                if (!Neighbours.ContainsKey(neighbour.Key))
                 {
-                    Neighbours.Add(neighbour);
+                    Neighbours.Add(neighbour.Key, new Neighbour
+                    {
+                        Id = neighbour.Value.Id,
+                        Position = neighbour.Value.Position,
+                        ClusterId = neighbour.Value.ClusterId,
+                        IsReference = neighbour.Value.IsReference
+                    });
                     shouldSendToAll = true;
                 }
             }
@@ -144,7 +151,8 @@ public class NetworkProtocol : ProtocolBase
         }
     }
 
-    public void StopAllAction() { }
+    public void StopAllAction()
+    { }
 
     public void SendFrameWithRouting(Frame frame)
     {
@@ -170,30 +178,30 @@ public class NetworkProtocol : ProtocolBase
         if (Sensor.ClusterId == -1)
             return -1;
 
-        var clusterMates = Neighbours.Where(s => s.ClusterId == Sensor.ClusterId).ToList();
+        var clusterMates = Neighbours.Where(s => s.Value.ClusterId == Sensor.ClusterId).ToList();
 
-        if (clusterMates.Any(m => m.IsReference == null))
+        if (clusterMates.Any(m => m.Value.IsReference == null))
             throw new Exception("Свойство IsReference не должно быть null");
 
-        int referenceId = clusterMates.First(m => m.IsReference.HasValue && m.IsReference.Value).Id;
+        int referenceId = clusterMates.First(m => m.Value.IsReference.HasValue && m.Value.IsReference.Value).Value.Id;
 
-        var referencePosition = Neighbours.First(n => n.Id == referenceId).Position;
+        var referencePosition = Neighbours.First(n => n.Value.Id == referenceId).Value.Position;
 
         double distanceToReference = Vector3.Distance(Sensor.Position, referencePosition);
 
         var neighboursByDistance = Neighbours.OrderBy(n =>
-            Vector3.Distance(Sensor.Position, n.Position)
+            Vector3.Distance(Sensor.Position, n.Value.Position)
         );
 
         int hopId = -1;
         foreach (var neighbour in neighboursByDistance)
         {
             if (
-                Vector3.Distance(neighbour.Position, referencePosition) < distanceToReference
-                && clusterMates.Count(m => m.Id == neighbour.Id) > 0
+                Vector3.Distance(neighbour.Value.Position, referencePosition) < distanceToReference
+                && clusterMates.Any(m => m.Value.Id == neighbour.Value.Id)
             )
             {
-                hopId = neighbour.Id;
+                hopId = neighbour.Value.Id;
             }
         }
 
