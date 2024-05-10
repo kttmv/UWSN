@@ -185,23 +185,7 @@ public class Sensor
         }
         else
         {
-            Clusterize();
-
-            List<Neighbour> neighbours = new();
-
-            foreach (var sensor in Simulation.Instance.Environment.Sensors)
-            {
-                var n = new Neighbour
-                {
-                    Position = sensor.Position,
-                    Id = sensor.Id,
-                    ClusterId = sensor.ClusterId ?? sensor.NextClusterization!.ClusterId,
-                    IsReference = sensor.IsReference ?? sensor.NextClusterization!.IsReference
-                };
-                neighbours.Add(n);
-            }
-
-            Network.Neighbours = neighbours;
+            Network.Neighbours = Clusterize();
         }
     }
 
@@ -233,12 +217,14 @@ public class Sensor
             {
                 Id = sensor.Id,
                 Position = sensor.Position,
-                ClusterId = sensor.NextClusterization != null
-                    ? sensor.NextClusterization!.ClusterId
-                    : sensor.ClusterId,
-                IsReference = sensor.NextClusterization != null
-                    ? sensor.NextClusterization!.IsReference
-                    : sensor.IsReference
+                ClusterId =
+                    sensor.NextClusterization != null
+                        ? sensor.NextClusterization!.ClusterId
+                        : sensor.ClusterId,
+                IsReference =
+                    sensor.NextClusterization != null
+                        ? sensor.NextClusterization!.IsReference
+                        : sensor.IsReference
             };
             neighbours.Add(neighbour);
         }

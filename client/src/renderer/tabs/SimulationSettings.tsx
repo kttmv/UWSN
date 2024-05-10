@@ -1,4 +1,5 @@
 import {
+    Button,
     Checkbox,
     Flex,
     FormLabel,
@@ -7,6 +8,7 @@ import {
     Input,
     Text
 } from '@chakra-ui/react'
+import { IconDeviceFloppy } from '@tabler/icons-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { SimulationSettings } from '../shared/types/simulationSettings'
@@ -116,6 +118,16 @@ export default function SimulationSettings() {
                         </Checkbox>
                     </GridItem>
                 </Grid>
+
+                <Button
+                    marginTop={6}
+                    width='100%'
+                    isDisabled={!form.formState.isDirty}
+                    type='submit'
+                >
+                    <IconDeviceFloppy />
+                    Сохранить изменения настройки симуляции
+                </Button>
             </Flex>
         </form>
     )
