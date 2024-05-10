@@ -173,7 +173,7 @@ public class Signal
 
     private void StartReceivingAction(Sensor sensor)
     {
-        if (sensor.Physical.CurrentState == PhysicalProtocol.State.Listening)
+        if (sensor.CurrentState == Sensor.State.Listening)
         {
             sensor.Physical.StartReceiving(Frame);
         }

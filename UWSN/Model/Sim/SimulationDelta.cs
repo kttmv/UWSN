@@ -23,7 +23,7 @@ public class SimulationDelta
         public int? ClusterId { get; set; }
         public bool? IsReference { get; set; }
         public double? Battery { get; set; }
-        public PhysicalProtocol.State? PhysicalProtocolState { get; set; }
+        public Sensor.State? State { get; set; }
     }
 
     public DateTime Time { get; set; } = new();

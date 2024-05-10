@@ -42,7 +42,7 @@ namespace UWSN.Model.Protocols.DataLink
             )
             {
                 WaitingForAckEvent = null;
-                Sensor.Physical.CurrentState = PhysicalProtocol.State.Listening;
+                Sensor.CurrentState = Sensor.State.Listening;
                 Logger.WriteSensorLine(Sensor, $"(PureAloha) получил ACK от #{frame.SenderId}");
 
                 return;
@@ -168,9 +168,6 @@ namespace UWSN.Model.Protocols.DataLink
 
         private void ResendFrame(Frame frame, int attemptsLeft)
         {
-            if (Sensor.Physical.CurrentState == PhysicalProtocol.State.Idle)
-                return;
-
             if (attemptsLeft == 0)
             {
                 Logger.WriteSensorLine(

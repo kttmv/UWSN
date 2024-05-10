@@ -31,13 +31,14 @@ public class SimulationResult
     public static SimulationDelta GetOrCreateSimulationDelta(DateTime time)
     {
         var allDeltas = Simulation.Instance.Result!.AllDeltas;
-        if (!allDeltas.ContainsKey(time))
+        if (!allDeltas.TryGetValue(time, out SimulationDelta? value))
         {
             var delta = new SimulationDelta(time);
-            allDeltas.Add(time, delta);
+            value = delta;
+            allDeltas.Add(time, value);
             return delta;
         }
 
-        return allDeltas[time];
+        return value;
     }
 }

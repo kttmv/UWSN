@@ -6,45 +6,23 @@ namespace UWSN.Model.Protocols
 {
     public class PhysicalProtocol : ProtocolBase
     {
-        public enum State
-        {
-            Idle,
-            Listening,
-            Receiving,
-            Emitting
-        }
-
-        private State _currentState;
-        public State CurrentState
-        {
-            get { return _currentState; }
-            set
-            {
-                _currentState = value;
-                var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
-                delta.SensorDeltas.Add(
-                    new SensorDelta { Id = Sensor.Id, PhysicalProtocolState = value }
-                );
-            }
-        }
-
-        public State OriginalState { get; set; }
+        public Sensor.State OriginalState { get; set; }
 
         public void StartReceiving(Frame frame)
         {
             if (Sensor.IsDead)
                 return;
 
-            OriginalState = Sensor.Physical.CurrentState;
+            OriginalState = Sensor.CurrentState;
 
-            CurrentState = State.Receiving;
+            Sensor.CurrentState = Sensor.State.Receiving;
 
             Logger.WriteSensorLine(Sensor, $"(Physical) начал принимать кадр от #{frame.SenderId}");
         }
 
         public void EndReceiving(Frame frame)
         {
-            CurrentState = OriginalState;
+            Sensor.CurrentState = OriginalState;
 
             Logger.WriteSensorLine(Sensor, $"(Physical) принял кадр от #{frame.SenderId}");
 
@@ -59,9 +37,9 @@ namespace UWSN.Model.Protocols
             if (Sensor.IsDead && frame.Type != Frame.FrameType.Warning)
                 return;
 
-            OriginalState = Sensor.Physical.CurrentState;
+            OriginalState = Sensor.CurrentState;
 
-            CurrentState = State.Emitting;
+            Sensor.CurrentState = Sensor.State.Emitting;
 
             if (frame.ReceiverId == -1)
                 Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра для всех");
@@ -83,7 +61,7 @@ namespace UWSN.Model.Protocols
 
         public void EndSending(Frame frame)
         {
-            CurrentState = OriginalState;
+            Sensor.CurrentState = OriginalState;
 
             if (frame.ReceiverId == -1)
                 Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра для всех");
@@ -98,7 +76,7 @@ namespace UWSN.Model.Protocols
 
         public void DetectCollision()
         {
-            CurrentState = State.Listening;
+            Sensor.CurrentState = Sensor.State.Listening;
 
             Logger.WriteSensorLine(
                 Sensor,

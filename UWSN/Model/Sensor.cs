@@ -17,7 +17,31 @@ public class NextClusterization
 
 public class Sensor
 {
+    public enum State
+    {
+        Listening,
+        Receiving,
+        Emitting
+    }
+
     #region Properties
+
+    [JsonIgnore]
+    private State _currentState;
+
+    [JsonIgnore]
+    public State CurrentState
+    {
+        get { return _currentState; }
+        set
+        {
+            _currentState = value;
+            var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
+            delta.SensorDeltas.Add(
+                new SensorDelta { Id = Id, State = value }
+            );
+        }
+    }
 
     [JsonIgnore]
     public PhysicalProtocol Physical { get; set; } = new();
@@ -116,7 +140,6 @@ public class Sensor
         RemoveAllEvents();
         DataLink.StopAllAction();
         Network.StopAllAction();
-        Physical.CurrentState = PhysicalProtocol.State.Idle;
     }
 
     public void AddEvent(Event e)
