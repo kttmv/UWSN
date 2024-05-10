@@ -47,6 +47,11 @@ public class Sensor
                 Logger.WriteSensorLine(this, "Осталось мало зарядки");
                 IsDead = true;
 
+                // храним количество мертвых сенсоров в симуляции, так как это значительно
+                // ускоряет симуляцию. раньше после каждого ивента считалось количество мертвых
+                // сенсоров, но это очень медленно.
+                Simulation.Instance.DeadSensorsCount += 1;
+
                 Network.SendDeathWarning();
                 StopAllAction();
             }

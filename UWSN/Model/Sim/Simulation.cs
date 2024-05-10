@@ -82,6 +82,9 @@ public class Simulation
             new SMTUTestModem()
         };
 
+    [JsonIgnore]
+    public int DeadSensorsCount { get; set; }
+
     #endregion Properties
 
     public Simulation()
@@ -309,10 +312,8 @@ public class Simulation
             eventNumber++;
 
             // проверяем, жива ли сеть
-            int deadSensorsCount = Environment.Sensors.Where(s => s.IsDead).Count();
-
             if (
-                deadSensorsCount / (double)Environment.Sensors.Count
+                DeadSensorsCount / (double)Environment.Sensors.Count
                 >= (double)SimulationSettings.DeadSensorsPercent / 100
             )
             {

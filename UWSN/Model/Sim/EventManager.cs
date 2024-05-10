@@ -9,12 +9,8 @@ namespace UWSN.Model.Sim;
 
 public class EventManager
 {
-    private SortedDictionary<DateTime, List<Event>> Events { get; set; }
-
-    public EventManager()
-    {
-        Events = new();
-    }
+    private Dictionary<DateTime, List<Event>> Events { get; set; } = new();
+    private SortedSet<DateTime> SortedTimes { get; set; } = new();
 
     /// <summary>
     /// Добавить событие
@@ -33,7 +29,9 @@ public class EventManager
 
         if (!Events.TryGetValue(e.Time, out List<Event>? eventsList))
         {
-            Events.Add(e.Time, new() { e });
+            eventsList = new List<Event> { e };
+            Events.Add(e.Time, eventsList);
+            SortedTimes.Add(e.Time);
         }
         else
         {
@@ -60,6 +58,7 @@ public class EventManager
         if (eventsList.Count == 0)
         {
             Events.Remove(e.Time);
+            SortedTimes.Remove(e.Time);
         }
     }
 
@@ -74,7 +73,8 @@ public class EventManager
             return null;
         }
 
-        var e = Events.First().Value.First();
+        var firstTime = SortedTimes.Min;
+        var e = Events[firstTime].First();
         RemoveEvent(e);
 
         return e;
