@@ -219,9 +219,9 @@ public class Simulation
         }
     }
 
-    private static void WakeSensorsUp()
+    private void WakeSensorsUp()
     {
-        foreach (var sensor in Instance.Environment.Sensors)
+        foreach (var sensor in Environment.Sensors)
         {
             sensor.WakeUp();
         }
@@ -256,28 +256,31 @@ public class Simulation
     {
         if (CurrentCycle == 0)
         {
-            foreach (var s in Instance.Environment.Sensors)
+            foreach (var sensor in Environment.Sensors)
             {
-                BatteriesPreCycle.Add(s, s.Battery);
+                BatteriesPreCycle.Add(sensor, sensor.Battery);
             }
-            TimeBeforeCycle = Instance.Time;
+
+            TimeBeforeCycle = Time;
         }
         else if (CurrentCycle <= NextSkipCycle)
         {
             BatteriesPostCycle.Clear();
-            foreach (var s in Instance.Environment.Sensors)
+
+            foreach (var sensor in Environment.Sensors)
             {
-                BatteriesPostCycle.Add(s, s.Battery);
+                BatteriesPostCycle.Add(sensor, sensor.Battery);
             }
-            TimeAfterCycle = Instance.Time;
+
+            TimeAfterCycle = Time;
 
             var cycleCosts = new Dictionary<Sensor, double>();
             var cycleData = new CycleData();
 
-            foreach (var s in BatteriesPostCycle)
+            foreach (var sensor in BatteriesPostCycle)
             {
-                double cost = BatteriesPreCycle.First(b => b.Key.Id == s.Key.Id).Value - s.Value;
-                cycleData.BatteryChange.Add(s.Key, cost);
+                double cost = BatteriesPreCycle.First(b => b.Key.Id == sensor.Key.Id).Value - sensor.Value;
+                cycleData.BatteryChange.Add(sensor.Key, cost);
             }
 
             var cycleTimeSpent = TimeAfterCycle - TimeBeforeCycle;
@@ -286,57 +289,64 @@ public class Simulation
             Cycles.Add(cycleData);
 
             BatteriesPreCycle.Clear();
-            foreach (var s in Instance.Environment.Sensors)
+
+            foreach (var sensor in Environment.Sensors)
             {
-                BatteriesPreCycle.Add(s, s.Battery);
+                BatteriesPreCycle.Add(sensor, sensor.Battery);
             }
-            TimeBeforeCycle = Instance.Time;
+
+            TimeBeforeCycle = Time;
         }
+
         if (CurrentCycle == NextSkipCycle)
         {
-            var avgCycle = new CycleData();
-            var avgBatteriesChange = new Dictionary<Sensor, double>();
-            foreach (var s in Instance.Environment.Sensors)
+            var averageCycle = new CycleData();
+            var averageBatteryChanges = new Dictionary<Sensor, double>();
+            foreach (var sensor in Environment.Sensors)
             {
-                avgBatteriesChange.Add(s, 0.0);
+                averageBatteryChanges.Add(sensor, 0.0);
             }
-            var avgTimeSpan = TimeSpan.Zero;
+            var averageTimeSpan = TimeSpan.Zero;
 
             // сложить всё
             foreach (var cycle in Cycles)
             {
-                avgTimeSpan += cycle.CycleTime;
-                foreach (var bc in cycle.BatteryChange)
+                averageTimeSpan += cycle.CycleTime;
+                foreach (var batteryChange in cycle.BatteryChange)
                 {
-                    int id = bc.Key.Id;
-                    double newBc = avgBatteriesChange.First(b => b.Key.Id == id).Value + bc.Value;
-                    avgBatteriesChange.Remove(bc.Key);
-                    avgBatteriesChange.Add(bc.Key, newBc);
+                    int id = batteryChange.Key.Id;
+                    double newBc = averageBatteryChanges.First(b => b.Key.Id == id).Value + batteryChange.Value;
+
+                    averageBatteryChanges.Remove(batteryChange.Key);
+                    averageBatteryChanges.Add(batteryChange.Key, newBc);
                 }
             }
 
             // среднее арифметическое
             var temp = new Dictionary<Sensor, double>();
-            foreach (var avgBc in avgBatteriesChange)
+            foreach (var average in averageBatteryChanges)
             {
-                double newAvg = avgBc.Value / Cycles.Count;
-                temp.Add(avgBc.Key, newAvg);
+                double newAverage = average.Value / Cycles.Count;
+                temp.Add(average.Key, newAverage);
             }
-            avgTimeSpan /= Cycles.Count;
 
-            avgCycle.BatteryChange = temp;
-            avgCycle.CycleTime = avgTimeSpan;
+            averageTimeSpan /= Cycles.Count;
+
+            averageCycle.BatteryChange = temp;
+            averageCycle.CycleTime = averageTimeSpan;
 
             // сам процесс пропуска циклов
             int minSkipsCount = int.MaxValue;
-            foreach (var s in Instance.Environment.Sensors)
+            foreach (var sensor in Environment.Sensors)
             {
-                if (s.IsDead)
+                if (sensor.IsDead)
                     continue;
 
-                double avgCost = avgCycle.BatteryChange.First(b => b.Key.Id == s.Id).Value;
-                double availableBattery = s.Battery - SensorSettings.BatteryDeadCharge - avgCost * 2;
-                int skippedCycles = (int)Math.Floor(availableBattery / avgCost);
+                double averageCost = averageCycle.BatteryChange.First(b => b.Key.Id == sensor.Id).Value;
+                double availableBattery = sensor.Battery - SensorSettings.BatteryDeadCharge - averageCost * 2;
+
+                int skippedCycles = (int)Math.Floor(availableBattery / averageCost);
+
                 if (skippedCycles < minSkipsCount)
                     minSkipsCount = skippedCycles;
 
@@ -350,29 +360,32 @@ public class Simulation
 
             if (minSkipsCount > 0 && minSkipsCount != int.MaxValue)
             {
-                foreach (var s in Instance.Environment.Sensors)
+                foreach (var sensor in Environment.Sensors)
                 {
-                    if (s.IsDead)
+                    if (sensor.IsDead)
                         continue;
 
-                    double cycleCost = avgCycle.BatteryChange.First(i => i.Key.Id == s.Id).Value;
-                    s.Battery -= cycleCost * minSkipsCount;
+                    double cycleCost = averageCycle.BatteryChange.First(i => i.Key.Id == sensor.Id).Value;
+                    sensor.Battery -= cycleCost * minSkipsCount;
                 }
 
-                Instance.Time += avgCycle.CycleTime * minSkipsCount;
+                Time += averageCycle.CycleTime * minSkipsCount;
                 CurrentCycle += minSkipsCount;
+
                 // номер цикла, на котором будет следующая попытка пропуска циклов
-                NextSkipCycle = CurrentCycle + Instance.SimulationSettings.CyclesCountBeforeSkip;
+                NextSkipCycle = CurrentCycle + SimulationSettings.CyclesCountBeforeSkip;
 
                 Cycles.Clear();
                 TimeAfterCycle = default;
                 BatteriesPreCycle.Clear();
                 BatteriesPreCycle.Clear();
-                foreach (var s in Instance.Environment.Sensors)
+
+                foreach (var sensor in Environment.Sensors)
                 {
-                    BatteriesPreCycle.Add(s, s.Battery);
+                    BatteriesPreCycle.Add(sensor, sensor.Battery);
                 }
-                TimeBeforeCycle = Instance.Time;
+
+                TimeBeforeCycle = Time;
             }
         }
     }
