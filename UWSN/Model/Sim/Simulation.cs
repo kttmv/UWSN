@@ -124,12 +124,26 @@ public class Simulation
         int eventNumber = 1;
         while (eventNumber < SimulationSettings.MaxProcessedEvents)
         {
-            PrintCurrentState(verbose, eventNumber);
+            if (CurrentCycle == 0 && eventNumber % SimulationSettings.PrintEveryNthEvent == 0)
+                PrintCurrentState(verbose, eventNumber);
 
             var eventToInvoke = EventManager.PopFirst();
             if (eventToInvoke == null)
             {
                 Logger.WriteLine("Больше событий нет.");
+
+                PrintCurrentState(verbose, eventNumber);
+
+                // так как при !fullResult не сохраняются изменения
+                // зарядов сенсоров, сохраняем их вручную после каждого
+                // цикла.
+                if (!fullResult)
+                {
+                    foreach (var sensor in Environment.Sensors)
+                    {
+                        AddSensorBatteryDelta(sensor);
+                    }
+                }
 
                 CalculateCyclesSkip();
 
@@ -195,7 +209,7 @@ public class Simulation
 
     private void PrintCurrentState(bool verbose, int eventNumber)
     {
-        if (!verbose && eventNumber % SimulationSettings.PrintEveryNthEvent == 0)
+        if (!verbose)
         {
             Console.WriteLine($"\nОбработано событий: {eventNumber}.");
             Console.WriteLine($"Текущее время симуляции: {Time:dd.MM.yyyy HH:mm:ss.fff}");
@@ -335,7 +349,7 @@ public class Simulation
             averageCycle.BatteryChange = temp;
             averageCycle.CycleTime = averageTimeSpan;
 
-            // сам процесс пропуска циклов
+            // подсчет количества пропусков
             int minSkipsCount = int.MaxValue;
             foreach (var sensor in Environment.Sensors)
             {
@@ -358,6 +372,7 @@ public class Simulation
             // maxAvgCost.Value * 2 - это сколько батареи мы хотим оставить,
             // чтобы досчитать остаток вручную и посмотреть на то, как умирают сенсоры
 
+            // сам процесс пропуска циклов
             if (minSkipsCount > 0 && minSkipsCount != int.MaxValue)
             {
                 foreach (var sensor in Environment.Sensors)
@@ -367,6 +382,11 @@ public class Simulation
 
                     double cycleCost = averageCycle.BatteryChange.First(i => i.Key.Id == sensor.Id).Value;
                     sensor.Battery -= cycleCost * minSkipsCount;
+
+                    for (int i = 0; i < minSkipsCount; i++)
+                    {
+                        AddSensorBatteryDelta(sensor);
+                    }
                 }
 
                 Time += averageCycle.CycleTime * minSkipsCount;
@@ -386,8 +406,21 @@ public class Simulation
                 }
 
                 TimeBeforeCycle = Time;
+
+                Console.WriteLine($"\nБыло пропущено {minSkipsCount} циклов.");
             }
         }
+    }
+
+    private void AddSensorBatteryDelta(Sensor sensor)
+    {
+        Result!.AddSensorDelta(
+            new SimulationDelta.SensorDelta
+            {
+                Id = sensor.Id,
+                Battery = sensor.Battery
+            },
+            true);
     }
 
     public void PrintResults()
