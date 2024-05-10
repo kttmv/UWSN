@@ -14,4 +14,6 @@ public class SimulationSettings
     public int DeadSensorsPercent { get; set; } = 33;
 
     public bool ShouldSkipHello { get; set; } = false;
+
+    public int CyclesCountBeforeSkip { get; set; } = 10;
 }
