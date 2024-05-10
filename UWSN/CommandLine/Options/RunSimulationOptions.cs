@@ -10,5 +10,8 @@ namespace UWSN.CommandLine.Options
 
         [Option('o', "output", Required = false, HelpText = "Сохранение вывода симуляции в файл в папке с .exe симулятора. Файлы могут весить гигабайты, а также это сильно замедляет программу.")]
         public bool Output { get; set; }
+
+        [Option('r', "result", Required = false, HelpText = "Сохраняет в результат симуляции абсолютно все. Может привести к очень большому количеству дельт и размеру файла.")]
+        public bool FullResult { get; set; }
     }
 }

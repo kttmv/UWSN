@@ -36,10 +36,6 @@ public class Sensor
         set
         {
             _currentState = value;
-            var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
-            delta.SensorDeltas.Add(
-                new SensorDelta { Id = Id, State = value }
-            );
         }
     }
 
@@ -61,8 +57,7 @@ public class Sensor
         get { return _battery; }
         set
         {
-            var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
-            delta.SensorDeltas.Add(new SensorDelta { Id = Id, Battery = -(_battery - value) });
+            Simulation.Instance.Result!.AddSensorDelta(new SensorDelta { Id = Id, Battery = _battery }, false);
 
             _battery = value;
 
@@ -268,14 +263,14 @@ public class Sensor
         IsReference = NextClusterization.IsReference;
         NextClusterization = null;
 
-        var delta = SimulationResult.GetOrCreateSimulationDelta(Simulation.Instance.Time);
-        delta.SensorDeltas.Add(
+        Simulation.Instance.Result!.AddSensorDelta(
             new SensorDelta
             {
                 Id = Id,
                 ClusterId = ClusterId.Value,
                 IsReference = IsReference.Value,
-            }
+            },
+            true
         );
 
         if (IsReference.Value)

@@ -103,9 +103,10 @@ public class Simulation
     /// <summary>
     /// Метод запуска симуляции
     /// </summary>
-    public void Run(bool verbose)
+    public void Run(bool verbose, bool fullResult)
     {
         var timeStart = DateTime.Now;
+        SimulationResult.ShouldCreateAllDeltas = fullResult;
 
         Result = new SimulationResult();
 

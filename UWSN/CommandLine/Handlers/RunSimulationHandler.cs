@@ -12,7 +12,7 @@ namespace UWSN.CommandLine.Handlers
 
             Logger.ShouldWriteToConsole = o.Verbose;
 
-            Simulation.Instance.Run(o.Verbose);
+            Simulation.Instance.Run(o.Verbose, o.FullResult);
 
             SerializationHelper.SaveSimulation(o.FilePath);
             if (o.Output)

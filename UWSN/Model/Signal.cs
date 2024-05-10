@@ -69,18 +69,20 @@ public class Signal
             // добавление сигнала в результат симуляции
             int frameId = Simulation.Instance.Result!.AllFrames.Count;
             int signalId = Simulation.Instance.Result!.AllSignals.Count;
-            Simulation.Instance.Result.AllSignals.Add(
+            Simulation.Instance.Result.AddSignalResult(
                 new SignalResult
                 {
                     FrameId = frameId,
                     SenderId = Emitter.Id,
                     ReceiverId = sensor.Id
-                }
+                },
+                false
             );
 
-            var delta = SimulationResult.GetOrCreateSimulationDelta(timeStartReceiving);
-            delta.SignalDeltas.Add(
-                new SignalDelta { SignalId = signalId, Type = SimulationDelta.SignalDeltaType.Add }
+            Simulation.Instance.Result.AddSignalDelta(
+                new SignalDelta { SignalId = signalId, Type = SignalDeltaType.Add },
+                timeStartReceiving,
+                false
             );
 
             // создание событий начала и окончания приема сообщения
@@ -106,7 +108,7 @@ public class Signal
         }
 
         // добавляем фрейм в результат симуляции
-        Simulation.Instance.Result!.AllFrames.Add(frame);
+        Simulation.Instance.Result!.AddFrame(frame, false);
 
         CreateEndSendingEvent(transmissionTime);
 
@@ -209,9 +211,10 @@ public class Signal
         double transmitionTime
     )
     {
-        var delta = SimulationResult.GetOrCreateSimulationDelta(timeEndReceiving);
-        delta.SignalDeltas.Add(
-            new SignalDelta { SignalId = id, Type = SimulationDelta.SignalDeltaType.Remove }
+        Simulation.Instance.Result!.AddSignalDelta(
+            new SignalDelta { SignalId = id, Type = SimulationDelta.SignalDeltaType.Remove },
+            timeEndReceiving,
+            false
         );
 
         sensor.Battery -= Simulation.Instance.SensorSettings.Modem.PowerRX * transmitionTime;

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using static UWSN.Model.Sim.SimulationDelta;
 
 namespace UWSN.Model.Sim;
 
@@ -10,6 +11,8 @@ public class SimulationResult
         public required int SenderId { get; set; }
         public required int ReceiverId { get; set; }
     }
+
+    public static bool ShouldCreateAllDeltas { get; set; }
 
     public TimeSpan RealTimeToSimulate { get; set; }
     public int TotalEvents { get; set; }
@@ -28,17 +31,50 @@ public class SimulationResult
         get { return AllDeltas.ToList().Select(x => x.Value).OrderBy(x => x.Time).ToList(); }
     }
 
-    public static SimulationDelta GetOrCreateSimulationDelta(DateTime time)
+    private SimulationDelta GetOrCreateSimulationDelta(DateTime time)
     {
-        var allDeltas = Simulation.Instance.Result!.AllDeltas;
-        if (!allDeltas.TryGetValue(time, out SimulationDelta? value))
+        if (!AllDeltas.TryGetValue(time, out SimulationDelta? value))
         {
             var delta = new SimulationDelta(time);
             value = delta;
-            allDeltas.Add(time, value);
+            AllDeltas.Add(time, value);
             return delta;
         }
 
         return value;
+    }
+
+    public void AddSensorDelta(SensorDelta delta, bool force)
+    {
+        if (ShouldCreateAllDeltas || force)
+        {
+            var simulationDelta = GetOrCreateSimulationDelta(Simulation.Instance.Time);
+            simulationDelta.SensorDeltas.Add(delta);
+        }
+    }
+
+    public void AddSignalDelta(SignalDelta delta, DateTime time, bool force)
+    {
+        if (ShouldCreateAllDeltas || force)
+        {
+            var simulationDelta = GetOrCreateSimulationDelta(time);
+            simulationDelta.SignalDeltas.Add(delta);
+        }
+    }
+
+    public void AddFrame(Frame frame, bool force)
+    {
+        if (ShouldCreateAllDeltas || force)
+        {
+            AllFrames.Add(frame);
+        }
+    }
+
+    public void AddSignalResult(SignalResult signal, bool force)
+    {
+        if (ShouldCreateAllDeltas || force)
+        {
+            AllSignals.Add(signal);
+        }
     }
 }
