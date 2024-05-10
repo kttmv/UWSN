@@ -73,7 +73,7 @@ export const useProjectStore = create<State>((set, get) => ({
     }
 }))
 
-function calculateSimulationState(
+export function calculateSimulationState(
     index: number,
     project: Project | undefined
 ): SimulationState {
@@ -134,8 +134,6 @@ function calculateSimulationState(
             }
         }
     }
-
-    console.log(state)
 
     return state
 }

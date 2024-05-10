@@ -24,7 +24,7 @@ public class NetworkProtocol : ProtocolBase
         {
             if (Sensor.IsReference.HasValue && Sensor.IsReference.Value)
             {
-                Sensor.ReceivedData.Add(frame.Data!);
+                Sensor.ReceivedData.Add(frame.CollectedData!);
 
                 return;
             }
@@ -40,7 +40,7 @@ public class NetworkProtocol : ProtocolBase
                 NeighboursData = null,
                 BatteryLeft = Sensor.Battery,
                 DeadSensors = null,
-                Data = frame.Data,
+                CollectedData = frame.CollectedData,
             };
 
             SendFrameWithRouting(newFrame);
@@ -77,7 +77,7 @@ public class NetworkProtocol : ProtocolBase
                 NeighboursData = Sensor.Network.Neighbours,
                 BatteryLeft = Sensor.Battery,
                 DeadSensors = Sensor.Network.DeadSensors,
-                Data = null,
+                CollectedData = null,
             };
 
             Sensor.StopAllAction();
@@ -130,7 +130,7 @@ public class NetworkProtocol : ProtocolBase
                 NeighboursData = Sensor.Network.Neighbours,
                 BatteryLeft = Sensor.Battery,
                 DeadSensors = null,
-                Data = null,
+                CollectedData = null,
             };
 
             SendFrameToAll(newFrame);
@@ -144,8 +144,7 @@ public class NetworkProtocol : ProtocolBase
         }
     }
 
-    public void StopAllAction()
-    { }
+    public void StopAllAction() { }
 
     public void SendFrameWithRouting(Frame frame)
     {
@@ -206,7 +205,7 @@ public class NetworkProtocol : ProtocolBase
         Neighbours = Sensor.Clusterize();
     }
 
-    public void SendCollectedData()
+    public void SendCollectedData(CollectedData data)
     {
         if (Sensor.IsReference == null || Sensor.ClusterId == null)
         {
@@ -217,7 +216,13 @@ public class NetworkProtocol : ProtocolBase
 
         if ((bool)Sensor.IsReference)
         {
-            Sensor.ReceivedData.Add($"D_{Sensor.Id}");
+            Sensor.ReceivedData.Add(
+                new CollectedData
+                {
+                    SensorId = Sensor.Id,
+                    CycleId = Simulation.Instance.CurrentCycle
+                }
+            );
 
             return;
         }
@@ -237,7 +242,7 @@ public class NetworkProtocol : ProtocolBase
             NeighboursData = null,
             BatteryLeft = Sensor.Battery,
             DeadSensors = null,
-            Data = $"D_{Sensor.Id}",
+            CollectedData = data
         };
 
         SendFrameWithRouting(frame);
@@ -263,7 +268,7 @@ public class NetworkProtocol : ProtocolBase
             NeighboursData = Neighbours,
             BatteryLeft = Sensor.Battery,
             DeadSensors = DeadSensors,
-            Data = null,
+            CollectedData = null,
         };
 
         SendFrameToAll(frame);

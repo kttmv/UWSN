@@ -58,7 +58,7 @@ namespace UWSN.Model.Protocols.DataLink
                     NeighboursData = null,
                     BatteryLeft = double.NaN,
                     DeadSensors = null,
-                    Data = null,
+                    CollectedData = null,
                 };
 
                 Logger.WriteSensorLine(

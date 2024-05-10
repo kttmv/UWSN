@@ -71,7 +71,14 @@ namespace UWSN.Model.Protocols
                     $"(Physical) начал отправку кадра для #{frame.ReceiverId}"
                 );
 
-            _ = new Signal(Sensor, frame, channelId);
+            if (frame.ReceiverId != -1)
+            {
+                _ = new Signal(Sensor, frame, channelId, true);
+            }
+            else
+            {
+                _ = new Signal(Sensor, frame, channelId, false);
+            }
         }
 
         public void EndSending(Frame frame)

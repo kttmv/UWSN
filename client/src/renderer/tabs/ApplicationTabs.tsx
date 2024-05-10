@@ -20,6 +20,7 @@ export default function ApplicationTabs() {
                 <Tab>Расстановка</Tab>
                 <Tab>Симуляция</Tab>
                 <Tab>Сенсор</Tab>
+                <Tab>Результаты симуляции</Tab>
             </TabList>
 
             <TabPanels>

@@ -57,10 +57,10 @@ public class Sensor
     public bool IsDead { get; set; }
 
     /// <summary>
-    /// Данные, полученные в ходе обмена данными. Только для референсов. Для проверки
+    /// Данные, полученные в ходе обмена данными. Только для референсов.
     /// </summary>
     [JsonIgnore]
-    public List<string> ReceivedData { get; set; } = new();
+    public List<CollectedData> ReceivedData { get; set; } = new();
 
     [JsonIgnore]
     public int? ClusterId { get; set; } = null;
@@ -172,7 +172,7 @@ public class Sensor
                 NeighboursData = Network.Neighbours,
                 BatteryLeft = Battery,
                 DeadSensors = null,
-                Data = null,
+                CollectedData = null,
             };
 
             AddEvent(
@@ -195,7 +195,14 @@ public class Sensor
         Battery -= Simulation.Instance.SensorSettings.Modem.PowerSP * 0.02;
 
         if (!IsDead)
-            Network.SendCollectedData();
+        {
+            var data = new CollectedData
+            {
+                SensorId = Id,
+                CycleId = Simulation.Instance.CurrentCycle
+            };
+            Network.SendCollectedData(data);
+        }
     }
 
     public List<Neighbour> Clusterize()

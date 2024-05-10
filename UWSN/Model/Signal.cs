@@ -3,6 +3,7 @@ using UWSN.Model.Protocols;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
 using static UWSN.Model.Sim.SimulationDelta;
+using static UWSN.Model.Sim.SimulationResult;
 
 namespace UWSN.Model;
 
@@ -21,7 +22,7 @@ public class Signal
         Event EndReceiving
     )> ReceivingEvents { get; }
 
-    public Signal(Sensor emitter, Frame frame, int channelId)
+    public Signal(Sensor emitter, Frame frame, int channelId, bool pointSend)
     {
         Emitter = emitter;
         Frame = frame;
@@ -43,10 +44,11 @@ public class Signal
             if (sensor == Emitter)
                 continue;
 
-            if (sensor.IsDead)
-            {
+            if (pointSend && frame.ReceiverId != sensor.Id)
                 continue;
-            }
+
+            if (sensor.IsDead)
+                continue;
 
             if (!CheckProbablity(sensor))
                 continue;
@@ -66,12 +68,20 @@ public class Signal
             }
 
             // добавление сигнала в результат симуляции
-            int id = Simulation.Instance.Result!.AllSignals.Count;
-            Simulation.Instance.Result.AllSignals.Add(new(id, Emitter.Id, sensor.Id));
+            int frameId = Simulation.Instance.Result!.AllFrames.Count;
+            int signalId = Simulation.Instance.Result!.AllSignals.Count;
+            Simulation.Instance.Result.AllSignals.Add(
+                new SignalResult
+                {
+                    FrameId = frameId,
+                    SenderId = Emitter.Id,
+                    ReceiverId = sensor.Id
+                }
+            );
 
             var delta = SimulationResult.GetOrCreateSimulationDelta(timeStartReceiving);
             delta.SignalDeltas.Add(
-                new SignalDelta { SignalId = id, Type = SimulationDelta.SignalDeltaType.Add }
+                new SignalDelta { SignalId = signalId, Type = SimulationDelta.SignalDeltaType.Add }
             );
 
             // создание событий начала и окончания приема сообщения
@@ -79,7 +89,7 @@ public class Signal
             var endReceiving = CreateEndReceivingEvent(
                 sensor,
                 timeEndReceiving,
-                id,
+                signalId,
                 transmissionTime
             );
 
