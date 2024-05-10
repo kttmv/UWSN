@@ -22,7 +22,7 @@ public class Signal
         Event EndReceiving
     )> ReceivingEvents { get; }
 
-    public Signal(Sensor emitter, Frame frame, int channelId)
+    public Signal(Sensor emitter, Frame frame, int channelId, bool pointSend)
     {
         Emitter = emitter;
         Frame = frame;
@@ -44,10 +44,11 @@ public class Signal
             if (sensor == Emitter)
                 continue;
 
-            if (sensor.IsDead)
-            {
+            if (pointSend && frame.ReceiverId != sensor.Id)
                 continue;
-            }
+
+            if (sensor.IsDead)
+                continue;
 
             if (!CheckProbablity(sensor))
                 continue;
