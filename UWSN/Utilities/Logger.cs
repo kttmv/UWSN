@@ -7,6 +7,7 @@ namespace UWSN.Utilities;
 public class Logger
 {
     public static readonly StreamWriter File;
+    public static readonly string FilePath;
     public static bool ShouldWriteToConsole { get; set; } = false;
     public static bool SaveOutput { get; set; } = false;
 
@@ -17,6 +18,7 @@ public class Logger
         string path = Path.Combine(strWorkPath, "output.txt");
 
         File = new StreamWriter(path);
+        FilePath = path;
     }
 
     public static void WriteLine(string value, bool withTime = false)
