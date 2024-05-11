@@ -98,6 +98,8 @@ public class Signal
             ReceivingEvents.Add(new(sensor, startReceiving, endReceiving));
         }
 
+        CreateEndSendingEvent(transmissionTime);
+
         if (receiversCount == 0)
         {
             if (Simulation.Instance.Verbose)
@@ -113,8 +115,6 @@ public class Signal
 
         // добавляем фрейм в результат симуляции
         Simulation.Instance.Result!.AddFrame(frame, false);
-
-        CreateEndSendingEvent(transmissionTime);
 
         DateTime timeFreeChannel = CreateFreeChannelEvent(timeEndReceivingMax);
 
@@ -158,14 +158,6 @@ public class Signal
         );
 
         Simulation.Instance.EventManager.AddEvent(EndSending);
-    }
-
-    private bool CheckProbablity(Sensor sensor)
-    {
-        double probability = CalculateDeliveryProbability(sensor);
-        double random = new Random().NextDouble();
-
-        return random <= probability;
     }
 
     private Event CreateStartReceivingEvent(Sensor sensor, DateTime timeStartReceiving)
@@ -257,6 +249,14 @@ public class Signal
         }
 
         Simulation.Instance.Result!.TotalCollisions += 1;
+    }
+
+    private bool CheckProbablity(Sensor sensor)
+    {
+        double probability = CalculateDeliveryProbability(sensor);
+        double random = new Random().NextDouble();
+
+        return random <= probability;
     }
 
     private double CalculateDeliveryProbability(Sensor sensor)

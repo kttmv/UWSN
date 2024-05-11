@@ -36,6 +36,7 @@ public class Sensor
         set
         {
             _currentState = value;
+            Simulation.Instance.Result!.AddSensorDelta(new SensorDelta { Id = Id, State = value }, false);
         }
     }
 
@@ -65,6 +66,7 @@ public class Sensor
             {
                 if (Simulation.Instance.Verbose)
                     Logger.WriteSensorLine(this, "Осталось мало зарядки");
+
                 IsDead = true;
 
                 // храним количество мертвых сенсоров в симуляции, так как это значительно
@@ -134,6 +136,7 @@ public class Sensor
     public void StopAllAction()
     {
         RemoveAllEvents();
+        Physical.StopAllAction();
         DataLink.StopAllAction();
         Network.StopAllAction();
     }
