@@ -6,6 +6,8 @@ namespace UWSN.Model.Protocols;
 
 public class NetworkProtocol : ProtocolBase
 {
+    private const int RESEND_WARNING_COUNT = 3;
+
     public class Neighbour
     {
         public required int Id { get; set; }
@@ -83,6 +85,8 @@ public class NetworkProtocol : ProtocolBase
             Sensor.StopAllAction();
             SendFrameToAll(newFrame);
 
+            CreateResendWarningEvents(newFrame);
+
             Clusterize();
 
             return;
@@ -151,6 +155,11 @@ public class NetworkProtocol : ProtocolBase
         }
     }
 
+    public void SendFrame(Frame frame)
+    {
+        Sensor.DataLink.SendFrame(frame);
+    }
+
     public void StopAllAction()
     { }
 
@@ -166,7 +175,7 @@ public class NetworkProtocol : ProtocolBase
 
     public void SendFrameToAll(Frame frame)
     {
-        Sensor.DataLink.SendFrame(frame);
+        SendFrame(frame);
     }
 
     private int CalculateNextHop()
@@ -282,5 +291,16 @@ public class NetworkProtocol : ProtocolBase
 
         SendFrameToAll(frame);
         Clusterize();
+
+        CreateResendWarningEvents(frame);
+    }
+
+    private void CreateResendWarningEvents(Frame newFrame)
+    {
+        for (int i = 0; i < RESEND_WARNING_COUNT; i++)
+        {
+            var time = Simulation.Instance.Time.AddSeconds(10 * i);
+            Sensor.AddEvent(new Event(time, "Повторная отправка фрейма с предупреждением о смерти", () => SendFrameToAll(newFrame)));
+        }
     }
 }
