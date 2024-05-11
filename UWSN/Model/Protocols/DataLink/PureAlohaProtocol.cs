@@ -86,20 +86,20 @@ namespace UWSN.Model.Protocols.DataLink
 
             bool ackIsBlocking = SensorsAwaitingAck.Count > 0 && frame.Type != Frame.FrameType.Ack;
 
-            // если канал занят или необходимо отправить ACK, то ждем и повторяем попытку
-            if (Simulation.Instance.ChannelManager.IsChannelBusy(CHANNEL_ID) || ackIsBlocking)
+            double rngTimeout = (Random.NextDouble() - 0.5) * Timeout * TimeoutRelativeDeviation;
+            double timeout = Timeout + rngTimeout;
+
+            if (timeout <= 0)
             {
-                double rngTimeout = (Random.NextDouble() - 0.5) * Timeout * TimeoutRelativeDeviation;
-                double timeout = Timeout + rngTimeout;
+                throw new Exception(
+                    "Значение времени ожидания отрицательное. "
+                        + "Вероятно, выставлено слишком большое относительное отклонение времени ожидания."
+                );
+            }
 
-                if (timeout <= 0)
-                {
-                    throw new Exception(
-                        "Значение времени ожидания отрицательное. "
-                            + "Вероятно, выставлено слишком большое относительное отклонение времени ожидания."
-                    );
-                }
-
+            // если канал занят или необходимо отправить ACK, то ждем и повторяем попытку
+            if (Simulation.Instance.ChannelManager.IsChannelBusy(CHANNEL_ID) || ackIsBlocking || !Sensor.Physical.CanStartSending)
+            {
                 if (ackIsBlocking)
                     LogAckIsBlocking(timeout);
                 else

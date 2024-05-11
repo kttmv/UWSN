@@ -97,7 +97,7 @@ namespace UWSN.Model.Protocols.DataLink
             }
 
             var freeChannels = Simulation.Instance.ChannelManager.FreeChannels;
-            if (freeChannels == null || freeChannels.Count == 0 || ackIsBlocking)
+            if (freeChannels == null || freeChannels.Count == 0 || ackIsBlocking || !Sensor.Physical.CanStartSending)
             {
                 if (ackIsBlocking)
                     LogAckIsBlocking(timeout);
