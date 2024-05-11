@@ -19,6 +19,7 @@ public class Sensor
 {
     public enum State
     {
+        Idle,
         Listening,
         Receiving,
         Emitting
@@ -75,7 +76,6 @@ public class Sensor
                 Simulation.Instance.DeadSensorsCount += 1;
 
                 Network.SendDeathWarning();
-                StopAllAction();
             }
         }
     }
@@ -218,7 +218,9 @@ public class Sensor
 
     public void CollectData()
     {
-        // тут надо выяснить сколько по времени сенсор собирает данные
+        ReceivedData.Clear();
+
+        // todo: тут надо выяснить сколько по времени сенсор собирает данные
         Battery -= Simulation.Instance.SensorSettings.Modem.PowerSP * 0.02;
 
         if (!IsDead)

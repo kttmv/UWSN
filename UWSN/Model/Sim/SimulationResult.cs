@@ -12,6 +12,27 @@ public class SimulationResult
         public required int ReceiverId { get; set; }
     }
 
+    public class ClusterCycleResult
+    {
+        public int ClusterId { get; set; }
+        public int ReferenceSensorId { get; set; }
+        public int SensorsCount { get; set; }
+        public int CollectedDataCount { get; set; }
+        public int CollectedDataSameClusterCount { get; set; }
+        public int CollectedDataOtherClusterCount { get; set; }
+    }
+
+    public class CycleResult
+    {
+        public int CycleId { get; set; }
+        public Dictionary<int, ClusterCycleResult> ClusterResults { get; set; } = new();
+
+        public int SensorsCount { get { return ClusterResults.Values.Select(r => r.SensorsCount).Sum(); } }
+        public int CollectedDataCount { get { return ClusterResults.Values.Select(r => r.CollectedDataCount).Sum(); } }
+        public int CollectedDataSameClusterCount { get { return ClusterResults.Values.Select(r => r.CollectedDataSameClusterCount).Sum(); } }
+        public int CollectedDataOtherClusterCount { get { return ClusterResults.Values.Select(r => r.CollectedDataOtherClusterCount).Sum(); } }
+    }
+
     public static bool ShouldCreateAllDeltas { get; set; }
 
     public DateTime SimulationEndTime { get; set; }
@@ -26,6 +47,7 @@ public class SimulationResult
 
     public List<Frame> AllFrames { get; set; } = new();
     public List<SignalResult> AllSignals { get; set; } = new();
+    public Dictionary<int, CycleResult> CycleResults { get; set; } = new();
 
     [JsonIgnore]
     public Dictionary<DateTime, SimulationDelta> AllDeltas { get; set; } = new();
@@ -40,8 +62,7 @@ public class SimulationResult
         if (!AllDeltas.TryGetValue(time, out SimulationDelta? value))
         {
             var delta = new SimulationDelta(time);
-            value = delta;
-            AllDeltas.Add(time, value);
+            AllDeltas.Add(time, delta);
             return delta;
         }
 
@@ -80,5 +101,33 @@ public class SimulationResult
         {
             AllSignals.Add(signal);
         }
+    }
+
+    public CycleResult GetOrCreateCycleResult(int cycle)
+    {
+        if (!CycleResults.TryGetValue(cycle, out var cycleResult))
+        {
+            cycleResult = new() { CycleId = cycle };
+            CycleResults.Add(cycle, cycleResult);
+        }
+
+        return cycleResult;
+    }
+
+    public ClusterCycleResult GetOrCreateClusterCycleResult(int cycle, int clusterId)
+    {
+        var cycleResult = GetOrCreateCycleResult(cycle);
+
+        if (!cycleResult.ClusterResults.TryGetValue(clusterId, out var clusterCycleResult))
+        {
+            clusterCycleResult = new ClusterCycleResult
+            {
+                ClusterId = clusterId
+            };
+
+            cycleResult.ClusterResults.Add(clusterId, clusterCycleResult);
+        }
+
+        return clusterCycleResult;
     }
 }

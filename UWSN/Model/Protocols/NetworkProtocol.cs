@@ -6,7 +6,7 @@ namespace UWSN.Model.Protocols;
 
 public class NetworkProtocol : ProtocolBase
 {
-    private const int RESEND_WARNING_COUNT = 3;
+    private const int RESEND_WARNING_COUNT = 1;
 
     public class Neighbour
     {
@@ -282,7 +282,7 @@ public class NetworkProtocol : ProtocolBase
             ReceiverId = -1,
             Type = Frame.FrameType.Warning,
             TimeSend = Simulation.Instance.Time,
-            AckIsNeeded = false,
+            AckIsNeeded = true,
             NeighboursData = Neighbours,
             BatteryLeft = Sensor.Battery,
             DeadSensors = DeadSensors,
@@ -291,8 +291,6 @@ public class NetworkProtocol : ProtocolBase
 
         SendFrameToAll(frame);
         Clusterize();
-
-        CreateResendWarningEvents(frame);
     }
 
     private void CreateResendWarningEvents(Frame newFrame)
