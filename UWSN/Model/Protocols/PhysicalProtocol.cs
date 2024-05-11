@@ -6,14 +6,10 @@ namespace UWSN.Model.Protocols
 {
     public class PhysicalProtocol : ProtocolBase
     {
-        public Sensor.State OriginalState { get; set; }
-
         public void StartReceiving(Frame frame)
         {
             if (Sensor.IsDead)
                 return;
-
-            OriginalState = Sensor.CurrentState;
 
             Sensor.CurrentState = Sensor.State.Receiving;
 
@@ -23,10 +19,10 @@ namespace UWSN.Model.Protocols
 
         public void EndReceiving(Frame frame)
         {
-            Sensor.CurrentState = OriginalState;
-
             if (Simulation.Instance.Verbose)
                 Logger.WriteSensorLine(Sensor, $"(Physical) принял кадр от #{frame.SenderId}");
+
+            Sensor.CurrentState = Sensor.State.Listening;
 
             Sensor.FrameBuffer.Add(frame);
             Sensor.DataLink.ReceiveFrame(frame);
@@ -38,8 +34,6 @@ namespace UWSN.Model.Protocols
         {
             if (Sensor.IsDead && frame.Type != Frame.FrameType.Warning)
                 return;
-
-            OriginalState = Sensor.CurrentState;
 
             Sensor.CurrentState = Sensor.State.Emitting;
 
@@ -66,7 +60,7 @@ namespace UWSN.Model.Protocols
 
         public void EndSending(Frame frame)
         {
-            Sensor.CurrentState = OriginalState;
+            Sensor.CurrentState = Sensor.State.Listening;
 
             if (Simulation.Instance.Verbose)
             {
@@ -93,6 +87,11 @@ namespace UWSN.Model.Protocols
                     $"(Physical) обнаружил коллизию и прекратил отправку/принятие кадра"
                 );
             }
+        }
+
+        public void StopAllAction()
+        {
+            Sensor.CurrentState = Sensor.State.Listening;
         }
     }
 }
