@@ -149,30 +149,24 @@ public class Simulation
                 if (Verbose)
                     Logger.WriteLine("Больше событий нет.");
 
+                if (CurrentCycle == 0 && Environment.Sensors.Any(sensor => sensor.ClusterId == null || sensor.IsReference == null))
+                    throw new Exception("Во время процесса HELLO не была вычислена кластеризация для всех сенсоров.");
+
                 PrintCurrentState();
 
-                // так как при !fullResult не сохраняются изменения
-                // зарядов сенсоров, сохраняем их вручную после каждого
-                // цикла.
-                if (!fullResult)
-                {
-                    foreach (var sensor in Environment.Sensors)
-                    {
-                        AddSensorBatteryDelta(sensor);
-                    }
-                }
+                // так как при !fullResult не сохраняются изменения зарядов сенсоров,
+                // сохраняем их вручную после каждого цикла.
+                CreateBatteryDeltas();
 
                 CalculateCyclesSkip();
 
-                if (CurrentCycle >= SimulationSettings.MaxCycles)
-                {
-                    break;
-                }
-
-                CheckLastCycleIsBad();
+                CheckIfLastCycleIsBad();
 
                 // TODO: вынести константу в свойство
                 if (BadCycles >= 10)
+                    break;
+
+                if (CurrentCycle >= SimulationSettings.MaxCycles)
                     break;
 
                 CurrentCycle++;
@@ -205,17 +199,25 @@ public class Simulation
         PrintResults();
     }
 
-    private void CheckLastCycleIsBad()
+    private void CreateBatteryDeltas()
+    {
+        if (!SimulationResult.ShouldCreateAllDeltas)
+        {
+            foreach (var sensor in Environment.Sensors)
+            {
+                AddSensorBatteryDelta(sensor);
+            }
+        }
+    }
+
+    private void CheckIfLastCycleIsBad()
     {
         bool isBad = false;
 
-        foreach (var sensor in Environment.Sensors)
+        foreach (var sensor in Environment.Sensors.Where(s => s.IsReference.GetValueOrDefault()))
         {
-            if (!sensor.IsReference.HasValue)
-                throw new Exception("У сенсора должна быть вычислена кластеризация");
-
-            if (!sensor.IsReference.Value)
-                continue;
+            if (CurrentCycle == 0)
+                break;
 
             var currentCycleData = sensor
                 .ReceivedData.GroupBy(d => d.CycleId)
