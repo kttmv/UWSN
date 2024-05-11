@@ -71,12 +71,16 @@ public class ChannelManager
 
     public void OccupyChannel(int channelId, Signal signal)
     {
-        Logger.WriteLine($"Менеджер сигналов: Сенсор #{signal.Emitter.Id} занял канал {channelId}");
+        Logger.WriteLine(
+            $"Менеджер сигналов: Сенсор #{signal.Emitter.Id} занял канал {channelId}",
+            false,
+            false
+        );
 
         // обработка коллизии
         if (Channels[channelId] != null)
         {
-            Logger.WriteLine($"Обнаружена коллизия на канале {channelId}");
+            Logger.WriteLine($"Обнаружена коллизия на канале {channelId}", false, false);
             Channels[channelId]!.DetectCollision();
             signal.DetectCollision();
             return;
@@ -87,7 +91,7 @@ public class ChannelManager
 
     public void FreeChannel(int channelId)
     {
-        Logger.WriteLine($"Менеджер сигналов: Канал {channelId} освобожден");
+        Logger.WriteLine($"Менеджер сигналов: Канал {channelId} освобожден", false, false);
         Channels[channelId] = null;
     }
 }

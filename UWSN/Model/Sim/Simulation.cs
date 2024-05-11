@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using Dew.Math;
 using Newtonsoft.Json;
 using UWSN.Model.Modems;
 using UWSN.Utilities;
@@ -83,14 +82,32 @@ public class Simulation
         };
 
     [JsonIgnore]
-    public int DeadSensorsCount { get; set; }
+    public int DeadSensorsCount { get; set; } = 0;
 
+    [JsonIgnore]
+    private int EventNumber { get; set; } = 0;
+
+    [JsonIgnore]
+    private bool Verbose { get; set; } = false;
+
+    [JsonIgnore]
     private List<CycleData> Cycles { get; set; } = new();
+
+    [JsonIgnore]
     private Dictionary<Sensor, double> BatteriesPreCycle { get; set; } = new();
+
+    [JsonIgnore]
     private DateTime TimeBeforeCycle { get; set; } = default;
-    private Dictionary<Sensor, double> BatteriesPostCycle { get; set; } = new Dictionary<Sensor, double>();
+
+    [JsonIgnore]
+    private Dictionary<Sensor, double> BatteriesPostCycle { get; set; } =
+        new Dictionary<Sensor, double>();
+
+    [JsonIgnore]
     private DateTime TimeAfterCycle { get; set; } = default;
-    private int NextSkipCycle { get; set; }
+
+    [JsonIgnore]
+    private int NextSkipCycle { get; set; } = 0;
 
     /// <summary>
     /// Количество циклов подряд, во время которых до каких-либо
@@ -125,22 +142,21 @@ public class Simulation
 
         Result = new SimulationResult();
 
+        Verbose = verbose;
+
         WakeSensorsUp();
 
-        int eventNumber = 1;
-        while (eventNumber < SimulationSettings.MaxProcessedEvents)
+        while (EventNumber < SimulationSettings.MaxProcessedEvents)
         {
-            if (CurrentCycle == 0 && eventNumber % SimulationSettings.PrintEveryNthEvent == 0)
-                PrintCurrentState(verbose, eventNumber);
+            if (CurrentCycle == 0 && EventNumber % SimulationSettings.PrintEveryNthEvent == 0)
+                PrintCurrentState(EventNumber);
 
             var eventToInvoke = EventManager.PopFirst();
             if (eventToInvoke == null)
             {
-                Logger.ShouldWriteToConsole = true;
-                Logger.WriteLine("Больше событий нет.");
-                Logger.ShouldWriteToConsole = false;
+                Logger.WriteLine("Больше событий нет.", false, true);
 
-                PrintCurrentState(verbose, eventNumber);
+                PrintCurrentState(EventNumber);
 
                 // так как при !fullResult не сохраняются изменения
                 // зарядов сенсоров, сохраняем их вручную после каждого
@@ -174,32 +190,18 @@ public class Simulation
             }
 
             Time = eventToInvoke.Time;
-            PrintEventHeader(eventNumber, eventToInvoke);
+            PrintEventHeader(EventNumber, eventToInvoke);
 
             // обрабатываем событие
             eventToInvoke.Invoke();
-            eventNumber++;
+            EventNumber++;
 
             // проверяем, мертва ли сеть
             if (CheckNetworkIsDead())
                 break;
         }
 
-        Logger.ShouldWriteToConsole = true;
-
-        if (eventNumber >= SimulationSettings.MaxProcessedEvents)
-            Logger.WriteLine("Был достигнут лимит событий.");
-
-        if (CurrentCycle >= SimulationSettings.MaxCycles)
-            Logger.WriteLine("Достигнуто максимальное количество циклов.");
-
-        // TODO: вынести константу в свойство
-        if (BadCycles >= 10)
-            Logger.WriteLine($"Было обнаружено {BadCycles} плохих циклов подряд.");
-
-        Logger.WriteLine("\nСимуляция остановлена.", true);
-
-        Result.TotalEvents = eventNumber;
+        Result.TotalEvents = EventNumber;
         Result.TotalCycles = CurrentCycle;
 
         var timeFinish = DateTime.Now;
@@ -220,8 +222,8 @@ public class Simulation
             if (!sensor.IsReference.Value)
                 continue;
 
-            var currentCycleData = sensor.ReceivedData
-                .GroupBy(d => d.CycleId)
+            var currentCycleData = sensor
+                .ReceivedData.GroupBy(d => d.CycleId)
                 .Where(group => group.Key == CurrentCycle)
                 .FirstOrDefault();
 
@@ -231,8 +233,8 @@ public class Simulation
                 break;
             }
 
-            var sensorsInCluster = Environment.Sensors
-                .Where(s => s.ClusterId == sensor.ClusterId)
+            var sensorsInCluster = Environment
+                .Sensors.Where(s => s.ClusterId == sensor.ClusterId)
                 .ToList();
 
             foreach (var data in currentCycleData)
@@ -253,8 +255,14 @@ public class Simulation
         if (isBad)
         {
             BadCycles++;
-            Console.WriteLine("\nБыл обнаружен плохой цикл: не все референсные узлы получили данные со всех сенсоров "
-                + $"своего кластера. Текущее количество плохих циклов подряд: {BadCycles}");
+            Logger.WriteLine(
+                "\nБыл обнаружен плохой цикл: не все референсные "
+                    + "узлы получили данные со всех сенсоров "
+                    + "своего кластера. Текущее количество "
+                    + $"плохих циклов подряд: {BadCycles}",
+                false,
+                true
+            );
         }
         else
         {
@@ -271,25 +279,27 @@ public class Simulation
             >= (double)SimulationSettings.DeadSensorsPercent / 100
         )
         {
-            Logger.ShouldWriteToConsole = true;
-            Logger.WriteLine("Сеть мертва");
+            Logger.WriteLine("Сеть мертва", false, true);
             result = true;
         }
 
         return result;
     }
 
-    private void PrintCurrentState(bool verbose, int eventNumber)
+    private void PrintCurrentState(int eventNumber)
     {
-        Logger.ShouldWriteToConsole = true;
-        Logger.WriteLine($"\nОбработано событий: {eventNumber}.");
-        Logger.WriteLine($"Текущее время симуляции: {Time:dd.MM.yyyy HH:mm:ss.fff}");
-        Logger.WriteLine($"Текущий цикл сбора данных: {CurrentCycle}");
+        Logger.WriteLine($"\nОбработано событий: {eventNumber}.", false, true);
+        Logger.WriteLine($"Текущее время симуляции: {Time:dd.MM.yyyy HH:mm:ss.fff}", false, true);
+        Logger.WriteLine($"Текущий цикл сбора данных: {CurrentCycle}", false, true);
 
         int deadCount = Environment.Sensors.Where(s => s.IsDead).Count();
         double deadPercentage = (double)deadCount / Environment.Sensors.Count * 100;
 
-        Logger.WriteLine($"Количество мертвых сенсоров: {deadCount} ({deadPercentage:0.#} %)");
+        Logger.WriteLine(
+            $"Количество мертвых сенсоров: {deadCount} ({deadPercentage:0.#} %)",
+            false,
+            true
+        );
 
         double totalInitialEnergy = Environment.Sensors.Count * SensorSettings.InitialSensorBattery;
         double totalEnergy = 0;
@@ -300,8 +310,12 @@ public class Simulation
 
         double totalEnergyPercentage = (double)totalEnergy / totalInitialEnergy * 100;
 
-        Logger.WriteLine($"Остаточное количество энергии в сенсорах: {totalEnergy} Дж ({totalEnergyPercentage:0.#} %)");
-        Logger.ShouldWriteToConsole = false;
+        Logger.WriteLine(
+            "Остаточное количество энергии в сенсорах: "
+                + $"{totalEnergy} Дж ({totalEnergyPercentage:0.#} %)",
+            false,
+            true
+        );
     }
 
     private void WakeSensorsUp()
@@ -333,8 +347,8 @@ public class Simulation
 
     private static void PrintEventHeader(int eventNumber, Event eventToInvoke)
     {
-        Logger.WriteLine($"\n=============================");
-        Logger.WriteLine($"Событие №{eventNumber}. {eventToInvoke.Description}", true);
+        Logger.WriteLine($"\n=============================", false, false);
+        Logger.WriteLine($"Событие №{eventNumber}. {eventToInvoke.Description}", true, false);
     }
 
     private void CalculateCyclesSkip()
@@ -364,7 +378,8 @@ public class Simulation
 
             foreach (var sensor in BatteriesPostCycle)
             {
-                double cost = BatteriesPreCycle.First(b => b.Key.Id == sensor.Key.Id).Value - sensor.Value;
+                double cost =
+                    BatteriesPreCycle.First(b => b.Key.Id == sensor.Key.Id).Value - sensor.Value;
                 cycleData.BatteryChange.Add(sensor.Key, cost);
             }
 
@@ -400,7 +415,9 @@ public class Simulation
                 foreach (var batteryChange in cycle.BatteryChange)
                 {
                     int id = batteryChange.Key.Id;
-                    double newBc = averageBatteryChanges.First(b => b.Key.Id == id).Value + batteryChange.Value;
+                    double newBc =
+                        averageBatteryChanges.First(b => b.Key.Id == id).Value
+                        + batteryChange.Value;
 
                     averageBatteryChanges.Remove(batteryChange.Key);
                     averageBatteryChanges.Add(batteryChange.Key, newBc);
@@ -427,8 +444,11 @@ public class Simulation
                 if (sensor.IsDead)
                     continue;
 
-                double averageCost = averageCycle.BatteryChange.First(b => b.Key.Id == sensor.Id).Value;
-                double availableBattery = sensor.Battery - SensorSettings.BatteryDeadCharge - averageCost * 2;
+                double averageCost = averageCycle
+                    .BatteryChange.First(b => b.Key.Id == sensor.Id)
+                    .Value;
+                double availableBattery =
+                    sensor.Battery - SensorSettings.BatteryDeadCharge - averageCost * 2;
 
                 int skippedCycles = (int)Math.Floor(availableBattery / averageCost);
 
@@ -451,7 +471,9 @@ public class Simulation
                     if (sensor.IsDead)
                         continue;
 
-                    double cycleCost = averageCycle.BatteryChange.First(i => i.Key.Id == sensor.Id).Value;
+                    double cycleCost = averageCycle
+                        .BatteryChange.First(i => i.Key.Id == sensor.Id)
+                        .Value;
                     sensor.Battery -= cycleCost * minSkipsCount;
 
                     for (int i = 0; i < minSkipsCount; i++)
@@ -478,7 +500,7 @@ public class Simulation
 
                 TimeBeforeCycle = Time;
 
-                Console.WriteLine($"\nБыло пропущено {minSkipsCount} циклов.");
+                Logger.WriteLine($"\nБыло пропущено {minSkipsCount} циклов.", false, true);
             }
         }
     }
@@ -486,22 +508,32 @@ public class Simulation
     private void AddSensorBatteryDelta(Sensor sensor)
     {
         Result!.AddSensorDelta(
-            new SimulationDelta.SensorDelta
-            {
-                Id = sensor.Id,
-                Battery = sensor.Battery
-            },
-            true);
+            new SimulationDelta.SensorDelta { Id = sensor.Id, Battery = sensor.Battery },
+            true
+        );
     }
 
     public void PrintResults()
     {
-        Logger.WriteLine($"\n=============================");
-        Logger.WriteLine("Результаты симуляции:");
+        if (EventNumber >= SimulationSettings.MaxProcessedEvents)
+            Logger.WriteLine("Был достигнут лимит событий.", false, true);
+
+        if (CurrentCycle >= SimulationSettings.MaxCycles)
+            Logger.WriteLine("Достигнуто максимальное количество циклов.", false, true);
+
+        // TODO: вынести константу в свойство
+        if (BadCycles >= 10)
+            Logger.WriteLine($"Было обнаружено {BadCycles} плохих циклов подряд.", false, true);
+
+        Logger.WriteLine("\nСимуляция остановлена.", true, true);
+        Logger.WriteLine($"\n=============================", false, true);
+        Logger.WriteLine("Результаты симуляции:", false, true);
 
         Logger.WriteLine(
             $"\tРеальное время, потраченное на симуляцию: "
-                + $"{Result!.RealTimeToSimulate:hh\\:mm\\:ss}"
+                + $"{Result!.RealTimeToSimulate:hh\\:mm\\:ss}",
+            false,
+            true
         );
 
         Logger.WriteLine(
@@ -510,7 +542,9 @@ public class Simulation
                     Result.TotalEvents >= SimulationSettings.MaxProcessedEvents
                         ? " (был достигнут лимит)"
                         : ""
-                )
+                ),
+            false,
+            true
         );
 
         Logger.WriteLine(
@@ -519,11 +553,14 @@ public class Simulation
                     Result.TotalCycles >= SimulationSettings.MaxCycles
                         ? " (был достигнут лимит)"
                         : ""
-                )
+                ),
+            false,
+            true
         );
 
-        Logger.WriteLine($"\tКоличество отправленных сообщений: {Result.TotalSends}");
-        Logger.WriteLine($"\tКоличество полученных сообщений: {Result.TotalReceives}");
-        Logger.WriteLine($"\tКоличество коллизий: {Result.TotalCollisions}");
+        Logger.WriteLine($"\tКоличество отправленных сообщений: {Result.TotalSends}", false, true);
+        Logger.WriteLine($"\tКоличество полученных сообщений: {Result.TotalReceives}", false, true);
+
+        Logger.WriteLine($"\tКоличество коллизий: {Result.TotalCollisions}", false, true);
     }
 }

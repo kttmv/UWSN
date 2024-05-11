@@ -1,6 +1,5 @@
 ﻿using UWSN.Model;
 using UWSN.Model.Sim;
-using System.IO;
 
 namespace UWSN.Utilities;
 
@@ -21,7 +20,7 @@ public class Logger
         FilePath = path;
     }
 
-    public static void WriteLine(string value, bool withTime = false)
+    public static void WriteLine(string value, bool withTime, bool force)
     {
         string str = withTime ? $"[{Simulation.Instance.Time:dd.MM.yyyy HH:mm:ss.fff}] " : "";
         str += value;
@@ -29,12 +28,12 @@ public class Logger
         if (SaveOutput)
             File.WriteLine(str);
 
-        if (ShouldWriteToConsole)
+        if (ShouldWriteToConsole || force)
             Console.WriteLine(str);
     }
 
     public static void WriteSensorLine(Sensor sensor, string value)
     {
-        WriteLine($"Сенсор #{sensor.Id}: {value}");
+        WriteLine($"Сенсор #{sensor.Id}: {value}", false, false);
     }
 }

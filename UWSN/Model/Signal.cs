@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using UWSN.Model.Protocols;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
 using static UWSN.Model.Sim.SimulationDelta;
@@ -21,8 +20,7 @@ public class Signal
         Sensor Receiver,
         Event StartReceiving,
         Event EndReceiving
-    )> ReceivingEvents
-    { get; }
+    )> ReceivingEvents { get; }
 
     public Signal(Sensor emitter, Frame frame, int channelId, bool pointSend)
     {
@@ -31,7 +29,9 @@ public class Signal
         ChannelId = channelId;
         ReceivingEvents = new();
 
-        var modem = Simulation.Instance.SensorSettings.Modem ?? throw new NullReferenceException("Не указан тип модема");
+        var modem =
+            Simulation.Instance.SensorSettings.Modem
+            ?? throw new NullReferenceException("Не указан тип модема");
 
         double transmissionTime = Frame.FRAME_SIZE_IN_BITS / modem.Bitrate;
 
@@ -101,7 +101,9 @@ public class Signal
         {
             Logger.WriteLine(
                 $"Менеджер сигналов: Сигнал от #{Emitter.Id} не дошел "
-                    + $"ни до одного сенсора. Канал {ChannelId} свободен."
+                    + $"ни до одного сенсора. Канал {ChannelId} свободен.",
+                false,
+                false
             );
 
             return;
@@ -119,7 +121,9 @@ public class Signal
         Logger.WriteLine(
             $"Менеджер сигналов: Сигнал от #{Emitter.Id} занял канал {ChannelId}.\n"
                 + $"\tКоличество получателей сигнала: {receiversCount}.\n"
-                + $"\tКанал будет особожден в {timeFreeChannel:dd.MM.yyyy HH:mm:ss.fff}."
+                + $"\tКанал будет особожден в {timeFreeChannel:dd.MM.yyyy HH:mm:ss.fff}.",
+            false,
+            false
         );
     }
 
@@ -182,7 +186,10 @@ public class Signal
         else
         {
             Logger.WriteLine(
-                $"Менеджер сигналов: Сенсор #{sensor.Id} находится не в состоянии прослушивания."
+                $"Менеджер сигналов: Сенсор #{sensor.Id} находится "
+                    + "не в состоянии прослушивания.",
+                false,
+                false
             );
         }
     }
