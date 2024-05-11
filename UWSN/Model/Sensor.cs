@@ -63,7 +63,8 @@ public class Sensor
 
             if (!IsDead && _battery < Simulation.Instance.SensorSettings.BatteryDeadCharge)
             {
-                Logger.WriteSensorLine(this, "Осталось мало зарядки");
+                if (Simulation.Instance.Verbose)
+                    Logger.WriteSensorLine(this, "Осталось мало зарядки");
                 IsDead = true;
 
                 // храним количество мертвых сенсоров в симуляции, так как это значительно
@@ -275,14 +276,20 @@ public class Sensor
 
         if (IsReference.Value)
         {
-            Logger.WriteSensorLine(
-                this,
-                $"Определил себя новым референсным узлом кластера {ClusterId}"
-            );
+            if (Simulation.Instance.Verbose)
+            {
+                Logger.WriteSensorLine(
+                    this,
+                    $"Определил себя новым референсным узлом кластера {ClusterId}"
+                );
+            }
         }
         else
         {
-            Logger.WriteSensorLine(this, $"Определил себя к кластеру {ClusterId}.");
+            if (Simulation.Instance.Verbose)
+            {
+                Logger.WriteSensorLine(this, $"Определил себя к кластеру {ClusterId}.");
+            }
         }
 
         return neighbours;

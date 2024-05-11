@@ -258,7 +258,8 @@ public class NetworkProtocol : ProtocolBase
 
     public void SendDeathWarning()
     {
-        Logger.WriteSensorLine(Sensor, "(Network) начинаю отправку предсмертного фрейма");
+        if (Simulation.Instance.Verbose)
+            Logger.WriteSensorLine(Sensor, "(Network) начинаю отправку предсмертного фрейма");
 
         if (!DeadSensors.Contains(Sensor.Id))
         {

@@ -14,12 +14,16 @@ public class SimulationResult
 
     public static bool ShouldCreateAllDeltas { get; set; }
 
+    public DateTime SimulationEndTime { get; set; }
     public TimeSpan RealTimeToSimulate { get; set; }
     public int TotalEvents { get; set; }
     public int TotalCycles { get; set; }
     public int TotalSends { get; set; }
     public int TotalReceives { get; set; }
     public int TotalCollisions { get; set; }
+    public int TotalSkippedCycles { get; set; }
+    public int TotalBadCycles { get; set; }
+
     public List<Frame> AllFrames { get; set; } = new();
     public List<SignalResult> AllSignals { get; set; } = new();
 

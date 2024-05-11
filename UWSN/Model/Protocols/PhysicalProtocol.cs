@@ -17,14 +17,16 @@ namespace UWSN.Model.Protocols
 
             Sensor.CurrentState = Sensor.State.Receiving;
 
-            Logger.WriteSensorLine(Sensor, $"(Physical) начал принимать кадр от #{frame.SenderId}");
+            if (Simulation.Instance.Verbose)
+                Logger.WriteSensorLine(Sensor, $"(Physical) начал принимать кадр от #{frame.SenderId}");
         }
 
         public void EndReceiving(Frame frame)
         {
             Sensor.CurrentState = OriginalState;
 
-            Logger.WriteSensorLine(Sensor, $"(Physical) принял кадр от #{frame.SenderId}");
+            if (Simulation.Instance.Verbose)
+                Logger.WriteSensorLine(Sensor, $"(Physical) принял кадр от #{frame.SenderId}");
 
             Sensor.FrameBuffer.Add(frame);
             Sensor.DataLink.ReceiveFrame(frame);
@@ -41,13 +43,16 @@ namespace UWSN.Model.Protocols
 
             Sensor.CurrentState = Sensor.State.Emitting;
 
-            if (frame.ReceiverId == -1)
-                Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра для всех");
-            else
-                Logger.WriteSensorLine(
-                    Sensor,
-                    $"(Physical) начал отправку кадра для #{frame.ReceiverId}"
-                );
+            if (Simulation.Instance.Verbose)
+            {
+                if (frame.ReceiverId == -1)
+                    Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра для всех");
+                else
+                    Logger.WriteSensorLine(
+                        Sensor,
+                        $"(Physical) начал отправку кадра для #{frame.ReceiverId}"
+                    );
+            }
 
             if (frame.ReceiverId != -1)
             {
@@ -63,13 +68,16 @@ namespace UWSN.Model.Protocols
         {
             Sensor.CurrentState = OriginalState;
 
-            if (frame.ReceiverId == -1)
-                Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра для всех");
-            else
-                Logger.WriteSensorLine(
-                    Sensor,
-                    $"(Physical) закончил отправку кадра для #{frame.ReceiverId}"
-                );
+            if (Simulation.Instance.Verbose)
+            {
+                if (frame.ReceiverId == -1)
+                    Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра для всех");
+                else
+                    Logger.WriteSensorLine(
+                        Sensor,
+                        $"(Physical) закончил отправку кадра для #{frame.ReceiverId}"
+                    );
+            }
 
             Simulation.Instance.Result!.TotalSends += 1;
         }
@@ -78,10 +86,13 @@ namespace UWSN.Model.Protocols
         {
             Sensor.CurrentState = Sensor.State.Listening;
 
-            Logger.WriteSensorLine(
-                Sensor,
-                $"(Physical) обнаружил коллизию и прекратил отправку/принятие кадра"
-            );
+            if (Simulation.Instance.Verbose)
+            {
+                Logger.WriteSensorLine(
+                    Sensor,
+                    $"(Physical) обнаружил коллизию и прекратил отправку/принятие кадра"
+                );
+            }
         }
     }
 }

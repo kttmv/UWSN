@@ -15,5 +15,7 @@ public class SimulationSettings
 
     public bool ShouldSkipHello { get; set; } = false;
 
+    public bool ShouldSkipCycles { get; set; } = false;
+
     public int CyclesCountBeforeSkip { get; set; } = 5;
 }

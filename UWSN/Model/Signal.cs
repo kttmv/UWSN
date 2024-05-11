@@ -20,7 +20,8 @@ public class Signal
         Sensor Receiver,
         Event StartReceiving,
         Event EndReceiving
-    )> ReceivingEvents { get; }
+    )> ReceivingEvents
+    { get; }
 
     public Signal(Sensor emitter, Frame frame, int channelId, bool pointSend)
     {
@@ -99,12 +100,13 @@ public class Signal
 
         if (receiversCount == 0)
         {
-            Logger.WriteLine(
-                $"Менеджер сигналов: Сигнал от #{Emitter.Id} не дошел "
-                    + $"ни до одного сенсора. Канал {ChannelId} свободен.",
-                false,
-                false
-            );
+            if (Simulation.Instance.Verbose)
+            {
+                Logger.WriteLine(
+                    $"Менеджер сигналов: Сигнал от #{Emitter.Id} не дошел "
+                        + $"ни до одного сенсора. Канал {ChannelId} свободен."
+                );
+            }
 
             return;
         }
@@ -118,13 +120,14 @@ public class Signal
 
         Simulation.Instance.ChannelManager.OccupyChannel(ChannelId, this);
 
-        Logger.WriteLine(
-            $"Менеджер сигналов: Сигнал от #{Emitter.Id} занял канал {ChannelId}.\n"
-                + $"\tКоличество получателей сигнала: {receiversCount}.\n"
-                + $"\tКанал будет особожден в {timeFreeChannel:dd.MM.yyyy HH:mm:ss.fff}.",
-            false,
-            false
-        );
+        if (Simulation.Instance.Verbose)
+        {
+            Logger.WriteLine(
+                $"Менеджер сигналов: Сигнал от #{Emitter.Id} занял канал {ChannelId}.\n"
+                    + $"\tКоличество получателей сигнала: {receiversCount}.\n"
+                    + $"\tКанал будет особожден в {timeFreeChannel:dd.MM.yyyy HH:mm:ss.fff}."
+            );
+        }
     }
 
     private DateTime CreateFreeChannelEvent(DateTime timeEndReceivingMax)
@@ -185,12 +188,13 @@ public class Signal
         }
         else
         {
-            Logger.WriteLine(
-                $"Менеджер сигналов: Сенсор #{sensor.Id} находится "
-                    + "не в состоянии прослушивания.",
-                false,
-                false
-            );
+            if (Simulation.Instance.Verbose)
+            {
+                Logger.WriteLine(
+                    $"Менеджер сигналов: Сенсор #{sensor.Id} находится "
+                        + "не в состоянии прослушивания."
+                );
+            }
         }
     }
 

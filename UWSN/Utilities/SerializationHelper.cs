@@ -30,7 +30,7 @@ public class SerializationHelper
             Serializer.Serialize(writer, Simulation.Instance);
         }
 
-        Console.WriteLine($"Файл {path} успешно сохранен.");
+        Console.WriteLine($"\nФайл {path} успешно сохранен.");
     }
 
     public static void LoadSimulation(string path)

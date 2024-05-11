@@ -41,10 +41,14 @@ namespace UWSN.Model.Protocols.DataLink
             {
                 WaitingForAckEvent = null;
                 Sensor.CurrentState = Sensor.State.Listening;
-                Logger.WriteSensorLine(
-                    Sensor,
-                    $"(MultiChanneledAloha) получил ACK от #{frame.SenderId}"
-                );
+
+                if (Simulation.Instance.Verbose)
+                {
+                    Logger.WriteSensorLine(
+                        Sensor,
+                        $"(MultiChanneledAloha) получил ACK от #{frame.SenderId}"
+                    );
+                }
 
                 return;
             }
@@ -65,10 +69,13 @@ namespace UWSN.Model.Protocols.DataLink
                     CollectedData = null,
                 };
 
-                Logger.WriteSensorLine(
-                    Sensor,
-                    $"(MultiChanneledAloha) начинаю отправку ACK для #{ack.ReceiverId}"
-                );
+                if (Simulation.Instance.Verbose)
+                {
+                    Logger.WriteSensorLine(
+                        Sensor,
+                        $"(MultiChanneledAloha) начинаю отправку ACK для #{ack.ReceiverId}"
+                    );
+                }
 
                 SensorsAwaitingAck.Add(ack.ReceiverId);
 
@@ -85,31 +92,42 @@ namespace UWSN.Model.Protocols.DataLink
 
         public void SendFrame(Frame frame, bool firstTime)
         {
-            if (firstTime)
+            if (Simulation.Instance.Verbose)
             {
-                if (frame.ReceiverId == -1)
-                    Logger.WriteSensorLine(
-                        Sensor,
-                        $"(MultiChanneledAloha) отправляю кадр для всех"
-                    );
+                if (firstTime)
+                {
+                    if (frame.ReceiverId == -1)
+                    {
+                        Logger.WriteSensorLine(
+                            Sensor,
+                            $"(MultiChanneledAloha) отправляю кадр для всех"
+                        );
+                    }
+                    else
+                    {
+                        Logger.WriteSensorLine(
+                            Sensor,
+                            $"(MultiChanneledAloha) отправляю кадр для #{frame.ReceiverId}"
+                        );
+                    }
+                }
                 else
-                    Logger.WriteSensorLine(
-                        Sensor,
-                        $"(MultiChanneledAloha) отправляю кадр для #{frame.ReceiverId}"
-                    );
-            }
-            else
-            {
-                if (frame.ReceiverId == -1)
-                    Logger.WriteSensorLine(
-                        Sensor,
-                        $"(MultiChanneledAloha) повторно отправляю кадр для всех"
-                    );
-                else
-                    Logger.WriteSensorLine(
-                        Sensor,
-                        $"(MultiChanneledAloha) повторно отправляю кадр для #{frame.ReceiverId}"
-                    );
+                {
+                    if (frame.ReceiverId == -1)
+                    {
+                        Logger.WriteSensorLine(
+                            Sensor,
+                            $"(MultiChanneledAloha) повторно отправляю кадр для всех"
+                        );
+                    }
+                    else
+                    {
+                        Logger.WriteSensorLine(
+                            Sensor,
+                            $"(MultiChanneledAloha) повторно отправляю кадр для #{frame.ReceiverId}"
+                        );
+                    }
+                }
             }
 
             bool ackIsBlocking = SensorsAwaitingAck.Count > 0 && frame.Type != Frame.FrameType.Ack;
@@ -129,19 +147,26 @@ namespace UWSN.Model.Protocols.DataLink
             var freeChannels = Simulation.Instance.ChannelManager.FreeChannels;
             if (freeChannels == null || freeChannels?.Count == 0 || ackIsBlocking)
             {
-                if (ackIsBlocking)
-                    Logger.WriteSensorLine(
-                        Sensor,
-                        "(MultiChanneledAloha) невозможно совершить отправку, "
-                            + "так как есть неотправленные пакеты ACK. "
-                            + $"Попробую еще раз через {timeout} сек."
-                    );
+                if (Simulation.Instance.Verbose)
+                {
+                    if (ackIsBlocking)
+                    {
+                        Logger.WriteSensorLine(
+                            Sensor,
+                            "(MultiChanneledAloha) невозможно совершить отправку, "
+                                + "так как есть неотправленные пакеты ACK. "
+                                + $"Попробую еще раз через {timeout} сек."
+                        );
+                    }
+                }
                 else
+                {
                     Logger.WriteSensorLine(
                         Sensor,
                         "(MultiChanneledAloha) Все каналы заняты, "
                             + $"начинаю ожидание в {timeout} сек."
                     );
+                }
 
                 Sensor.AddEvent(
                     new Event(
@@ -166,10 +191,14 @@ namespace UWSN.Model.Protocols.DataLink
 
             if (firstTime && frame.AckIsNeeded)
             {
-                Logger.WriteSensorLine(
-                    Sensor,
-                    $"(MultiChanneledAloha) начинаю ожидать ACK от #{frame.ReceiverId}"
-                );
+                if (Simulation.Instance.Verbose)
+                {
+                    Logger.WriteSensorLine(
+                        Sensor,
+                        $"(MultiChanneledAloha) начинаю ожидать ACK от #{frame.ReceiverId}"
+                    );
+                }
+
                 CreateAckTimeout(frame, AckRetries);
             }
         }
@@ -178,20 +207,26 @@ namespace UWSN.Model.Protocols.DataLink
         {
             if (attemptsLeft == 0)
             {
-                Logger.WriteSensorLine(
-                    Sensor,
-                    $"(MultiChanneledAloha) не получил ACK от #{frame.ReceiverId}. Ожидание прекращено."
-                );
+                if (Simulation.Instance.Verbose)
+                {
+                    Logger.WriteSensorLine(
+                        Sensor,
+                        $"(MultiChanneledAloha) не получил ACK от #{frame.ReceiverId}. Ожидание прекращено."
+                    );
+                }
 
                 WaitingForAckEvent = null;
                 return;
             }
 
-            Logger.WriteSensorLine(
-                Sensor,
-                $"(MultiChanneledAloha) ACK не был получен. Повторно отправляю кадр сенсору #{frame.ReceiverId}. "
-                    + $"Попыток осталось: {attemptsLeft}"
-            );
+            if (Simulation.Instance.Verbose)
+            {
+                Logger.WriteSensorLine(
+                    Sensor,
+                    $"(MultiChanneledAloha) ACK не был получен. Повторно отправляю кадр сенсору #{frame.ReceiverId}. "
+                        + $"Попыток осталось: {attemptsLeft}"
+                );
+            }
 
             SendFrame(frame, false);
 
@@ -200,10 +235,13 @@ namespace UWSN.Model.Protocols.DataLink
 
         private void CreateAckTimeout(Frame frame, int attemptsLeft)
         {
-            Logger.WriteSensorLine(
-                Sensor,
-                $"(MultiChanneledAloha) жду ACK от #{frame.ReceiverId} в течение {AckTimeout} сек."
-            );
+            if (Simulation.Instance.Verbose)
+            {
+                Logger.WriteSensorLine(
+                    Sensor,
+                    $"(MultiChanneledAloha) жду ACK от #{frame.ReceiverId} в течение {AckTimeout} сек."
+                );
+            }
 
             WaitingForAckEvent = new Event(
                 Simulation.Instance.Time.AddSeconds(AckTimeout),

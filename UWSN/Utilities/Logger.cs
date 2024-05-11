@@ -5,10 +5,13 @@ namespace UWSN.Utilities;
 
 public class Logger
 {
+    public const int PADDING_SIZE = 4;
+
     public static readonly StreamWriter File;
     public static readonly string FilePath;
-    public static bool ShouldWriteToConsole { get; set; } = false;
     public static bool SaveOutput { get; set; } = false;
+
+    public static int LeftPadding { get; set; } = 0;
 
     static Logger()
     {
@@ -20,20 +23,24 @@ public class Logger
         FilePath = path;
     }
 
-    public static void WriteLine(string value, bool withTime, bool force)
+    public static void WriteLine(string value, bool withTime = false)
     {
         string str = withTime ? $"[{Simulation.Instance.Time:dd.MM.yyyy HH:mm:ss.fff}] " : "";
         str += value;
 
+        if (LeftPadding > 0)
+        {
+            str = new string(' ', LeftPadding * PADDING_SIZE) + str;
+        }
+
         if (SaveOutput)
             File.WriteLine(str);
 
-        if (ShouldWriteToConsole || force)
-            Console.WriteLine(str);
+        Console.WriteLine(str);
     }
 
     public static void WriteSensorLine(Sensor sensor, string value)
     {
-        WriteLine($"Сенсор #{sensor.Id}: {value}", false, false);
+        WriteLine($"Сенсор #{sensor.Id}: {value}");
     }
 }

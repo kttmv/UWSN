@@ -13,24 +13,23 @@ public class ChannelManager
     /// <summary>
     /// Отсортированные по каналам эммиты
     /// </summary>
+    [JsonIgnore]
     private Signal?[] Channels
     {
         get
         {
-            // костыль. при создании объекта количество каналов не известно,
+            // при создании объекта количество каналов не известно,
             // так как десериализация заполняет его свойства ПОСЛЕ его создания.
             // так что приходится создавать массив каналов при первом обращении к нему,
-            // когда все уже точно создано.
-            if (_channels == null)
-            {
-                _channels = new Signal?[NumberOfChannels];
-            }
+            // когда все уже точно заполнено.
+            _channels ??= new Signal?[NumberOfChannels];
 
             return _channels;
         }
     }
 
-    private Signal?[]? _channels { get; set; }
+    [JsonIgnore]
+    private Signal?[]? _channels;
 
     [JsonIgnore]
     public List<int> FreeChannels
@@ -71,16 +70,20 @@ public class ChannelManager
 
     public void OccupyChannel(int channelId, Signal signal)
     {
-        Logger.WriteLine(
-            $"Менеджер сигналов: Сенсор #{signal.Emitter.Id} занял канал {channelId}",
-            false,
-            false
-        );
+        if (Simulation.Instance.Verbose)
+        {
+            Logger.WriteLine(
+                $"Менеджер сигналов: Сенсор #{signal.Emitter.Id} занял канал {channelId}",
+                false
+            );
+        }
 
         // обработка коллизии
         if (Channels[channelId] != null)
         {
-            Logger.WriteLine($"Обнаружена коллизия на канале {channelId}", false, false);
+            if (Simulation.Instance.Verbose)
+                Logger.WriteLine($"Обнаружена коллизия на канале {channelId}");
+
             Channels[channelId]!.DetectCollision();
             signal.DetectCollision();
             return;
@@ -91,7 +94,9 @@ public class ChannelManager
 
     public void FreeChannel(int channelId)
     {
-        Logger.WriteLine($"Менеджер сигналов: Канал {channelId} освобожден", false, false);
+        if (Simulation.Instance.Verbose)
+            Logger.WriteLine($"Менеджер сигналов: Канал {channelId} освобожден");
+
         Channels[channelId] = null;
     }
 }
