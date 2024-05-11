@@ -102,6 +102,8 @@ namespace UWSN.Model.Protocols.DataLink
             {
                 if (ackIsBlocking)
                     LogAckIsBlocking(timeout);
+                else if (!Sensor.Physical.CanStartSending)
+                    LogCantStartSending(timeout);
                 else
                     LogChannelIsBusy(timeout);
 
@@ -199,6 +201,18 @@ namespace UWSN.Model.Protocols.DataLink
                 else
                     Logger.WriteSensorLine(Sensor, $"(PureAloha) повторно отправляю кадр для #{frame.ReceiverId}");
             }
+        }
+
+        private void LogCantStartSending(double timeout)
+        {
+            if (!Simulation.Instance.Verbose)
+                return;
+
+            Logger.WriteSensorLine(
+                Sensor,
+                "(MultiChanneledAloha) Модем заблокирован, "
+                    + $"начинаю ожидание в {timeout} сек."
+            );
         }
 
         private void LogAckIsBlocking(double timeout)
