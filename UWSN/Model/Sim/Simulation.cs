@@ -154,7 +154,7 @@ public class Simulation
                 if (CurrentCycle == 0)
                     CheckHelloResult();
 
-                // так как при в данном режиме не сохраняются изменения зарядов сенсоров,
+                // так как в данном режиме не сохраняются изменения зарядов сенсоров,
                 // сохраняем их вручную после каждого цикла.
                 if (!SimulationResult.ShouldCreateAllDeltas)
                     CreateBatteryDeltas();
@@ -538,17 +538,19 @@ public class Simulation
                 double cycleCost = averageCycle
                     .BatteryChange.First(i => i.Key.Id == sensor.Id)
                     .Value;
+
                 sensor.Battery -= cycleCost * cyclesToSkip;
 
-                for (int i = 0; i < cyclesToSkip; i++)
-                {
-                    AddSensorBatteryDelta(sensor);
-                }
+                if (sensor.IsDead)
+                    throw new Exception("Процесс пропуска циклов произошел с ошибкой.");
             }
 
             Time += averageCycle.CycleTime * cyclesToSkip;
+
             CurrentCycle += cyclesToSkip;
             Result!.TotalSkippedCycles += cyclesToSkip;
+
+            CreateBatteryDeltas();
 
             // номер цикла, на котором будет следующая попытка пропуска циклов
             NextSkipCycle = CurrentCycle + SimulationSettings.CyclesCountBeforeSkip + 2;
