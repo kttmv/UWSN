@@ -11,21 +11,14 @@ export default function Viewer() {
     const { isOpen, setIsOpen } = useViewerStore()
 
     return (
-        <Flex
-            direction={{ base: 'column', lg: 'row' }}
-            h={isOpen ? { base: '50%', lg: '100%' } : undefined}
-            flexGrow={isOpen ? 1 : 0}
-            minW={0}
-            minH={0}
-            position='relative'
-        >
+        <>
             {isOpen && (
                 <>
                     <ViewerCanvas />
                     <ViewerSettings />
                     <ViewerDeltaSettings />
-                    <ViewerSelectedObjectInfo />
                     <ViewerStateInfo />
+                    <ViewerSelectedObjectInfo />
                 </>
             )}
 
@@ -44,6 +37,6 @@ export default function Viewer() {
                     3D просмотр
                 </Flex>
             </Button>
-        </Flex>
+        </>
     )
 }
