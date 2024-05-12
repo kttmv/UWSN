@@ -91,6 +91,7 @@ export function calculateSimulationState(
         const simulationDelta = project.Result.Deltas[i]
 
         state.Time = simulationDelta.Time
+        state.CycleId = simulationDelta.CycleId
 
         const signalDeltas = simulationDelta.SignalDeltas
         const sensorDeltas = simulationDelta.SensorDeltas
@@ -141,6 +142,8 @@ export function calculateSimulationState(
         }
     }
 
+    console.log(state)
+
     return state
 }
 
@@ -180,6 +183,7 @@ function createDefaultState(project: Project | undefined): SimulationState {
 
     return {
         Time: '0001-01-01T00:00:00.00',
+        CycleId: 0,
         Signals: [],
         Sensors: sensors
     }

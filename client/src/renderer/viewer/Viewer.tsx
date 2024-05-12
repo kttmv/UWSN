@@ -5,6 +5,7 @@ import ViewerCanvas from './ViewerCanvas'
 import ViewerDeltaSettings from './ViewerDeltaSettings'
 import ViewerSelectedObjectInfo from './ViewerSelectedObjectInfo'
 import ViewerSettings from './ViewerSettings'
+import ViewerStateInfo from './ViewerStateInfo'
 
 export default function Viewer() {
     const { isOpen, setIsOpen } = useViewerStore()
@@ -24,6 +25,7 @@ export default function Viewer() {
                     <ViewerSettings />
                     <ViewerDeltaSettings />
                     <ViewerSelectedObjectInfo />
+                    <ViewerStateInfo />
                 </>
             )}
 
