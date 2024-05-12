@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using UWSN.Model.Protocols;
-
-namespace UWSN.Model.Sim;
+﻿namespace UWSN.Model.Sim;
 
 public class SimulationDelta
 {
@@ -26,7 +23,8 @@ public class SimulationDelta
         public Sensor.State? State { get; set; }
     }
 
-    public DateTime Time { get; set; } = new();
+    public DateTime Time { get; set; }
+    public int CycleId { get; set; }
 
     public List<SignalDelta> SignalDeltas { get; set; } = new();
 
@@ -42,8 +40,9 @@ public class SimulationDelta
         return SensorDeltas.Count > 0;
     }
 
-    public SimulationDelta(DateTime time)
+    public SimulationDelta(DateTime time, int cycleId)
     {
         Time = time;
+        CycleId = cycleId;
     }
 }

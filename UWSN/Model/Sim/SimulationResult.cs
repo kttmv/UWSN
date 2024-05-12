@@ -27,10 +27,25 @@ public class SimulationResult
         public int CycleId { get; set; }
         public Dictionary<int, ClusterCycleResult> ClusterResults { get; set; } = new();
 
-        public int SensorsCount { get { return ClusterResults.Values.Select(r => r.SensorsCount).Sum(); } }
-        public int CollectedDataCount { get { return ClusterResults.Values.Select(r => r.CollectedDataCount).Sum(); } }
-        public int CollectedDataSameClusterCount { get { return ClusterResults.Values.Select(r => r.CollectedDataSameClusterCount).Sum(); } }
-        public int CollectedDataOtherClusterCount { get { return ClusterResults.Values.Select(r => r.CollectedDataOtherClusterCount).Sum(); } }
+        public int SensorsCount
+        {
+            get { return ClusterResults.Values.Select(r => r.SensorsCount).Sum(); }
+        }
+        public int CollectedDataCount
+        {
+            get { return ClusterResults.Values.Select(r => r.CollectedDataCount).Sum(); }
+        }
+        public int CollectedDataSameClusterCount
+        {
+            get { return ClusterResults.Values.Select(r => r.CollectedDataSameClusterCount).Sum(); }
+        }
+        public int CollectedDataOtherClusterCount
+        {
+            get
+            {
+                return ClusterResults.Values.Select(r => r.CollectedDataOtherClusterCount).Sum();
+            }
+        }
     }
 
     public static bool ShouldCreateAllDeltas { get; set; }
@@ -61,7 +76,7 @@ public class SimulationResult
     {
         if (!AllDeltas.TryGetValue(time, out SimulationDelta? value))
         {
-            var delta = new SimulationDelta(time);
+            var delta = new SimulationDelta(time, Simulation.Instance.CurrentCycle);
             AllDeltas.Add(time, delta);
             return delta;
         }
@@ -120,10 +135,7 @@ public class SimulationResult
 
         if (!cycleResult.ClusterResults.TryGetValue(clusterId, out var clusterCycleResult))
         {
-            clusterCycleResult = new ClusterCycleResult
-            {
-                ClusterId = clusterId
-            };
+            clusterCycleResult = new ClusterCycleResult { ClusterId = clusterId };
 
             cycleResult.ClusterResults.Add(clusterId, clusterCycleResult);
         }
