@@ -95,42 +95,48 @@ export function calculateSimulationState(
         const signalDeltas = simulationDelta.SignalDeltas
         const sensorDeltas = simulationDelta.SensorDeltas
 
-        for (const delta of signalDeltas) {
-            switch (delta.Type) {
-                case 'Add': {
-                    const signal = project.Result.AllSignals[delta.SignalId]
-                    state.Signals.push(signal)
-                    break
-                }
-                case 'Remove': {
-                    const signal = project.Result.AllSignals[delta.SignalId]
-                    state.Signals = state.Signals.filter((x) => x !== signal)
-                    break
-                }
-                default: {
-                    throw new Error('Что-то пошло не так')
+        if (signalDeltas) {
+            for (const delta of signalDeltas) {
+                switch (delta.Type) {
+                    case 'Add': {
+                        const signal = project.Result.AllSignals[delta.SignalId]
+                        state.Signals.push(signal)
+                        break
+                    }
+                    case 'Remove': {
+                        const signal = project.Result.AllSignals[delta.SignalId]
+                        state.Signals = state.Signals.filter(
+                            (x) => x !== signal
+                        )
+                        break
+                    }
+                    default: {
+                        throw new Error('Что-то пошло не так')
+                    }
                 }
             }
         }
 
-        for (const delta of sensorDeltas) {
-            const sensor = state.Sensors[delta.Id]
+        if (sensorDeltas) {
+            for (const delta of sensorDeltas) {
+                const sensor = state.Sensors[delta.Id]
 
-            // ниже нужно обязательно писать именно
-            // ... !== undefined, так как 0 - это тоже false
-            // (я обожаю джаваскрипт. я только что потратил
-            // час времени на то, чтобы понять, в чем трабл
-            // с нулевым кластером)
+                // ниже нужно обязательно писать именно
+                // ... !== undefined, так как 0 - это тоже false
+                // (я обожаю джаваскрипт. я только что потратил
+                // час времени на то, чтобы понять, в чем трабл
+                // с нулевым кластером)
 
-            if (delta.ClusterId !== undefined) {
-                sensor.ClusterId = delta.ClusterId
-            }
+                if (delta.ClusterId !== undefined) {
+                    sensor.ClusterId = delta.ClusterId
+                }
 
-            if (delta.IsReference !== undefined) {
-                sensor.IsReference = delta.IsReference
-            }
-            if (delta.Battery !== undefined) {
-                sensor.Battery += delta.Battery
+                if (delta.IsReference !== undefined) {
+                    sensor.IsReference = delta.IsReference
+                }
+                if (delta.Battery !== undefined) {
+                    sensor.Battery = delta.Battery
+                }
             }
         }
     }

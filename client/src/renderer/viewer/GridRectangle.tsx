@@ -42,9 +42,9 @@ export default function GridRectangle({ v1, v2 }: Props) {
     points.push([v1Scaled.X, v1Scaled.Y, v2Scaled.Z])
     points.push([v1Scaled.X, v1Scaled.Y, v1Scaled.Z])
 
-    const segmentsX = Math.round(Math.log(lengthX)) * 2
-    const segmentsY = Math.round(Math.log(lengthY)) * 2
-    const segmentsZ = Math.round(Math.log(lengthZ)) * 2
+    const segmentsX = Math.round(Math.log(lengthX))
+    const segmentsY = Math.round(Math.log(lengthY))
+    const segmentsZ = Math.round(Math.log(lengthZ))
 
     return (
         <Box

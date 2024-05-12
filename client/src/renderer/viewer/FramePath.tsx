@@ -33,7 +33,7 @@ export default function FramePath() {
     for (let i = 0; i < project.Result.AllSignals.length; i++) {
         const signal = project.Result.AllSignals[i]
 
-        if (signal.FrameId == selectedFrame[0]) {
+        if (signal.FrameId === selectedFrame[0]) {
             signalsWithData.push([i, signal, false])
         }
     }
@@ -43,9 +43,13 @@ export default function FramePath() {
         for (let i = 0; i < project.Result.Deltas.length; i++) {
             const delta = project.Result.Deltas[i]
 
+            if (!delta.SignalDeltas) {
+                continue
+            }
+
             if (delta.SignalDeltas.length > 0) {
                 for (const signal of delta.SignalDeltas) {
-                    if (signal.SignalId == signalWithData[0]) {
+                    if (signal.SignalId === signalWithData[0]) {
                         signalWithData[2] = i > simulationDeltaIndex
                     }
                 }
