@@ -15,12 +15,22 @@ export default function SensorBatterySettings({ form }: Props) {
                 templateColumns='min-content auto'
                 gap={4}
             >
-                <Text whiteSpace='nowrap'>Начальный заряд батареи:</Text>
+                <Text whiteSpace='nowrap'>Начальный заряд батареи, Дж:</Text>
                 <Input
                     type='number'
                     {...form.register('InitialSensorBattery')}
                     fontWeight={
                         form.formState.dirtyFields.InitialSensorBattery
+                            ? 'bold'
+                            : undefined
+                    }
+                />
+                <Text whiteSpace='nowrap'>Считать умершим при заряде, Дж:</Text>
+                <Input
+                    type='number'
+                    {...form.register('BatteryDeadCharge')}
+                    fontWeight={
+                        form.formState.dirtyFields.BatteryDeadCharge
                             ? 'bold'
                             : undefined
                     }

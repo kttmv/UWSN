@@ -1,4 +1,12 @@
-import { Card, CardHeader, Code, Flex, GridItem, Text } from '@chakra-ui/react'
+import {
+    Card,
+    CardBody,
+    CardHeader,
+    Code,
+    Flex,
+    GridItem,
+    Text
+} from '@chakra-ui/react'
 import { Signal } from '../shared/types/signal'
 import { useProjectStore } from '../store/projectStore'
 
@@ -68,9 +76,11 @@ export default function SignalInfo({ signal }: Props) {
             <GridItem colSpan={2}>
                 <Card>
                     <CardHeader>Все данные фрейма</CardHeader>
-                    <Code whiteSpace='pre'>
-                        {JSON.stringify(frame, null, 2)}
-                    </Code>
+                    <CardBody>
+                        <Code whiteSpace='pre'>
+                            {JSON.stringify(frame, null, 2)}
+                        </Code>
+                    </CardBody>
                 </Card>
             </GridItem>
         </>
