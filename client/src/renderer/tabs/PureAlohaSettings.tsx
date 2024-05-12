@@ -55,7 +55,7 @@ export default function PureAlohaSettings({ form }: Props) {
                 />
 
                 <Text whiteSpace='nowrap'>
-                    Количество попыток ожидания Ack:
+                    Количество попыток ожидания ACK:
                 </Text>
                 <Input
                     {...form.register('DataLinkProtocol.AckRetries', {

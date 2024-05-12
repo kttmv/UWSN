@@ -1,4 +1,4 @@
-import { ClusterizationAlgorithm } from './clsterizationAlgorith'
+import { ClusterizationAlgorithm } from './clusterizationAlgorithm'
 import { DataLinkProtocol } from './dataLinkProtocol'
 import { Modem } from './modem'
 import { NetworkProtocol } from './networkProtocol'

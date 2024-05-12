@@ -31,7 +31,8 @@ export function createDefaultProject() {
 
             ClusterizationAlgorithm: {
                 $type: ClusterizationAlgorithmType.RetardedClusterization,
-                NumberOfClusters: 6
+                XClusterCount: 3,
+                ZClusterCount: 2
             }
         },
 

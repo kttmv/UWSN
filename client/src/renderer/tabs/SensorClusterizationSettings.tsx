@@ -1,6 +1,6 @@
 import { FormLabel, Select } from '@chakra-ui/react'
 import { UseFormReturn } from 'react-hook-form'
-import { isRetardedClusterization } from '../shared/types/clsterizationAlgorith'
+import { isRetardedClusterization } from '../shared/types/clusterizationAlgorithm'
 import { ClusterizationAlgorithmType } from '../shared/types/clusterizationAlogirthmType'
 import { SensorSettings } from '../shared/types/sensorSettings'
 import RetardedClusterizationSettings from './RetardedClusterizationSettings'
@@ -26,7 +26,7 @@ export default function SensorProtocolSettings({ form }: Props) {
                 <option
                     value={ClusterizationAlgorithmType.RetardedClusterization}
                 >
-                    Метод разбиения на равные параллелепипеды
+                    Разбиение на равные секторы
                 </option>
             </Select>
 

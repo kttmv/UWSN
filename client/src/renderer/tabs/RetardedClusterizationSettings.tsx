@@ -1,4 +1,4 @@
-import { Flex, Input, Text } from '@chakra-ui/react'
+import { Grid, Input, Text } from '@chakra-ui/react'
 import { UseFormReturn } from 'react-hook-form'
 import { SensorSettings } from '../shared/types/sensorSettings'
 
@@ -8,19 +8,32 @@ type Props = {
 
 export default function RetardedClusterizationSettings({ form }: Props) {
     return (
-        <Flex direction='row' alignItems='center' gap={4}>
-            <Text whiteSpace='nowrap'>Количество кластеров:</Text>
+        <Grid templateColumns='min-content auto' gap={4}>
+            <Text whiteSpace='nowrap'>Количество кластеров по X:</Text>
             <Input
                 type='number'
                 flexGrow={1}
-                {...form.register('ClusterizationAlgorithm.NumberOfClusters')}
+                {...form.register('ClusterizationAlgorithm.XClusterCount')}
                 fontWeight={
                     form.formState.dirtyFields.ClusterizationAlgorithm
-                        ?.NumberOfClusters
+                        ?.XClusterCount
                         ? 'bold'
                         : undefined
                 }
             />
-        </Flex>
+
+            <Text whiteSpace='nowrap'>Количество кластеров по Z:</Text>
+            <Input
+                type='number'
+                flexGrow={1}
+                {...form.register('ClusterizationAlgorithm.ZClusterCount')}
+                fontWeight={
+                    form.formState.dirtyFields.ClusterizationAlgorithm
+                        ?.ZClusterCount
+                        ? 'bold'
+                        : undefined
+                }
+            />
+        </Grid>
     )
 }

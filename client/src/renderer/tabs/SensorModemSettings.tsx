@@ -10,7 +10,7 @@ type Props = {
 export default function SensorModemSettings({ form }: Props) {
     return (
         <>
-            <FormLabel marginTop={10}>Алгоритм кластеризации</FormLabel>
+            <FormLabel marginTop={10}>Модем</FormLabel>
             <Select
                 {...form.register('Modem.$type', {
                     required: true
