@@ -1,4 +1,4 @@
-import { Button, Flex, FormControl, Tooltip } from '@chakra-ui/react'
+import { Button, Flex, FormControl, Text, Tooltip } from '@chakra-ui/react'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -62,8 +62,10 @@ export default function SensorSettings() {
                     isDisabled={!form.formState.isDirty}
                     type='submit'
                 >
-                    <IconDeviceFloppy />
-                    Сохранить изменения настройки сенсоров
+                    <IconDeviceFloppy />{' '}
+                    <Text marginLeft={1}>
+                        Сохранить изменения настройки сенсоров
+                    </Text>
                 </Button>
             </Tooltip>
         </form>

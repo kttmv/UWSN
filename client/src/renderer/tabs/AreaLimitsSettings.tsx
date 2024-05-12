@@ -20,7 +20,7 @@ interface EnvironmentInputs {
     v2: Vector3
 }
 
-export default function AreaLimits() {
+export default function AreaLimitsSettings() {
     const { project, setProject } = useProjectStore()
 
     if (!project) {

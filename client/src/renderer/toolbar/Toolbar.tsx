@@ -14,6 +14,7 @@ import { createDefaultProject } from './createDefaultProject'
 export default function Toolbar() {
     const {
         project,
+        setProject,
         updateProject,
         projectFilePath,
         setProjectFilePath,
@@ -54,9 +55,15 @@ export default function Toolbar() {
     }
 
     const onRunSimulationClick = async () => {
+        if (!project) throw new Error('Project не задан')
+
         setIsShellRunning(true)
         setConsoleIsOpen(true)
         addLineToConsoleOutput('Запущен процесс симуляции', true)
+
+        const newProject = structuredClone(project)
+        newProject.Result = undefined
+        setProject(newProject)
 
         await runSimulation(projectFilePath)
 

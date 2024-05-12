@@ -41,7 +41,7 @@ export default function ViewerDeltaSlider() {
             <Slider
                 flexGrow={1}
                 id='slider'
-                defaultValue={simulationDeltaIndex}
+                value={simulationDeltaIndex}
                 colorScheme='teal'
                 onChange={(v) => setDeltaIndex(v)}
                 onMouseEnter={() => setShowTooltip(true)}

@@ -90,9 +90,9 @@ export default function SensorNode({ sensor }: Props) {
             {isDead ? (
                 <coneGeometry args={[0.5, 1, 8]} />
             ) : sensor.IsReference ? (
-                <boxGeometry args={[1, 1, 1]} />
-            ) : (
                 <sphereGeometry args={[1]} />
+            ) : (
+                <boxGeometry args={[1, 1, 1]} />
             )}
             <meshStandardMaterial
                 color={hovered ? 'pink' : isSelected ? 'white' : color}

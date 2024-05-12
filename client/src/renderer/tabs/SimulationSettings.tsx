@@ -273,8 +273,10 @@ export default function SimulationSettings() {
                     isDisabled={!form.formState.isDirty}
                     type='submit'
                 >
-                    <IconDeviceFloppy />
-                    Сохранить изменения настройки симуляции
+                    <IconDeviceFloppy />{' '}
+                    <Text marginLeft={1}>
+                        Сохранить изменения настройки симуляции
+                    </Text>
                 </Button>
             </Flex>
         </form>

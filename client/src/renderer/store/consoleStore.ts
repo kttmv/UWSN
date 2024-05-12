@@ -8,7 +8,7 @@ interface State {
     setIsOpen: (value: boolean) => void
 }
 
-const MAX_CACHE_SIZE = 100
+const MAX_CACHE_SIZE = 1000
 let cache: string[] = []
 
 const useConsoleStore = create<State>((set) => ({

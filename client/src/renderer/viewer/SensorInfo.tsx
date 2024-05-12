@@ -18,7 +18,9 @@ export default function SensorInfo({ sensor }: Props) {
         `Z: ${sensor.Position.Z.toFixed(1)} }`
 
     let clusterString =
-        sensor.ClusterId > -1 ? sensor.ClusterId.toString() : 'Отсутствует'
+        sensor.ClusterId && sensor.ClusterId > -1
+            ? sensor.ClusterId.toString()
+            : 'Отсутствует'
 
     if (sensor.IsReference) {
         clusterString += ', является референсным'
