@@ -142,8 +142,6 @@ export function calculateSimulationState(
         }
     }
 
-    console.log(state)
-
     return state
 }
 
@@ -173,7 +171,7 @@ function createDefaultState(project: Project | undefined): SimulationState {
         sensors = project.Environment.Sensors.map((x) => ({
             Id: x.Id,
             Position: x.Position,
-            ClusterId: -1,
+            ClusterId: undefined,
             IsReference: false,
             Battery: project.SensorSettings.InitialSensorBattery
         }))
