@@ -41,12 +41,14 @@ namespace UWSN.Model.Protocols
                 );
         }
 
-        public void EndReceiving(Frame frame)
+        public void EndReceiving(Frame frame, double transmissionTime)
         {
             if (OriginalState == Sensor.State.Emitting)
                 throw new Exception(
                     "Невозможно перейти в состояние передачи данных после получения."
                 );
+
+            Sensor.Battery -= Simulation.Instance.SensorSettings.Modem.PowerRX * transmissionTime;
 
             Sensor.CurrentState = OriginalState;
 
@@ -54,6 +56,7 @@ namespace UWSN.Model.Protocols
                 Logger.WriteSensorLine(Sensor, $"(Physical) принял кадр от #{frame.SenderId}");
 
             Sensor.FrameBuffer.Add(frame);
+
             Sensor.DataLink.ReceiveFrame(frame);
 
             Simulation.Instance.Result!.TotalReceives += 1;
@@ -90,12 +93,15 @@ namespace UWSN.Model.Protocols
                 _ = new Signal(Sensor, frame, channelId, false);
         }
 
-        public void EndSending(Frame frame)
+        public void EndSending(Frame frame, double transmissionTime)
         {
             if (OriginalState == Sensor.State.Emitting)
                 throw new Exception(
                     "Невозможно перейти из состояния передачи в состояние передачи."
                 );
+
+            Sensor.Battery -=
+                Simulation.Instance.SensorSettings.Modem.PowerTX * transmissionTime;
 
             Sensor.CurrentState = OriginalState;
 

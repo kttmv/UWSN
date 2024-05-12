@@ -20,7 +20,8 @@ public class Signal
         Sensor Receiver,
         Event StartReceiving,
         Event EndReceiving
-    )> ReceivingEvents { get; }
+    )> ReceivingEvents
+    { get; }
 
     public Signal(Sensor emitter, Frame frame, int channelId, bool pointSend)
     {
@@ -153,9 +154,7 @@ public class Signal
             $"Окончание отправки кадра сенсором #{Emitter.Id}",
             () =>
             {
-                Emitter.Physical.EndSending(Frame);
-                Emitter.Battery -=
-                    Simulation.Instance.SensorSettings.Modem.PowerTX * transmissionTime;
+                Emitter.Physical.EndSending(Frame, transmissionTime);
             }
         );
 
@@ -196,13 +195,13 @@ public class Signal
         Sensor sensor,
         DateTime timeEndReceiving,
         int id,
-        double transmitionTime
+        double transmissionTime
     )
     {
         var endReceiving = new Event(
             timeEndReceiving,
             $"Окончание получения сенсором #{sensor.Id} кадра от #{Emitter.Id}",
-            () => EndReceivingAction(sensor, timeEndReceiving, id, transmitionTime)
+            () => EndReceivingAction(sensor, timeEndReceiving, id, transmissionTime)
         );
 
         Simulation.Instance.EventManager.AddEvent(endReceiving);
@@ -213,18 +212,29 @@ public class Signal
         Sensor sensor,
         DateTime timeEndReceiving,
         int id,
-        double transmitionTime
+        double transmissionTime
     )
     {
-        Simulation.Instance.Result!.AddSignalDelta(
-            new SignalDelta { SignalId = id, Type = SimulationDelta.SignalDeltaType.Remove },
-            timeEndReceiving,
-            false
-        );
+        if (sensor.CurrentState == Sensor.State.Receiving)
+        {
+            Simulation.Instance.Result!.AddSignalDelta(
+                new SignalDelta { SignalId = id, Type = SimulationDelta.SignalDeltaType.Remove },
+                timeEndReceiving,
+                false
+            );
 
-        sensor.Battery -= Simulation.Instance.SensorSettings.Modem.PowerRX * transmitionTime;
-
-        sensor.Physical.EndReceiving(Frame);
+            sensor.Physical.EndReceiving(Frame, transmissionTime);
+        }
+        else
+        {
+            if (Simulation.Instance.SimulationSettings.Verbose)
+            {
+                Logger.WriteLine(
+                    $"Менеджер сигналов: Сенсор #{sensor.Id} находится "
+                        + "не в состоянии получения."
+                );
+            }
+        }
     }
 
     public void DetectCollision()

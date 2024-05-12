@@ -209,6 +209,7 @@ public class Sensor
 
     public void WakeUp()
     {
+        CurrentState = State.Listening;
         ReceivedData.Clear();
 
         if (!Simulation.Instance.SimulationSettings.ShouldSkipHello)
@@ -243,6 +244,8 @@ public class Sensor
 
     public void CollectData()
     {
+        CurrentState = State.Listening;
+
         ReceivedData.Clear();
 
         // todo: тут надо выяснить сколько по времени сенсор собирает данные
