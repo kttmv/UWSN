@@ -71,6 +71,7 @@ public class BasicNetworProtocol : NetworkProtocol
             };
 
             Sensor.StopAllAction();
+            Sensor.CurrentState = Sensor.State.Listening;
             SendFrameToAll(newFrame);
 
             CreateResendWarningEvents(newFrame);

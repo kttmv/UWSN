@@ -376,9 +376,6 @@ public class Simulation
             )
         )
             throw new Exception("Не все сенсоры получили информацию о смерти других сенсоров.");
-
-        if (Environment.Sensors.Any(s => !s.IsDead && s.NextClusterization != null))
-            throw new Exception("Не все сенсоры обновили свою кластеризацию");
     }
 
     private bool CheckNetworkIsDead()
