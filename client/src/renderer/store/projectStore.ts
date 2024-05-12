@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { readFile, writeFile } from '../shared/helpers/fsHelpers'
 import { Project } from '../shared/types/project'
-import { Sensor } from '../shared/types/sensor'
+import { SensorSimulationState } from '../shared/types/sensorSimulationState'
+import { SensorState } from '../shared/types/sensorState'
 import { SimulationState } from '../shared/types/simulationResultState'
 
 type State = {
@@ -135,8 +136,13 @@ export function calculateSimulationState(
                 if (delta.IsReference !== undefined) {
                     sensor.IsReference = delta.IsReference
                 }
+
                 if (delta.Battery !== undefined) {
                     sensor.Battery = delta.Battery
+                }
+
+                if (delta.State !== undefined) {
+                    sensor.State = delta.State
                 }
             }
         }
@@ -166,10 +172,11 @@ async function parseProjectFile(
 }
 
 function createDefaultState(project: Project | undefined): SimulationState {
-    let sensors: Sensor[] | undefined
+    let sensors: SensorSimulationState[] | undefined
     if (project) {
         sensors = project.Environment.Sensors.map((x) => ({
             Id: x.Id,
+            State: SensorState.Idle,
             Position: x.Position,
             ClusterId: undefined,
             IsReference: false,

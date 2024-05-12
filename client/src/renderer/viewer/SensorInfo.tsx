@@ -1,9 +1,9 @@
 import { Card, Text } from '@chakra-ui/react'
-import { Sensor } from '../shared/types/sensor'
+import { SensorSimulationState } from '../shared/types/sensorSimulationState'
 import { useProjectStore } from '../store/projectStore'
 
 type Props = {
-    sensor: Sensor
+    sensor: SensorSimulationState
 }
 
 export default function SensorInfo({ sensor }: Props) {
@@ -28,8 +28,8 @@ export default function SensorInfo({ sensor }: Props) {
 
     return (
         <>
-            <Text whiteSpace='nowrap'>Координаты:</Text>
-            <Card padding='5px'>{positionString}</Card>
+            <Text whiteSpace='nowrap'>Состояние:</Text>
+            <Card padding='5px'>{sensor.State}</Card>
 
             <Text whiteSpace='nowrap'>Кластер:</Text>
             <Card padding='5px'>{clusterString}</Card>
@@ -44,6 +44,9 @@ export default function SensorInfo({ sensor }: Props) {
                 ).toFixed(2)}
                 %)
             </Card>
+
+            <Text whiteSpace='nowrap'>Координаты:</Text>
+            <Card padding='5px'>{positionString}</Card>
         </>
     )
 }

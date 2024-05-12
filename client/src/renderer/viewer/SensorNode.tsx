@@ -2,7 +2,7 @@ import { Edges } from '@react-three/drei'
 import { useRef, useState } from 'react'
 import * as THREE from 'three'
 import { Mesh } from 'three'
-import { Sensor } from '../shared/types/sensor'
+import { SensorSimulationState } from '../shared/types/sensorSimulationState'
 import { useProjectStore } from '../store/projectStore'
 import useViewerStore from '../store/viewerStore'
 
@@ -30,7 +30,7 @@ const clusterColors: THREE.ColorRepresentation[] = [
 ]
 
 interface Props {
-    sensor: Sensor
+    sensor: SensorSimulationState
 }
 
 export default function SensorNode({ sensor }: Props) {

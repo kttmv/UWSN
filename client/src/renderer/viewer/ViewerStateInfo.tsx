@@ -16,10 +16,10 @@ export default function ViewerStateInfo() {
             direction='column'
             gap={1}
         >
+            <Text userSelect='none'>Цикл: {simulationState.CycleId}</Text>
             <Text userSelect='none'>
                 Время: {simulationState.Time.replace('T', ' ')}
             </Text>
-            <Text userSelect='none'>Цикл: {simulationState.CycleId}</Text>
         </Flex>
     )
 }

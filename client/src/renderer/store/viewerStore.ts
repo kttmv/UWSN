@@ -1,18 +1,18 @@
 import { create } from 'zustand'
-import { Sensor } from '../shared/types/sensor'
+import { SensorSimulationState } from '../shared/types/sensorSimulationState'
 import { Signal } from '../shared/types/signal'
 
 type State = {
     scale: number
     isOpen: boolean
     isFullscreen: boolean
-    selectedSensor: Sensor | undefined
+    selectedSensor: SensorSimulationState | undefined
     selectedSignal: Signal | undefined
 
     setScale: (value: number) => void
     setIsOpen: (value: boolean) => void
     setIsFullscreen: (value: boolean) => void
-    setSelectedSensor: (value: Sensor | undefined) => void
+    setSelectedSensor: (value: SensorSimulationState | undefined) => void
     setSelectedSignal: (value: Signal | undefined) => void
 }
 
@@ -39,7 +39,7 @@ const useViewerStore = create<State>((set, get) => ({
         set({ isFullscreen: value })
     },
 
-    setSelectedSensor: (value: Sensor | undefined) => {
+    setSelectedSensor: (value: SensorSimulationState | undefined) => {
         set({ selectedSensor: value, selectedSignal: undefined })
     },
 

@@ -1,4 +1,4 @@
-import { SensorDelta } from './clusterizationDelta'
+import { SensorDelta } from './sensorDelta'
 import { SignalDelta } from './signalDelta'
 
 export type SimulationDelta = {
