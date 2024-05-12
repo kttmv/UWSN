@@ -1,5 +1,5 @@
 import { Button, Flex, FormControl, Text, Tooltip } from '@chakra-ui/react'
-import { IconDeviceFloppy } from '@tabler/icons-react'
+import { IconDeviceFloppy, IconRestore } from '@tabler/icons-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { SensorSettings } from '../shared/types/sensorSettings'
@@ -41,35 +41,51 @@ export default function SensorSettings() {
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>
-            <FormControl>
-                <Flex direction='column' gap={4}>
-                    <DataLinkProtocolSettings form={form} />
+            <Flex direction='column' gap={4}>
+                <FormControl>
+                    <Flex direction='column' gap={4}>
+                        <DataLinkProtocolSettings form={form} />
 
-                    <ClusterizationSettings form={form} />
+                        <ClusterizationSettings form={form} />
 
-                    <ModemSettings form={form} />
+                        <ModemSettings form={form} />
 
-                    <BatterySettings form={form} />
-                </Flex>
-            </FormControl>
-            <Tooltip
-                isDisabled={project.Result === undefined}
-                label='Внимание! Данное действие удалит результаты симуляции'
-            >
-                <Button
-                    marginTop={10}
-                    width='100%'
-                    isDisabled={
-                        !form.formState.isDirty || !form.formState.isValid
-                    }
-                    type='submit'
+                        <BatterySettings form={form} />
+                    </Flex>
+                </FormControl>
+                <Tooltip
+                    isDisabled={project.Result === undefined}
+                    label='Внимание! Данное действие удалит результаты симуляции'
                 >
-                    <IconDeviceFloppy />{' '}
-                    <Text marginLeft={1}>
-                        Сохранить изменения настройки сенсоров
-                    </Text>
-                </Button>
-            </Tooltip>
+                    <Button
+                        marginTop={10}
+                        width='100%'
+                        isDisabled={
+                            !form.formState.isDirty || !form.formState.isValid
+                        }
+                        type='submit'
+                    >
+                        <IconDeviceFloppy />{' '}
+                        <Text marginLeft={1}>
+                            Сохранить изменения настройки сенсоров
+                        </Text>
+                    </Button>
+                </Tooltip>
+
+                {form.formState.isDirty && (
+                    <Button
+                        width='100%'
+                        isDisabled={!form.formState.isDirty}
+                        type='button'
+                        onClick={() => form.reset()}
+                    >
+                        <IconRestore />
+                        <Text marginLeft={1}>
+                            Отменить изменения настройки симуляции
+                        </Text>
+                    </Button>
+                )}
+            </Flex>
         </form>
     )
 }

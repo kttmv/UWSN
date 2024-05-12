@@ -9,7 +9,7 @@ import {
     Text,
     Tooltip
 } from '@chakra-ui/react'
-import { IconDeviceFloppy } from '@tabler/icons-react'
+import { IconDeviceFloppy, IconRestore } from '@tabler/icons-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { SimulationSettings } from '../shared/types/simulationSettings'
@@ -304,11 +304,25 @@ export default function SimulationSettings() {
                     }
                     type='submit'
                 >
-                    <IconDeviceFloppy />{' '}
+                    <IconDeviceFloppy />
                     <Text marginLeft={1}>
                         Сохранить изменения настройки симуляции
                     </Text>
                 </Button>
+
+                {form.formState.isDirty && (
+                    <Button
+                        width='100%'
+                        isDisabled={!form.formState.isDirty}
+                        type='button'
+                        onClick={() => form.reset()}
+                    >
+                        <IconRestore />
+                        <Text marginLeft={1}>
+                            Отменить изменения настройки симуляции
+                        </Text>
+                    </Button>
+                )}
             </Flex>
         </form>
     )
