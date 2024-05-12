@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using static UWSN.Model.Protocols.NetworkProtocol;
 
 namespace UWSN.Model;
 
@@ -32,7 +31,7 @@ public class Frame
 
     public required CollectedData? CollectedData { get; set; }
 
-    public required Dictionary<int, Neighbour>? NeighboursData { get; set; }
+    public required Dictionary<int, Sensor.Neighbour>? NeighboursData { get; set; }
 
     public required List<int>? DeadSensors { get; set; }
 }

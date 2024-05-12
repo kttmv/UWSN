@@ -2,25 +2,13 @@
 using UWSN.Model.Sim;
 using UWSN.Utilities;
 
-namespace UWSN.Model.Protocols;
+namespace UWSN.Model.Protocols.Network;
 
-public class NetworkProtocol : ProtocolBase
+public class BasicNetworProtocol : NetworkProtocol
 {
-    private const int RESEND_WARNING_COUNT = 1;
+    public int ResendWarningCount { get; set; } = 1;
 
-    public class Neighbour
-    {
-        public required int Id { get; set; }
-        public required Vector3 Position { get; set; }
-        public required int? ClusterId { get; set; }
-        public required bool? IsReference { get; set; }
-    }
-
-    public Dictionary<int, Neighbour> Neighbours { get; set; } = new();
-
-    public List<int> DeadSensors { get; set; } = new();
-
-    public void ReceiveFrame(Frame frame)
+    public override void ReceiveFrame(Frame frame)
     {
         if (frame.Type == Frame.FrameType.Data && frame.ReceiverId == Sensor.Id)
         {
@@ -58,9 +46,9 @@ public class NetworkProtocol : ProtocolBase
             bool shouldSendWarning = false;
             foreach (var dead in newDeads)
             {
-                if (!DeadSensors.Contains(dead))
+                if (!Sensor.DeadSensors.Contains(dead))
                 {
-                    DeadSensors.Add(dead);
+                    Sensor.DeadSensors.Add(dead);
                     shouldSendWarning = true;
                 }
             }
@@ -76,9 +64,9 @@ public class NetworkProtocol : ProtocolBase
                 Type = Frame.FrameType.Warning,
                 TimeSend = Simulation.Instance.Time,
                 AckIsNeeded = false,
-                NeighboursData = Sensor.Network.Neighbours,
+                NeighboursData = Sensor.Neighbours,
                 BatteryLeft = Sensor.Battery,
-                DeadSensors = Sensor.Network.DeadSensors,
+                DeadSensors = Sensor.DeadSensors,
                 CollectedData = null,
             };
 
@@ -94,11 +82,11 @@ public class NetworkProtocol : ProtocolBase
 
         if (frame.Type == Frame.FrameType.Hello)
         {
-            if (Neighbours.Count == 0)
+            if (Sensor.Neighbours.Count == 0)
             {
-                Neighbours.Add(
+                Sensor.Neighbours.Add(
                     Sensor.Id,
-                    new Neighbour
+                    new Sensor.Neighbour
                     {
                         Id = Sensor.Id,
                         Position = Sensor.Position,
@@ -114,15 +102,18 @@ public class NetworkProtocol : ProtocolBase
             bool shouldSendToAll = false;
             foreach (var neighbour in newNeighbours)
             {
-                if (!Neighbours.ContainsKey(neighbour.Key))
+                if (!Sensor.Neighbours.ContainsKey(neighbour.Key))
                 {
-                    Neighbours.Add(neighbour.Key, new Neighbour
-                    {
-                        Id = neighbour.Value.Id,
-                        Position = neighbour.Value.Position,
-                        ClusterId = neighbour.Value.ClusterId,
-                        IsReference = neighbour.Value.IsReference
-                    });
+                    Sensor.Neighbours.Add(
+                        neighbour.Key,
+                        new Sensor.Neighbour
+                        {
+                            Id = neighbour.Value.Id,
+                            Position = neighbour.Value.Position,
+                            ClusterId = neighbour.Value.ClusterId,
+                            IsReference = neighbour.Value.IsReference
+                        }
+                    );
                     shouldSendToAll = true;
                 }
             }
@@ -138,7 +129,7 @@ public class NetworkProtocol : ProtocolBase
                 Type = Frame.FrameType.Hello,
                 TimeSend = Simulation.Instance.Time,
                 AckIsNeeded = false,
-                NeighboursData = Sensor.Network.Neighbours,
+                NeighboursData = Sensor.Neighbours,
                 BatteryLeft = Sensor.Battery,
                 DeadSensors = null,
                 CollectedData = null,
@@ -146,7 +137,7 @@ public class NetworkProtocol : ProtocolBase
 
             SendFrameToAll(newFrame);
 
-            if (Neighbours.Count == Simulation.Instance.Environment.Sensors.Count)
+            if (Sensor.Neighbours.Count == Simulation.Instance.Environment.Sensors.Count)
             {
                 Clusterize();
             }
@@ -155,13 +146,12 @@ public class NetworkProtocol : ProtocolBase
         }
     }
 
-    public void SendFrame(Frame frame)
+    public override void SendFrame(Frame frame)
     {
         Sensor.DataLink.SendFrame(frame);
     }
 
-    public void StopAllAction()
-    { }
+    public override void StopAllAction() { }
 
     public void SendFrameWithRouting(Frame frame)
     {
@@ -187,18 +177,24 @@ public class NetworkProtocol : ProtocolBase
         if (Sensor.ClusterId == -1)
             return -1;
 
-        var clusterMates = Neighbours.Where(s => s.Value.ClusterId == Sensor.ClusterId).ToList();
+        var clusterMates = Sensor
+            .Neighbours.Where(s => s.Value.ClusterId == Sensor.ClusterId)
+            .ToList();
 
         if (clusterMates.Any(m => m.Value.IsReference == null))
             throw new Exception("Свойство IsReference не должно быть null");
 
-        int referenceId = clusterMates.First(m => m.Value.IsReference.HasValue && m.Value.IsReference.Value).Value.Id;
+        int referenceId = clusterMates
+            .First(m => m.Value.IsReference.HasValue && m.Value.IsReference.Value)
+            .Value.Id;
 
-        var referencePosition = Neighbours.First(n => n.Value.Id == referenceId).Value.Position;
+        var referencePosition = Sensor
+            .Neighbours.First(n => n.Value.Id == referenceId)
+            .Value.Position;
 
         double distanceToReference = Vector3.Distance(Sensor.Position, referencePosition);
 
-        var neighboursByDistance = Neighbours.OrderBy(n =>
+        var neighboursByDistance = Sensor.Neighbours.OrderBy(n =>
             Vector3.Distance(Sensor.Position, n.Value.Position)
         );
 
@@ -219,10 +215,10 @@ public class NetworkProtocol : ProtocolBase
 
     private void Clusterize()
     {
-        Neighbours = Sensor.Clusterize();
+        Sensor.Neighbours = Sensor.Clusterize();
     }
 
-    public void SendCollectedData(CollectedData data)
+    public override void SendCollectedData(CollectedData data)
     {
         if (Sensor.IsReference == null || Sensor.ClusterId == null)
         {
@@ -265,14 +261,14 @@ public class NetworkProtocol : ProtocolBase
         SendFrameWithRouting(frame);
     }
 
-    public void SendDeathWarning()
+    public override void SendDeathWarning()
     {
         if (Simulation.Instance.Verbose)
             Logger.WriteSensorLine(Sensor, "(Network) начинаю отправку предсмертного фрейма");
 
-        if (!DeadSensors.Contains(Sensor.Id))
+        if (!Sensor.DeadSensors.Contains(Sensor.Id))
         {
-            DeadSensors.Add(Sensor.Id);
+            Sensor.DeadSensors.Add(Sensor.Id);
         }
 
         var frame = new Frame
@@ -283,9 +279,9 @@ public class NetworkProtocol : ProtocolBase
             Type = Frame.FrameType.Warning,
             TimeSend = Simulation.Instance.Time,
             AckIsNeeded = true,
-            NeighboursData = Neighbours,
+            NeighboursData = Sensor.Neighbours,
             BatteryLeft = Sensor.Battery,
-            DeadSensors = DeadSensors,
+            DeadSensors = Sensor.DeadSensors,
             CollectedData = null,
         };
 
@@ -295,10 +291,16 @@ public class NetworkProtocol : ProtocolBase
 
     private void CreateResendWarningEvents(Frame newFrame)
     {
-        for (int i = 0; i < RESEND_WARNING_COUNT; i++)
+        for (int i = 0; i < ResendWarningCount; i++)
         {
             var time = Simulation.Instance.Time.AddSeconds(10 * i);
-            Sensor.AddEvent(new Event(time, "Повторная отправка фрейма с предупреждением о смерти", () => SendFrameToAll(newFrame)));
+            Sensor.AddEvent(
+                new Event(
+                    time,
+                    "Повторная отправка фрейма с предупреждением о смерти",
+                    () => SendFrameToAll(newFrame)
+                )
+            );
         }
     }
 }

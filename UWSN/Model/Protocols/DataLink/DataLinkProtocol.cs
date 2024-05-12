@@ -1,11 +1,10 @@
-﻿namespace UWSN.Model.Protocols.DataLink
+﻿namespace UWSN.Model.Protocols.DataLink;
+
+public abstract class DataLinkProtocol : ProtocolBase
 {
-    public abstract class DataLinkProtocol : ProtocolBase
-    {
-        public abstract void ReceiveFrame(Frame frame);
+    public abstract void ReceiveFrame(Frame frame);
 
-        public abstract void SendFrame(Frame frame);
+    public abstract void SendFrame(Frame frame);
 
-        public abstract void StopAllAction();
-    }
+    public abstract void StopAllAction();
 }
