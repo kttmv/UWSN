@@ -263,7 +263,7 @@ public class BasicNetworProtocol : NetworkProtocol
 
     public override void SendDeathWarning()
     {
-        if (Simulation.Instance.Verbose)
+        if (Simulation.Instance.SimulationSettings.Verbose)
             Logger.WriteSensorLine(Sensor, "(Network) начинаю отправку предсмертного фрейма");
 
         if (!Sensor.DeadSensors.Contains(Sensor.Id))

@@ -97,7 +97,12 @@ namespace UWSN.Model.Protocols.DataLink
             }
 
             var freeChannels = Simulation.Instance.ChannelManager.FreeChannels;
-            if (freeChannels == null || freeChannels.Count == 0 || ackIsBlocking || !Sensor.Physical.CanStartSending)
+            if (
+                freeChannels == null
+                || freeChannels.Count == 0
+                || ackIsBlocking
+                || !Sensor.Physical.CanStartSending
+            )
             {
                 if (ackIsBlocking)
                     LogAckIsBlocking(timeout);
@@ -169,7 +174,7 @@ namespace UWSN.Model.Protocols.DataLink
 
         private void LogSendingFrame(Frame frame, bool firstTime)
         {
-            if (!Simulation.Instance.Verbose)
+            if (!Simulation.Instance.SimulationSettings.Verbose)
                 return;
 
             if (firstTime)
@@ -210,7 +215,7 @@ namespace UWSN.Model.Protocols.DataLink
 
         private void LogStartWaitingForAck(Frame frame)
         {
-            if (!Simulation.Instance.Verbose)
+            if (!Simulation.Instance.SimulationSettings.Verbose)
                 return;
 
             Logger.WriteSensorLine(
@@ -221,7 +226,7 @@ namespace UWSN.Model.Protocols.DataLink
 
         private void LogAckRetry(Frame frame, int attemptsLeft)
         {
-            if (!Simulation.Instance.Verbose)
+            if (!Simulation.Instance.SimulationSettings.Verbose)
                 return;
 
             Logger.WriteSensorLine(
@@ -233,7 +238,7 @@ namespace UWSN.Model.Protocols.DataLink
 
         private void LogStoppedWaitingForAck(Frame frame)
         {
-            if (!Simulation.Instance.Verbose)
+            if (!Simulation.Instance.SimulationSettings.Verbose)
                 return;
 
             Logger.WriteSensorLine(
@@ -244,7 +249,7 @@ namespace UWSN.Model.Protocols.DataLink
 
         private void LogWaitingForAck(Frame frame)
         {
-            if (!Simulation.Instance.Verbose)
+            if (!Simulation.Instance.SimulationSettings.Verbose)
                 return;
 
             Logger.WriteSensorLine(
@@ -255,7 +260,7 @@ namespace UWSN.Model.Protocols.DataLink
 
         private void LogStartingSendingAck(Frame ack)
         {
-            if (!Simulation.Instance.Verbose)
+            if (!Simulation.Instance.SimulationSettings.Verbose)
                 return;
 
             Logger.WriteSensorLine(
@@ -266,7 +271,7 @@ namespace UWSN.Model.Protocols.DataLink
 
         private void LogReceivedAck(Frame frame)
         {
-            if (!Simulation.Instance.Verbose)
+            if (!Simulation.Instance.SimulationSettings.Verbose)
                 return;
 
             Logger.WriteSensorLine(
@@ -277,31 +282,29 @@ namespace UWSN.Model.Protocols.DataLink
 
         private void LogAllChannelsAreBusy(double timeout)
         {
-            if (!Simulation.Instance.Verbose)
+            if (!Simulation.Instance.SimulationSettings.Verbose)
                 return;
 
             Logger.WriteSensorLine(
                 Sensor,
-                "(MultiChanneledAloha) Все каналы заняты, "
-                    + $"начинаю ожидание в {timeout} сек."
+                "(MultiChanneledAloha) Все каналы заняты, " + $"начинаю ожидание в {timeout} сек."
             );
         }
 
         private void LogCantStartSending(double timeout)
         {
-            if (!Simulation.Instance.Verbose)
+            if (!Simulation.Instance.SimulationSettings.Verbose)
                 return;
 
             Logger.WriteSensorLine(
                 Sensor,
-                "(MultiChanneledAloha) Модем заблокирован, "
-                    + $"начинаю ожидание в {timeout} сек."
+                "(MultiChanneledAloha) Модем заблокирован, " + $"начинаю ожидание в {timeout} сек."
             );
         }
 
         private void LogAckIsBlocking(double timeout)
         {
-            if (!Simulation.Instance.Verbose)
+            if (!Simulation.Instance.SimulationSettings.Verbose)
                 return;
 
             Logger.WriteSensorLine(

@@ -6,8 +6,6 @@ public class SimulationSettings
 
     public int MaxCycles { get; set; } = 0;
 
-    public int PrintEveryNthEvent { get; set; } = 10_000;
-
     /// <summary>
     /// % мёртвых сенсоров, при достижении которого мы считаем сеть мертвой
     /// </summary>
@@ -18,4 +16,12 @@ public class SimulationSettings
     public bool ShouldSkipCycles { get; set; } = false;
 
     public int CyclesCountBeforeSkip { get; set; } = 50;
+
+    public int PrintEveryNthEvent { get; set; } = 10_000;
+
+    public bool Verbose { get; set; } = false;
+
+    public bool CreateAllDeltas { get; set; } = false;
+
+    public bool SaveOutput { get; set; } = false;
 }

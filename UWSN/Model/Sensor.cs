@@ -83,7 +83,7 @@ public class Sensor
 
             if (!IsDead && _battery < Simulation.Instance.SensorSettings.BatteryDeadCharge)
             {
-                if (Simulation.Instance.Verbose)
+                if (Simulation.Instance.SimulationSettings.Verbose)
                     Logger.WriteSensorLine(this, "Осталось мало зарядки");
 
                 IsDead = true;
@@ -306,7 +306,7 @@ public class Sensor
 
         if (IsReference.Value)
         {
-            if (Simulation.Instance.Verbose)
+            if (Simulation.Instance.SimulationSettings.Verbose)
             {
                 Logger.WriteSensorLine(
                     this,
@@ -316,7 +316,7 @@ public class Sensor
         }
         else
         {
-            if (Simulation.Instance.Verbose)
+            if (Simulation.Instance.SimulationSettings.Verbose)
             {
                 Logger.WriteSensorLine(this, $"Определил себя к кластеру {ClusterId}.");
             }

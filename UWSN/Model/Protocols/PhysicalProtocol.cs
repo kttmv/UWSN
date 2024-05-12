@@ -15,14 +15,17 @@ namespace UWSN.Model.Protocols
         {
             get
             {
-                return Sensor.CurrentState == Sensor.State.Idle || Sensor.CurrentState == Sensor.State.Listening;
+                return Sensor.CurrentState == Sensor.State.Idle
+                    || Sensor.CurrentState == Sensor.State.Listening;
             }
         }
 
         public void StartReceiving(Frame frame)
         {
             if (Sensor.CurrentState != Sensor.State.Listening)
-                throw new Exception("Сенсор не может начать принимать кадр, так как не находится в состоянии прослушивания.");
+                throw new Exception(
+                    "Сенсор не может начать принимать кадр, так как не находится в состоянии прослушивания."
+                );
 
             if (Sensor.IsDead)
                 return;
@@ -31,18 +34,23 @@ namespace UWSN.Model.Protocols
 
             Sensor.CurrentState = Sensor.State.Receiving;
 
-            if (Simulation.Instance.Verbose)
-                Logger.WriteSensorLine(Sensor, $"(Physical) начал принимать кадр от #{frame.SenderId}");
+            if (Simulation.Instance.SimulationSettings.Verbose)
+                Logger.WriteSensorLine(
+                    Sensor,
+                    $"(Physical) начал принимать кадр от #{frame.SenderId}"
+                );
         }
 
         public void EndReceiving(Frame frame)
         {
             if (OriginalState == Sensor.State.Emitting)
-                throw new Exception("Невозможно перейти в состояние передачи данных после получения.");
+                throw new Exception(
+                    "Невозможно перейти в состояние передачи данных после получения."
+                );
 
             Sensor.CurrentState = OriginalState;
 
-            if (Simulation.Instance.Verbose)
+            if (Simulation.Instance.SimulationSettings.Verbose)
                 Logger.WriteSensorLine(Sensor, $"(Physical) принял кадр от #{frame.SenderId}");
 
             Sensor.FrameBuffer.Add(frame);
@@ -54,7 +62,9 @@ namespace UWSN.Model.Protocols
         public void StartSending(Frame frame, int channelId)
         {
             if (Sensor.CurrentState == Sensor.State.Emitting)
-                throw new Exception("Сенсор не может начать отправлять данные, так как уже находится в состоянии передачи данных");
+                throw new Exception(
+                    "Сенсор не может начать отправлять данные, так как уже находится в состоянии передачи данных"
+                );
 
             if (Sensor.IsDead && frame.Type != Frame.FrameType.Warning)
                 return;
@@ -63,7 +73,7 @@ namespace UWSN.Model.Protocols
 
             Sensor.CurrentState = Sensor.State.Emitting;
 
-            if (Simulation.Instance.Verbose)
+            if (Simulation.Instance.SimulationSettings.Verbose)
             {
                 if (frame.ReceiverId == -1)
                     Logger.WriteSensorLine(Sensor, $"(Physical) начал отправку кадра для всех");
@@ -83,11 +93,13 @@ namespace UWSN.Model.Protocols
         public void EndSending(Frame frame)
         {
             if (OriginalState == Sensor.State.Emitting)
-                throw new Exception("Невозможно перейти из состояния передачи в состояние передачи.");
+                throw new Exception(
+                    "Невозможно перейти из состояния передачи в состояние передачи."
+                );
 
             Sensor.CurrentState = OriginalState;
 
-            if (Simulation.Instance.Verbose)
+            if (Simulation.Instance.SimulationSettings.Verbose)
             {
                 if (frame.ReceiverId == -1)
                     Logger.WriteSensorLine(Sensor, $"(Physical) закончил отправку кадра для всех");
@@ -105,7 +117,7 @@ namespace UWSN.Model.Protocols
         {
             Sensor.CurrentState = Sensor.State.Listening;
 
-            if (Simulation.Instance.Verbose)
+            if (Simulation.Instance.SimulationSettings.Verbose)
             {
                 Logger.WriteSensorLine(
                     Sensor,

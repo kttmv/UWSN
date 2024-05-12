@@ -88,9 +88,6 @@ public class Simulation
     private int EventNumber { get; set; } = 0;
 
     [JsonIgnore]
-    public bool Verbose { get; set; } = false;
-
-    [JsonIgnore]
     private List<CycleData> Cycles { get; set; } = new();
 
     [JsonIgnore]
@@ -129,10 +126,9 @@ public class Simulation
     /// <summary>
     /// Метод запуска симуляции
     /// </summary>
-    public void Run(bool fullResult)
+    public void Run()
     {
         var timeStart = DateTime.Now;
-        SimulationResult.ShouldCreateAllDeltas = fullResult;
 
         Result = new SimulationResult();
 
@@ -156,7 +152,7 @@ public class Simulation
 
                 // так как в данном режиме не сохраняются изменения зарядов сенсоров,
                 // сохраняем их вручную после каждого цикла.
-                if (!SimulationResult.ShouldCreateAllDeltas)
+                if (!SimulationSettings.CreateAllDeltas)
                     CreateBatteryDeltas();
 
                 CheckCycleForErrors();
@@ -586,7 +582,7 @@ public class Simulation
 
     private void PrintEventHeader(int eventNumber, Event eventToInvoke)
     {
-        if (Verbose)
+        if (SimulationSettings.Verbose)
         {
             Logger.WriteLine($"\n=============================");
             Logger.WriteLine($"Событие №{eventNumber:n0}. {eventToInvoke.Description}", true);

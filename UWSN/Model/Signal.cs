@@ -20,8 +20,7 @@ public class Signal
         Sensor Receiver,
         Event StartReceiving,
         Event EndReceiving
-    )> ReceivingEvents
-    { get; }
+    )> ReceivingEvents { get; }
 
     public Signal(Sensor emitter, Frame frame, int channelId, bool pointSend)
     {
@@ -102,7 +101,7 @@ public class Signal
 
         if (receiversCount == 0)
         {
-            if (Simulation.Instance.Verbose)
+            if (Simulation.Instance.SimulationSettings.Verbose)
             {
                 Logger.WriteLine(
                     $"Менеджер сигналов: Сигнал от #{Emitter.Id} не дошел "
@@ -120,7 +119,7 @@ public class Signal
 
         Simulation.Instance.ChannelManager.OccupyChannel(ChannelId, this);
 
-        if (Simulation.Instance.Verbose)
+        if (Simulation.Instance.SimulationSettings.Verbose)
         {
             Logger.WriteLine(
                 $"Менеджер сигналов: Сигнал от #{Emitter.Id} занял канал {ChannelId}.\n"
@@ -180,7 +179,7 @@ public class Signal
         }
         else
         {
-            if (Simulation.Instance.Verbose)
+            if (Simulation.Instance.SimulationSettings.Verbose)
             {
                 Logger.WriteLine(
                     $"Менеджер сигналов: Сенсор #{sensor.Id} находится "

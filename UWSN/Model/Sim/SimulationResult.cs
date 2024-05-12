@@ -48,8 +48,6 @@ public class SimulationResult
         }
     }
 
-    public static bool ShouldCreateAllDeltas { get; set; }
-
     public DateTime SimulationEndTime { get; set; }
     public TimeSpan RealTimeToSimulate { get; set; }
     public int TotalEvents { get; set; }
@@ -86,7 +84,7 @@ public class SimulationResult
 
     public void AddSensorDelta(SensorDelta delta, bool force)
     {
-        if (ShouldCreateAllDeltas || force)
+        if (Simulation.Instance.SimulationSettings.CreateAllDeltas || force)
         {
             var simulationDelta = GetOrCreateSimulationDelta(Simulation.Instance.Time);
             simulationDelta.SensorDeltas.Add(delta);
@@ -95,7 +93,7 @@ public class SimulationResult
 
     public void AddSignalDelta(SignalDelta delta, DateTime time, bool force)
     {
-        if (ShouldCreateAllDeltas || force)
+        if (Simulation.Instance.SimulationSettings.CreateAllDeltas || force)
         {
             var simulationDelta = GetOrCreateSimulationDelta(time);
             simulationDelta.SignalDeltas.Add(delta);
@@ -104,7 +102,7 @@ public class SimulationResult
 
     public void AddFrame(Frame frame, bool force)
     {
-        if (ShouldCreateAllDeltas || force)
+        if (Simulation.Instance.SimulationSettings.CreateAllDeltas || force)
         {
             AllFrames.Add(frame);
         }
@@ -112,7 +110,7 @@ public class SimulationResult
 
     public void AddSignalResult(SignalResult signal, bool force)
     {
-        if (ShouldCreateAllDeltas || force)
+        if (Simulation.Instance.SimulationSettings.CreateAllDeltas || force)
         {
             AllSignals.Add(signal);
         }
