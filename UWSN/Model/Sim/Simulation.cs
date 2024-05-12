@@ -155,13 +155,11 @@ public class Simulation
                 if (!SimulationSettings.CreateAllDeltas)
                     CreateBatteryDeltas();
 
-                CheckCycleForErrors();
-
                 Logger.WriteLine("");
                 Logger.WriteLine("Цикл завершен");
 
+                CheckCycleForErrors();
                 AnalyzeCurrentCycle();
-
                 TryToSkipCycles();
 
                 // TODO: вынести константу в свойство
@@ -190,6 +188,9 @@ public class Simulation
             if (CheckNetworkIsDead())
                 break;
         }
+
+        if (!SimulationSettings.CreateAllDeltas)
+            CreateBatteryDeltas();
 
         Result.TotalEvents = EventNumber;
         Result.TotalCycles = CurrentCycle;
