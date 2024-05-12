@@ -157,7 +157,8 @@ public class Simulation
 
                 CheckCycleForErrors();
 
-                Logger.WriteLine("\nЦикл завершен");
+                Logger.WriteLine("");
+                Logger.WriteLine("Цикл завершен");
 
                 AnalyzeCurrentCycle();
 
@@ -220,12 +221,14 @@ public class Simulation
                 );
         }
 
-        Logger.WriteLine("\nПроцесс HELLO был завершен успешно");
+        Logger.WriteLine("");
+        Logger.WriteLine("Процесс HELLO был завершен успешно");
     }
 
     private void StartNewCycle()
     {
-        Logger.WriteLine($"\n=============================");
+        Logger.WriteLine("");
+        Logger.WriteLine($"=============================");
         Logger.WriteLine("Начало нового цикла");
         CurrentCycle++;
 
@@ -314,7 +317,9 @@ public class Simulation
             }
         }
 
-        Logger.WriteLine($"\nРезультаты цикла #{CurrentCycle:n0}:\n");
+        Logger.WriteLine("");
+        Logger.WriteLine($"Результаты цикла #{CurrentCycle:n0}:");
+        Logger.WriteLine("");
 
         Logger.WriteLine($"Количество кластеров: {clustersCount:n0}");
         Logger.WriteLine(
@@ -344,7 +349,8 @@ public class Simulation
         {
             BadCyclesInRow++;
             Result.TotalBadCycles++;
-            Logger.WriteLine("\nЦикл является плохим.");
+            Logger.WriteLine("");
+            Logger.WriteLine("Цикл является плохим.");
             Logger.WriteLine($"Количество плохих циклов подряд: {BadCyclesInRow:n0}");
         }
         else
@@ -397,7 +403,11 @@ public class Simulation
         }
 
         if (!SimulationSettings.ShouldSkipHello)
-            Logger.WriteLine("\nЗапущен процесс HELLO\n");
+        {
+            Logger.WriteLine("");
+            Logger.WriteLine("Запущен процесс HELLO");
+            Logger.WriteLine("");
+        }
     }
 
     private void CollectSensorsData()
@@ -563,9 +573,11 @@ public class Simulation
 
             TimeBeforeCycle = Time;
 
-            Logger.WriteLine($"\n=============================");
+            Logger.WriteLine("");
+            Logger.WriteLine($"=============================");
             Logger.WriteLine($"Было пропущено {cyclesToSkip:n0} циклов.");
-            Logger.WriteLine($"=============================\n");
+            Logger.WriteLine($"=============================");
+            Logger.WriteLine("");
             return true;
         }
 
@@ -584,14 +596,15 @@ public class Simulation
     {
         if (SimulationSettings.Verbose)
         {
-            Logger.WriteLine($"\n=============================");
+            Logger.WriteLine("");
             Logger.WriteLine($"Событие №{eventNumber:n0}. {eventToInvoke.Description}", true);
         }
     }
 
     private void PrintCurrentState()
     {
-        Logger.WriteLine($"\nТекущий цикл сбора данных: {CurrentCycle:n0}");
+        Logger.WriteLine("");
+        Logger.WriteLine($"Текущий цикл сбора данных: {CurrentCycle:n0}");
         Logger.WriteLine($"Текущее время симуляции: {Time:dd.MM.yyyy HH:mm:ss.fff}");
         Logger.WriteLine($"Обработано событий: {EventNumber:n0}.");
 
@@ -623,27 +636,43 @@ public class Simulation
     {
         PrintCurrentState();
 
-        Logger.WriteLine($"\n=============================");
-        Logger.WriteLine("\nСимуляция остановлена.");
+        Logger.WriteLine("");
+        Logger.WriteLine($"=============================");
+        Logger.WriteLine("");
+        Logger.WriteLine("Симуляция остановлена.");
 
         if (
             EventNumber >= SimulationSettings.MaxProcessedEvents
             && SimulationSettings.MaxProcessedEvents > 0
         )
-            Logger.WriteLine("\nБыл достигнут лимит событий.");
+        {
+            Logger.WriteLine("");
+            Logger.WriteLine("Был достигнут лимит событий.");
+        }
 
         if (CurrentCycle >= SimulationSettings.MaxCycles && SimulationSettings.MaxCycles > 0)
-            Logger.WriteLine("\nДостигнуто максимальное количество циклов.");
+        {
+            Logger.WriteLine("");
+            Logger.WriteLine("Достигнуто максимальное количество циклов.");
+        }
 
         if (CheckNetworkIsDead())
-            Logger.WriteLine("\nСеть мертва");
+        {
+            Logger.WriteLine("");
+            Logger.WriteLine("Сеть мертва");
+        }
 
         // TODO: вынести константу в свойство
         if (BadCyclesInRow >= 10)
-            Logger.WriteLine($"\nБыло обнаружено {BadCyclesInRow:n0} плохих циклов подряд.");
+        {
+            Logger.WriteLine("");
+            Logger.WriteLine($"Было обнаружено {BadCyclesInRow:n0} плохих циклов подряд.");
+        }
 
-        Logger.WriteLine($"\n=============================");
-        Logger.WriteLine("Результаты симуляции:\n");
+        Logger.WriteLine("");
+        Logger.WriteLine($"=============================");
+        Logger.WriteLine("Результаты симуляции:");
+        Logger.WriteLine("");
 
         Logger.LeftPadding++;
 

@@ -122,10 +122,13 @@ public class Signal
         if (Simulation.Instance.SimulationSettings.Verbose)
         {
             Logger.WriteLine(
-                $"Менеджер сигналов: Сигнал от #{Emitter.Id} занял канал {ChannelId}.\n"
-                    + $"\tКоличество получателей сигнала: {receiversCount}.\n"
-                    + $"\tКанал будет особожден в {timeFreeChannel:dd.MM.yyyy HH:mm:ss.fff}."
+                $"Менеджер сигналов: Сигнал от #{Emitter.Id} занял канал {ChannelId}."
             );
+
+            Logger.LeftPadding++;
+            Logger.WriteLine($"Количество получателей сигнала: {receiversCount}.");
+            Logger.WriteLine($"Канал будет особожден в {timeFreeChannel:dd.MM.yyyy HH:mm:ss.fff}.");
+            Logger.LeftPadding--;
         }
     }
 

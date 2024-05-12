@@ -30,13 +30,16 @@ public class SerializationHelper
             Serializer.Serialize(writer, Simulation.Instance);
         }
 
-        Console.WriteLine($"\nФайл {path} успешно сохранен.");
+        Logger.WriteLine("");
+        Logger.WriteLine($"Файл {path} успешно сохранен.");
     }
 
     public static void LoadSimulation(string path)
     {
-        Console.WriteLine("Загружается файл симуляции. Это может "
-            + "занять длительное время при большом размере файла.");
+        Console.WriteLine(
+            "Загружается файл симуляции. Это может "
+                + "занять длительное время при большом размере файла."
+        );
 
         if (!File.Exists(path))
         {

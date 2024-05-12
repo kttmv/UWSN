@@ -15,7 +15,10 @@ namespace UWSN.CommandLine.Handlers
             SerializationHelper.SaveSimulation(o.FilePath);
 
             if (Simulation.Instance.SimulationSettings.SaveOutput)
-                Console.WriteLine($"\nПолный вывод симуляции сохранен в файл {Logger.FilePath}");
+            {
+                Logger.WriteLine("");
+                Logger.WriteLine($"Полный вывод симуляции сохранен в файл {Logger.FilePath}");
+            }
         }
     }
 }
