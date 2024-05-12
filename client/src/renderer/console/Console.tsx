@@ -1,11 +1,17 @@
-import { Button, Card, CardBody, Flex, Text } from '@chakra-ui/react'
+import { Box, Button, Card, Code, Flex, Text } from '@chakra-ui/react'
 import { IconCaretDown, IconCaretUp } from '@tabler/icons-react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import useConsoleStore from '../store/consoleStore'
 
 export default function Console() {
     const { isOpen, setIsOpen, consoleOutput, addLineToConsoleOutput } =
         useConsoleStore()
+
+    const divRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (divRef.current) divRef.current.scrollIntoView()
+    }, [consoleOutput])
 
     useEffect(() => {
         const removeReplyListener = window.electronAPI.ipcRenderer.on(
@@ -19,7 +25,8 @@ export default function Console() {
             'run-shell-close',
             (data) => {
                 addLineToConsoleOutput(
-                    `Процесс завершен с кодом ${data as number}`
+                    `Процесс завершен с кодом ${data as number}`,
+                    true
                 )
             }
         )
@@ -50,14 +57,15 @@ export default function Console() {
                 )}
             </Button>
             {isOpen && (
-                <Card h='100%' overflowY='scroll' borderTopRadius={0}>
-                    <CardBody fontFamily='monospace'>
+                <Card h='100%' borderTopRadius={0} overflowY='scroll'>
+                    <Code whiteSpace='pre'>
                         {consoleOutput.length === 0
                             ? 'Пусто...'
                             : consoleOutput.map((value, index) => (
                                   <Text key={index}>{value}</Text>
                               ))}
-                    </CardBody>
+                        <Box ref={divRef}></Box>
+                    </Code>
                 </Card>
             )}
         </Flex>

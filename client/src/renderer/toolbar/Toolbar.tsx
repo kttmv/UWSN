@@ -56,7 +56,7 @@ export default function Toolbar() {
     const onRunSimulationClick = async () => {
         setIsShellRunning(true)
         setConsoleIsOpen(true)
-        addLineToConsoleOutput('Запущен процесс симуляции')
+        addLineToConsoleOutput('Запущен процесс симуляции', true)
 
         await runSimulation(projectFilePath)
 
