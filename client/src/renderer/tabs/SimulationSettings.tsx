@@ -113,8 +113,14 @@ export default function SimulationSettings() {
                     </Tooltip>
 
                     <Input
+                        isInvalid={
+                            form.formState.errors.CyclesCountBeforeSkip !==
+                            undefined
+                        }
                         type='number'
-                        {...form.register('CyclesCountBeforeSkip')}
+                        {...form.register('CyclesCountBeforeSkip', {
+                            required: true
+                        })}
                         fontWeight={
                             form.formState.dirtyFields.CyclesCountBeforeSkip
                                 ? 'bold'
@@ -136,8 +142,14 @@ export default function SimulationSettings() {
                         Максимальное количество событий:
                     </Text>
                     <Input
+                        isInvalid={
+                            form.formState.errors.MaxProcessedEvents !==
+                            undefined
+                        }
                         type='number'
-                        {...form.register('MaxProcessedEvents')}
+                        {...form.register('MaxProcessedEvents', {
+                            required: true
+                        })}
                         fontWeight={
                             form.formState.dirtyFields.MaxProcessedEvents
                                 ? 'bold'
@@ -149,8 +161,13 @@ export default function SimulationSettings() {
                         Максимальное количество циклов:
                     </Text>
                     <Input
+                        isInvalid={
+                            form.formState.errors.MaxCycles !== undefined
+                        }
                         type='number'
-                        {...form.register('MaxCycles')}
+                        {...form.register('MaxCycles', {
+                            required: true
+                        })}
                         fontWeight={
                             form.formState.dirtyFields.MaxCycles
                                 ? 'bold'
@@ -162,8 +179,14 @@ export default function SimulationSettings() {
                         Мертвых сенсоров для остановки (%):
                     </Text>
                     <Input
+                        isInvalid={
+                            form.formState.errors.DeadSensorsPercent !==
+                            undefined
+                        }
                         type='number'
-                        {...form.register('DeadSensorsPercent')}
+                        {...form.register('DeadSensorsPercent', {
+                            required: true
+                        })}
                         fontWeight={
                             form.formState.dirtyFields.DeadSensorsPercent
                                 ? 'bold'
@@ -187,9 +210,15 @@ export default function SimulationSettings() {
                         <br /> HELLO каждые N событий:
                     </Text>
                     <Input
+                        isInvalid={
+                            form.formState.errors.PrintEveryNthEvent !==
+                            undefined
+                        }
                         marginLeft={2}
                         type='number'
-                        {...form.register('PrintEveryNthEvent')}
+                        {...form.register('PrintEveryNthEvent', {
+                            required: true
+                        })}
                         fontWeight={
                             form.formState.dirtyFields.PrintEveryNthEvent
                                 ? 'bold'
@@ -270,7 +299,9 @@ export default function SimulationSettings() {
                 <Button
                     marginTop={6}
                     width='100%'
-                    isDisabled={!form.formState.isDirty}
+                    isDisabled={
+                        !form.formState.isDirty || !form.formState.isValid
+                    }
                     type='submit'
                 >
                     <IconDeviceFloppy />{' '}

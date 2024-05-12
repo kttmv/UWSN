@@ -7,11 +7,12 @@ type Props = {
     form: UseFormReturn<SensorSettings>
 }
 
-export default function SensorModemSettings({ form }: Props) {
+export default function ModemSettings({ form }: Props) {
     return (
         <>
             <FormLabel marginTop={10}>Модем</FormLabel>
             <Select
+                isInvalid={form.formState.errors.Modem?.$type !== undefined}
                 {...form.register('Modem.$type', {
                     required: true
                 })}

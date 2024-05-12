@@ -9,7 +9,7 @@ type Props = {
     form: UseFormReturn<SensorSettings>
 }
 
-export default function SensorProtocolSettings({ form }: Props) {
+export default function ClusterizationSettings({ form }: Props) {
     return (
         <>
             <FormLabel marginTop={10}>Алгоритм кластеризации</FormLabel>

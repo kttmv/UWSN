@@ -126,7 +126,7 @@ export default function AreaLimitsSettings() {
                             <Text>x₁</Text>
                             <Input
                                 type='number'
-                                isInvalid={errors.v1?.X?.type === 'required'}
+                                isInvalid={errors.v1?.X !== undefined}
                                 fontWeight={
                                     dirtyFields.v1?.X ? 'bold' : undefined
                                 }
@@ -141,7 +141,7 @@ export default function AreaLimitsSettings() {
                             <Text>y₁</Text>
                             <Input
                                 type='number'
-                                isInvalid={errors.v1?.Y?.type === 'required'}
+                                isInvalid={errors.v1?.Y !== undefined}
                                 fontWeight={
                                     dirtyFields.v1?.Y ? 'bold' : undefined
                                 }
@@ -156,7 +156,7 @@ export default function AreaLimitsSettings() {
                             <Text>z₁</Text>
                             <Input
                                 type='number'
-                                isInvalid={errors.v1?.Z?.type === 'required'}
+                                isInvalid={errors.v1?.Z !== undefined}
                                 fontWeight={
                                     dirtyFields.v1?.Z ? 'bold' : undefined
                                 }
@@ -171,7 +171,7 @@ export default function AreaLimitsSettings() {
                             <Text>x₂</Text>
                             <Input
                                 type='number'
-                                isInvalid={errors.v2?.X?.type === 'required'}
+                                isInvalid={errors.v2?.X !== undefined}
                                 fontWeight={
                                     dirtyFields.v2?.X ? 'bold' : undefined
                                 }
@@ -186,7 +186,7 @@ export default function AreaLimitsSettings() {
                             <Text>y₂</Text>
                             <Input
                                 type='number'
-                                isInvalid={errors.v2?.Y?.type === 'required'}
+                                isInvalid={errors.v2?.Y !== undefined}
                                 fontWeight={
                                     dirtyFields.v2?.Y ? 'bold' : undefined
                                 }
@@ -201,7 +201,7 @@ export default function AreaLimitsSettings() {
                             <Text>z₂</Text>
                             <Input
                                 type='number'
-                                isInvalid={errors.v2?.Z?.type === 'required'}
+                                isInvalid={errors.v2?.Z !== undefined}
                                 fontWeight={
                                     dirtyFields.v2?.Z ? 'bold' : undefined
                                 }

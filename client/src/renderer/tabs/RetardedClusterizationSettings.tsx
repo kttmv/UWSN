@@ -11,9 +11,15 @@ export default function RetardedClusterizationSettings({ form }: Props) {
         <Grid templateColumns='min-content auto' gap={4}>
             <Text whiteSpace='nowrap'>Количество кластеров по X:</Text>
             <Input
+                isInvalid={
+                    form.formState.errors.ClusterizationAlgorithm
+                        ?.XClusterCount !== undefined
+                }
                 type='number'
                 flexGrow={1}
-                {...form.register('ClusterizationAlgorithm.XClusterCount')}
+                {...form.register('ClusterizationAlgorithm.XClusterCount', {
+                    required: true
+                })}
                 fontWeight={
                     form.formState.dirtyFields.ClusterizationAlgorithm
                         ?.XClusterCount
@@ -24,9 +30,15 @@ export default function RetardedClusterizationSettings({ form }: Props) {
 
             <Text whiteSpace='nowrap'>Количество кластеров по Z:</Text>
             <Input
+                isInvalid={
+                    form.formState.errors.ClusterizationAlgorithm
+                        ?.ZClusterCount !== undefined
+                }
                 type='number'
                 flexGrow={1}
-                {...form.register('ClusterizationAlgorithm.ZClusterCount')}
+                {...form.register('ClusterizationAlgorithm.ZClusterCount', {
+                    required: true
+                })}
                 fontWeight={
                     form.formState.dirtyFields.ClusterizationAlgorithm
                         ?.ZClusterCount

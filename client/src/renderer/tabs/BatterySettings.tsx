@@ -6,7 +6,7 @@ type Props = {
     form: UseFormReturn<SensorSettings>
 }
 
-export default function SensorBatterySettings({ form }: Props) {
+export default function BatterySettings({ form }: Props) {
     return (
         <>
             <FormLabel marginTop={10}>Параметры батареи</FormLabel>
@@ -17,8 +17,13 @@ export default function SensorBatterySettings({ form }: Props) {
             >
                 <Text whiteSpace='nowrap'>Начальный заряд батареи, Дж:</Text>
                 <Input
+                    isInvalid={
+                        form.formState.errors.InitialSensorBattery !== undefined
+                    }
                     type='number'
-                    {...form.register('InitialSensorBattery')}
+                    {...form.register('InitialSensorBattery', {
+                        required: true
+                    })}
                     fontWeight={
                         form.formState.dirtyFields.InitialSensorBattery
                             ? 'bold'
@@ -27,8 +32,13 @@ export default function SensorBatterySettings({ form }: Props) {
                 />
                 <Text whiteSpace='nowrap'>Считать умершим при заряде, Дж:</Text>
                 <Input
+                    isInvalid={
+                        form.formState.errors.BatteryDeadCharge !== undefined
+                    }
                     type='number'
-                    {...form.register('BatteryDeadCharge')}
+                    {...form.register('BatteryDeadCharge', {
+                        required: true
+                    })}
                     fontWeight={
                         form.formState.dirtyFields.BatteryDeadCharge
                             ? 'bold'

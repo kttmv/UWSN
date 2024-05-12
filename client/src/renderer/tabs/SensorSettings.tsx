@@ -4,10 +4,10 @@ import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { SensorSettings } from '../shared/types/sensorSettings'
 import { useProjectStore } from '../store/projectStore'
-import SensorBatterySettings from './SensorBatterySettings'
-import SensorClusterizationSettings from './SensorClusterizationSettings'
-import SensorModemSettings from './SensorModemSettings'
-import SensorProtocolSettings from './SensorProtocolSettings'
+import BatterySettings from './BatterySettings'
+import ClusterizationSettings from './ClusterizationSettings'
+import DataLinkProtocolSettings from './DataLinkProtocolSettings'
+import ModemSettings from './ModemSettings'
 
 export default function SensorSettings() {
     const { project, setProject } = useProjectStore()
@@ -43,13 +43,13 @@ export default function SensorSettings() {
         <form onSubmit={form.handleSubmit(onSubmit)}>
             <FormControl>
                 <Flex direction='column' gap={4}>
-                    <SensorProtocolSettings form={form} />
+                    <DataLinkProtocolSettings form={form} />
 
-                    <SensorClusterizationSettings form={form} />
+                    <ClusterizationSettings form={form} />
 
-                    <SensorModemSettings form={form} />
+                    <ModemSettings form={form} />
 
-                    <SensorBatterySettings form={form} />
+                    <BatterySettings form={form} />
                 </Flex>
             </FormControl>
             <Tooltip
@@ -59,7 +59,9 @@ export default function SensorSettings() {
                 <Button
                     marginTop={10}
                     width='100%'
-                    isDisabled={!form.formState.isDirty}
+                    isDisabled={
+                        !form.formState.isDirty || !form.formState.isValid
+                    }
                     type='submit'
                 >
                     <IconDeviceFloppy />{' '}

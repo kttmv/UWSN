@@ -13,11 +13,14 @@ type Props = {
     form: UseFormReturn<SensorSettings>
 }
 
-export default function SensorProtocolSettings({ form }: Props) {
+export default function DataLinkProtocolSettings({ form }: Props) {
     return (
         <>
             <FormLabel>Канальный протокол</FormLabel>
             <Select
+                isInvalid={
+                    form.formState.errors.DataLinkProtocol?.$type !== undefined
+                }
                 {...form.register('DataLinkProtocol.$type', {
                     required: true
                 })}
