@@ -87,18 +87,19 @@ export default function Console() {
                     </Code>
                 </Card>
             )}
-
-            <Tooltip label='Очистить консоль'>
-                <IconButton
-                    onClick={clearConsoleOutput}
-                    aria-label='Очистить консоль'
-                    position='absolute'
-                    top={7}
-                    right={5}
-                >
-                    <IconTrashX />
-                </IconButton>
-            </Tooltip>
+            {isOpen && (
+                <Tooltip label='Очистить консоль'>
+                    <IconButton
+                        onClick={clearConsoleOutput}
+                        aria-label='Очистить консоль'
+                        position='absolute'
+                        top={7}
+                        right={5}
+                    >
+                        <IconTrashX />
+                    </IconButton>
+                </Tooltip>
+            )}
         </Flex>
     )
 }
