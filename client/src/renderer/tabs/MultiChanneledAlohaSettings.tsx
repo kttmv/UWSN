@@ -17,6 +17,7 @@ export default function MultiChanneledAlohaSettings({ form }: Props) {
                 <Text whiteSpace='nowrap'>Время ожидания (сек):</Text>
                 <Input
                     type='number'
+                    step='any'
                     isInvalid={
                         form.formState.errors.DataLinkProtocol?.Timeout !==
                         undefined
@@ -35,6 +36,7 @@ export default function MultiChanneledAlohaSettings({ form }: Props) {
                 <Text>Отклонение времени ожидания:</Text>
                 <Input
                     type='number'
+                    step='any'
                     isInvalid={
                         form.formState.errors.DataLinkProtocol
                             ?.TimeoutRelativeDeviation !== undefined
@@ -54,6 +56,7 @@ export default function MultiChanneledAlohaSettings({ form }: Props) {
                 <Text whiteSpace='nowrap'>Время ожидания ACK:</Text>
                 <Input
                     type='number'
+                    step='any'
                     isInvalid={
                         form.formState.errors.DataLinkProtocol?.AckTimeout !==
                         undefined

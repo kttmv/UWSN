@@ -17,6 +17,7 @@ export default function PureAlohaSettings({ form }: Props) {
                 <Text whiteSpace='nowrap'>Время ожидания (сек):</Text>
                 <Input
                     type='number'
+                    step='any'
                     isInvalid={
                         form.formState.errors.DataLinkProtocol?.Timeout !==
                         undefined
@@ -34,6 +35,7 @@ export default function PureAlohaSettings({ form }: Props) {
 
                 <Text>Отклонение времени ожидания:</Text>
                 <Input
+                    step='any'
                     type='number'
                     isInvalid={
                         form.formState.errors.DataLinkProtocol
@@ -53,6 +55,7 @@ export default function PureAlohaSettings({ form }: Props) {
 
                 <Text whiteSpace='nowrap'>Время ожидания ACK:</Text>
                 <Input
+                    step='any'
                     type='number'
                     isInvalid={
                         form.formState.errors.DataLinkProtocol?.AckTimeout !==
