@@ -4,6 +4,7 @@ interface State {
     consoleOutput: string[]
     isOpen: boolean
     addLineToConsoleOutput: (value: string, force?: boolean) => void
+    clearConsoleOutput: () => void
     setIsOpen: (value: boolean) => void
 }
 
@@ -22,6 +23,9 @@ const useConsoleStore = create<State>((set) => ({
             }))
             cache = []
         }
+    },
+    clearConsoleOutput: () => {
+        set(() => ({ consoleOutput: [] }))
     },
     setIsOpen: (value: boolean) => set({ isOpen: value })
 }))

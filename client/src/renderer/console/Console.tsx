@@ -1,11 +1,29 @@
-import { Box, Button, Card, Code, Flex, Text } from '@chakra-ui/react'
-import { IconCaretDown, IconCaretUp } from '@tabler/icons-react'
+import {
+    Box,
+    Button,
+    Card,
+    Code,
+    Flex,
+    IconButton,
+    Text,
+    Tooltip,
+    useTheme
+} from '@chakra-ui/react'
+import { IconCaretDown, IconCaretUp, IconTrashX } from '@tabler/icons-react'
 import { useEffect, useRef } from 'react'
 import useConsoleStore from '../store/consoleStore'
 
 export default function Console() {
-    const { isOpen, setIsOpen, consoleOutput, addLineToConsoleOutput } =
-        useConsoleStore()
+    const {
+        isOpen,
+        setIsOpen,
+        consoleOutput,
+        clearConsoleOutput,
+        addLineToConsoleOutput
+    } = useConsoleStore()
+
+    const theme = useTheme()
+    const bg = theme.__cssMap['colors.chakra-body-bg'].value
 
     const divRef = useRef<HTMLDivElement>(null)
 
@@ -40,7 +58,7 @@ export default function Console() {
     }, [])
 
     return (
-        <Flex direction='column' h={isOpen ? '33vh' : ''}>
+        <Flex position='relative' direction='column' h={isOpen ? '33vh' : ''}>
             <Button
                 borderBottomRadius={0}
                 size='xs'
@@ -56,9 +74,10 @@ export default function Console() {
                     </>
                 )}
             </Button>
+
             {isOpen && (
                 <Card h='100%' borderTopRadius={0} overflowY='scroll'>
-                    <Code whiteSpace='pre'>
+                    <Code padding={4} whiteSpace='pre' backgroundColor={bg}>
                         {consoleOutput.length === 0
                             ? 'Пусто...'
                             : consoleOutput.map((value, index) => (
@@ -68,6 +87,18 @@ export default function Console() {
                     </Code>
                 </Card>
             )}
+
+            <Tooltip label='Очистить консоль'>
+                <IconButton
+                    onClick={clearConsoleOutput}
+                    aria-label='Очистить консоль'
+                    position='absolute'
+                    top={7}
+                    right={5}
+                >
+                    <IconTrashX />
+                </IconButton>
+            </Tooltip>
         </Flex>
     )
 }
