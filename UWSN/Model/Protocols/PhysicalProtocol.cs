@@ -23,9 +23,11 @@ namespace UWSN.Model.Protocols
         public void StartReceiving(Frame frame)
         {
             if (Sensor.CurrentState != Sensor.State.Listening)
+            {
                 throw new Exception(
                     "Сенсор не может начать принимать кадр, так как не находится в состоянии прослушивания."
                 );
+            }
 
             if (Sensor.IsDead)
                 return;
@@ -43,10 +45,26 @@ namespace UWSN.Model.Protocols
 
         public void EndReceiving(Frame frame, double transmissionTime)
         {
+            if (Sensor.CurrentState != Sensor.State.Receiving)
+            {
+                throw new Exception(
+                    "Сенсор не может закончить принимать кадр, так как не находится в состоянии приема."
+                );
+            }
+
             if (OriginalState == Sensor.State.Emitting)
+            {
                 throw new Exception(
                     "Невозможно перейти в состояние передачи данных после получения."
                 );
+            }
+
+            if (OriginalState == Sensor.State.Receiving)
+            {
+                throw new Exception(
+                    "Невозможно перейти в состояние получения данных после получения."
+                );
+            }
 
             Sensor.Battery -= Simulation.Instance.SensorSettings.Modem.PowerRX * transmissionTime;
 
@@ -64,10 +82,12 @@ namespace UWSN.Model.Protocols
 
         public void StartSending(Frame frame, int channelId)
         {
-            if (Sensor.CurrentState == Sensor.State.Emitting)
+            if (!CanStartSending)
+            {
                 throw new Exception(
-                    "Сенсор не может начать отправлять данные, так как уже находится в состоянии передачи данных"
+                    "Сенсор не может начать отправку данных."
                 );
+            }
 
             if (Sensor.IsDead && frame.Type != Frame.FrameType.Warning)
                 return;
@@ -95,10 +115,26 @@ namespace UWSN.Model.Protocols
 
         public void EndSending(Frame frame, double transmissionTime)
         {
+            if (Sensor.CurrentState != Sensor.State.Emitting)
+            {
+                throw new Exception(
+                    "Сенсор не может закончить отправлять кадр, так как не находится в состоянии передачи."
+                );
+            }
+
             if (OriginalState == Sensor.State.Emitting)
+            {
                 throw new Exception(
                     "Невозможно перейти из состояния передачи в состояние передачи."
                 );
+            }
+
+            if (OriginalState == Sensor.State.Receiving)
+            {
+                throw new Exception(
+                    "Невозможно перейти из состояния передачи в состояние приема."
+                );
+            }
 
             Sensor.Battery -=
                 Simulation.Instance.SensorSettings.Modem.PowerTX * transmissionTime;
