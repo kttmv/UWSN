@@ -1,5 +1,6 @@
 import { Flex, Text } from '@chakra-ui/react'
 import { useProjectStore } from '../store/projectStore'
+import EnergyPerSensor from './EnergyPerSensor'
 import TotalEnergy from './TotalEnergy'
 
 export default function Results() {
@@ -15,6 +16,7 @@ export default function Results() {
 
     return (
         <Flex direction='column' gap={4}>
+            <EnergyPerSensor />
             <TotalEnergy />
         </Flex>
     )
