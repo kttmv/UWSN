@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using UWSN.Model.Modems;
+using UWSN.Model.Sim;
 
 namespace UWSN.Utilities
 {
@@ -44,7 +45,10 @@ namespace UWSN.Utilities
             //snr = 20 * Math.Log10(p0 / n0 * r);
 
             // в тестовых задачах положим p0/n0 = 6.71∙10^3
-            snr = isPassiveEq ? CalculatePassiveSonarEq(f, ps, r) : 20 * Math.Log10(6.71 * 1000 / r);
+            snr = isPassiveEq ? CalculatePassiveSonarEq(
+                f, ps, r, 
+                Simulation.Instance.SimulationSettings.PassiveSonarEqParameterS, 
+                Simulation.Instance.SimulationSettings.PassiveSonarEqParameterW) : 20 * Math.Log10(6.71 * 1000 / r);
 
             double beta;
 
@@ -145,6 +149,7 @@ namespace UWSN.Utilities
             //полосы пропускания – 16 кГц, SNR – 18,1 ДБ, битовой скорости 13,9 кБит.
             //Расстояние должно получиться в районе 3.5 км.
 
+
             // искомое максимальное допустимое расстояние между сенсорами
             double rmin = double.NaN;
             // договорились, что не ищем по битовой ошибке и модуляции снр, а просто берем 10
@@ -154,7 +159,7 @@ namespace UWSN.Utilities
             double ps = modem.PowerTX;
             // несущая частота модема
             double f = modem.CenterFrequency;
-            double fbit = modem.Bitrate;
+            double fbit = modem.Bitrate / 1000;
             double b = modem.Bandwidth;
 
             // чо делать с пустыми значениями характеристик модемов - неясно
@@ -163,11 +168,16 @@ namespace UWSN.Utilities
             //f = 26.0;
             //ps = 35.0;
             //b = 16.0;
-            //fbit = 13900;
+            //fbit = 13.9;
+
+            //f = 9.75;
+            //ps = 20.0;
+            //b = 4.5;
+            //fbit = 2.0;
 
             double bf = 10 * Math.Log10(b / fbit);
 
-            double sl = 10 * Math.Log10(ps) + 170.8;
+            double sl = 10 * Math.Log10(ps) + 117.8;
 
             double di = 0.0;
 

@@ -24,4 +24,14 @@ public class SimulationSettings
     public bool CreateAllDeltas { get; set; } = false;
 
     public bool SaveOutput { get; set; } = false;
+
+    /// <summary>
+    /// Скорость ветра (м/с) для уравнения пассивного сонара модели вероятности
+    /// </summary>
+    public double PassiveSonarEqParameterW { get; set; } = 0.0;
+
+    /// <summary>
+    /// Фактор судоходства (безразмерная величина) для уравнения пассивного сонара модели вероятности
+    /// </summary>
+    public double PassiveSonarEqParameterS { get; set; } = 0.5;
 }
