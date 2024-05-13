@@ -10,7 +10,7 @@ export default function App() {
     const { project } = useProjectStore()
     const { isOpen, isFullscreen } = useViewerStore()
 
-    console.log(isFullscreen)
+    console.log('test')
 
     if (!project) {
         return (
