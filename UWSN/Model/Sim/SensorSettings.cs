@@ -18,5 +18,6 @@ public class SensorSettings
     public NetworkProtocol NetworkProtocol { get; set; } = new BasicNetworProtocol();
 
     public IClusterization ClusterizationAlgorithm { get; set; } =
-        new RetardedClusterization() { XClusterCount = 3, ZClusterCount = 2 };
+        new AutoClusterization();
+        //new RetardedClusterization() { XClusterCount = 3, ZClusterCount = 2 };
 }
