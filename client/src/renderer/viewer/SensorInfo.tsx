@@ -28,8 +28,12 @@ export default function SensorInfo({ sensor }: Props) {
 
     return (
         <>
-            <Text whiteSpace='nowrap'>Состояние:</Text>
-            <Card padding='5px'>{sensor.State}</Card>
+            {sensor.State && (
+                <>
+                    <Text whiteSpace='nowrap'>Состояние:</Text>
+                    <Card padding='5px'>{sensor.State}</Card>
+                </>
+            )}
 
             <Text whiteSpace='nowrap'>Кластер:</Text>
             <Card padding='5px'>{clusterString}</Card>

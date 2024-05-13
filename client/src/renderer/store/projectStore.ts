@@ -2,7 +2,6 @@ import { create } from 'zustand'
 import { readFile, writeFile } from '../shared/helpers/fsHelpers'
 import { Project } from '../shared/types/project'
 import { SensorSimulationState } from '../shared/types/sensorSimulationState'
-import { SensorState } from '../shared/types/sensorState'
 import { SimulationState } from '../shared/types/simulationResultState'
 
 type State = {
@@ -176,7 +175,7 @@ function createDefaultState(project: Project | undefined): SimulationState {
     if (project) {
         sensors = project.Environment.Sensors.map((x) => ({
             Id: x.Id,
-            State: SensorState.Idle,
+            State: undefined,
             Position: x.Position,
             ClusterId: undefined,
             IsReference: false,
