@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using UWSN.Model.Protocols;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
 using static UWSN.Model.Sim.SimulationDelta;
@@ -31,7 +30,9 @@ public class Signal
         ChannelId = channelId;
         ReceivingEvents = new();
 
-        var modem = Simulation.Instance.SensorSettings.Modem ?? throw new NullReferenceException("Не указан тип модема");
+        var modem =
+            Simulation.Instance.SensorSettings.Modem
+            ?? throw new NullReferenceException("Не указан тип модема");
 
         double transmissionTime = Frame.FRAME_SIZE_IN_BITS / modem.Bitrate;
 
@@ -97,12 +98,17 @@ public class Signal
             ReceivingEvents.Add(new(sensor, startReceiving, endReceiving));
         }
 
+        CreateEndSendingEvent(transmissionTime);
+
         if (receiversCount == 0)
         {
-            Logger.WriteLine(
-                $"Менеджер сигналов: Сигнал от #{Emitter.Id} не дошел "
-                    + $"ни до одного сенсора. Канал {ChannelId} свободен."
-            );
+            if (Simulation.Instance.SimulationSettings.Verbose)
+            {
+                Logger.WriteLine(
+                    $"Менеджер сигналов: Сигнал от #{Emitter.Id} не дошел "
+                        + $"ни до одного сенсора. Канал {ChannelId} свободен."
+                );
+            }
 
             return;
         }
@@ -110,17 +116,21 @@ public class Signal
         // добавляем фрейм в результат симуляции
         Simulation.Instance.Result!.AddFrame(frame, false);
 
-        CreateEndSendingEvent(transmissionTime);
-
         DateTime timeFreeChannel = CreateFreeChannelEvent(timeEndReceivingMax);
 
         Simulation.Instance.ChannelManager.OccupyChannel(ChannelId, this);
 
-        Logger.WriteLine(
-            $"Менеджер сигналов: Сигнал от #{Emitter.Id} занял канал {ChannelId}.\n"
-                + $"\tКоличество получателей сигнала: {receiversCount}.\n"
-                + $"\tКанал будет особожден в {timeFreeChannel:dd.MM.yyyy HH:mm:ss.fff}."
-        );
+        if (Simulation.Instance.SimulationSettings.Verbose)
+        {
+            Logger.WriteLine(
+                $"Менеджер сигналов: Сигнал от #{Emitter.Id} занял канал {ChannelId}."
+            );
+
+            Logger.LeftPadding++;
+            Logger.WriteLine($"Количество получателей сигнала: {receiversCount}.");
+            Logger.WriteLine($"Канал будет особожден в {timeFreeChannel:dd.MM.yyyy HH:mm:ss.fff}.");
+            Logger.LeftPadding--;
+        }
     }
 
     private DateTime CreateFreeChannelEvent(DateTime timeEndReceivingMax)
@@ -144,21 +154,11 @@ public class Signal
             $"Окончание отправки кадра сенсором #{Emitter.Id}",
             () =>
             {
-                Emitter.Physical.EndSending(Frame);
-                Emitter.Battery -=
-                    Simulation.Instance.SensorSettings.Modem.PowerTX * transmissionTime;
+                Emitter.Physical.EndSending(Frame, transmissionTime);
             }
         );
 
         Simulation.Instance.EventManager.AddEvent(EndSending);
-    }
-
-    private bool CheckProbablity(Sensor sensor)
-    {
-        double probability = CalculateDeliveryProbability(sensor);
-        double random = new Random().NextDouble();
-
-        return random <= probability;
     }
 
     private Event CreateStartReceivingEvent(Sensor sensor, DateTime timeStartReceiving)
@@ -181,9 +181,13 @@ public class Signal
         }
         else
         {
-            Logger.WriteLine(
-                $"Менеджер сигналов: Сенсор #{sensor.Id} находится не в состоянии прослушивания."
-            );
+            if (Simulation.Instance.SimulationSettings.Verbose)
+            {
+                Logger.WriteLine(
+                    $"Менеджер сигналов: Сенсор #{sensor.Id} находится "
+                        + "не в состоянии прослушивания."
+                );
+            }
         }
     }
 
@@ -191,13 +195,13 @@ public class Signal
         Sensor sensor,
         DateTime timeEndReceiving,
         int id,
-        double transmitionTime
+        double transmissionTime
     )
     {
         var endReceiving = new Event(
             timeEndReceiving,
             $"Окончание получения сенсором #{sensor.Id} кадра от #{Emitter.Id}",
-            () => EndReceivingAction(sensor, timeEndReceiving, id, transmitionTime)
+            () => EndReceivingAction(sensor, timeEndReceiving, id, transmissionTime)
         );
 
         Simulation.Instance.EventManager.AddEvent(endReceiving);
@@ -208,18 +212,29 @@ public class Signal
         Sensor sensor,
         DateTime timeEndReceiving,
         int id,
-        double transmitionTime
+        double transmissionTime
     )
     {
-        Simulation.Instance.Result!.AddSignalDelta(
-            new SignalDelta { SignalId = id, Type = SimulationDelta.SignalDeltaType.Remove },
-            timeEndReceiving,
-            false
-        );
+        if (sensor.CurrentState == Sensor.State.Receiving)
+        {
+            Simulation.Instance.Result!.AddSignalDelta(
+                new SignalDelta { SignalId = id, Type = SimulationDelta.SignalDeltaType.Remove },
+                timeEndReceiving,
+                false
+            );
 
-        sensor.Battery -= Simulation.Instance.SensorSettings.Modem.PowerRX * transmitionTime;
-
-        sensor.Physical.EndReceiving(Frame);
+            sensor.Physical.EndReceiving(Frame, transmissionTime);
+        }
+        else
+        {
+            if (Simulation.Instance.SimulationSettings.Verbose)
+            {
+                Logger.WriteLine(
+                    $"Менеджер сигналов: Сенсор #{sensor.Id} находится "
+                        + "не в состоянии получения."
+                );
+            }
+        }
     }
 
     public void DetectCollision()
@@ -246,6 +261,14 @@ public class Signal
         }
 
         Simulation.Instance.Result!.TotalCollisions += 1;
+    }
+
+    private bool CheckProbablity(Sensor sensor)
+    {
+        double probability = CalculateDeliveryProbability(sensor);
+        double random = new Random().NextDouble();
+
+        return random <= probability;
     }
 
     private double CalculateDeliveryProbability(Sensor sensor)

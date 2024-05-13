@@ -2,7 +2,8 @@ import { ClusterizationAlgorithmType } from './clusterizationAlogirthmType'
 
 export type RetardedClusterization = {
     $type: ClusterizationAlgorithmType.RetardedClusterization
-    NumberOfClusters: number
+    XClusterCount: number
+    ZClusterCount: number
 }
 
 export function isRetardedClusterization(

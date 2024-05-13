@@ -55,6 +55,7 @@ on('run-shell', (event, args) => {
     child.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`)
         reply(event, 'run-shell-reply', data.toString())
+        reply(event, 'run-shell-close', undefined)
     })
 
     child.stdout.on('data', (data) => {

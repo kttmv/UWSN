@@ -10,13 +10,15 @@ namespace UWSN.CommandLine.Handlers
         {
             SerializationHelper.LoadSimulation(o.FilePath);
 
-            Logger.ShouldWriteToConsole = o.Verbose;
-
-            Simulation.Instance.Run(o.Verbose, o.FullResult);
+            Simulation.Instance.Run();
 
             SerializationHelper.SaveSimulation(o.FilePath);
-            if (o.Output)
-                Console.WriteLine($"Полный вывод симуляции сохранен в файл {Logger.FilePath}");
+
+            if (Simulation.Instance.SimulationSettings.SaveOutput)
+            {
+                Logger.WriteLine("");
+                Logger.WriteLine($"Полный вывод симуляции сохранен в файл {Logger.FilePath}");
+            }
         }
     }
 }

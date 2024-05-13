@@ -1,13 +1,13 @@
-import { Button, Flex, FormControl, Tooltip } from '@chakra-ui/react'
-import { IconDeviceFloppy } from '@tabler/icons-react'
+import { Button, Flex, FormControl, Text, Tooltip } from '@chakra-ui/react'
+import { IconDeviceFloppy, IconRestore } from '@tabler/icons-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { SensorSettings } from '../shared/types/sensorSettings'
 import { useProjectStore } from '../store/projectStore'
-import SensorBatterySettings from './SensorBatterySettings'
-import SensorClusterizationSettings from './SensorClusterizationSettings'
-import SensorModemSettings from './SensorModemSettings'
-import SensorProtocolSettings from './SensorProtocolSettings'
+import BatterySettings from './BatterySettings'
+import ClusterizationSettings from './ClusterizationSettings'
+import DataLinkProtocolSettings from './DataLinkProtocolSettings'
+import ModemSettings from './ModemSettings'
 
 export default function SensorSettings() {
     const { project, setProject } = useProjectStore()
@@ -41,31 +41,51 @@ export default function SensorSettings() {
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>
-            <FormControl>
-                <Flex direction='column' gap={4}>
-                    <SensorProtocolSettings form={form} />
+            <Flex direction='column' gap={4}>
+                <FormControl>
+                    <Flex direction='column' gap={4}>
+                        <DataLinkProtocolSettings form={form} />
 
-                    <SensorClusterizationSettings form={form} />
+                        <ClusterizationSettings form={form} />
 
-                    <SensorModemSettings form={form} />
+                        <ModemSettings form={form} />
 
-                    <SensorBatterySettings form={form} />
-                </Flex>
-            </FormControl>
-            <Tooltip
-                isDisabled={project.Result === undefined}
-                label='Внимание! Данное действие удалит результаты симуляции'
-            >
-                <Button
-                    marginTop={10}
-                    width='100%'
-                    isDisabled={!form.formState.isDirty}
-                    type='submit'
+                        <BatterySettings form={form} />
+                    </Flex>
+                </FormControl>
+                <Tooltip
+                    isDisabled={project.Result === undefined}
+                    label='Внимание! Данное действие удалит результаты симуляции'
                 >
-                    <IconDeviceFloppy />
-                    Сохранить изменения настройки сенсоров
-                </Button>
-            </Tooltip>
+                    <Button
+                        marginTop={10}
+                        width='100%'
+                        isDisabled={
+                            !form.formState.isDirty || !form.formState.isValid
+                        }
+                        type='submit'
+                    >
+                        <IconDeviceFloppy />{' '}
+                        <Text marginLeft={1}>
+                            Сохранить изменения настройки сенсоров
+                        </Text>
+                    </Button>
+                </Tooltip>
+
+                {form.formState.isDirty && (
+                    <Button
+                        width='100%'
+                        isDisabled={!form.formState.isDirty}
+                        type='button'
+                        onClick={() => form.reset()}
+                    >
+                        <IconRestore />
+                        <Text marginLeft={1}>
+                            Отменить изменения настройки симуляции
+                        </Text>
+                    </Button>
+                )}
+            </Flex>
         </form>
     )
 }

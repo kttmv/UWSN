@@ -2,7 +2,7 @@ import { Edges } from '@react-three/drei'
 import { useRef, useState } from 'react'
 import * as THREE from 'three'
 import { Mesh } from 'three'
-import { Sensor } from '../shared/types/sensor'
+import { SensorSimulationState } from '../shared/types/sensorSimulationState'
 import { useProjectStore } from '../store/projectStore'
 import useViewerStore from '../store/viewerStore'
 
@@ -30,7 +30,7 @@ const clusterColors: THREE.ColorRepresentation[] = [
 ]
 
 interface Props {
-    sensor: Sensor
+    sensor: SensorSimulationState
 }
 
 export default function SensorNode({ sensor }: Props) {
@@ -48,14 +48,21 @@ export default function SensorNode({ sensor }: Props) {
     const isSelected = selectedSensor && sensor.Id === selectedSensor.Id
 
     let color: THREE.ColorRepresentation
-    if (sensor.Battery <= project.SensorSettings.BatteryDeadCharge) {
+    let isDead = false
+
+    if (sensor.ClusterId === undefined) {
+        // кластер не определен
+        color = 'orange'
+    } else if (
+        sensor.Battery <= project.SensorSettings.BatteryDeadCharge ||
+        sensor.ClusterId < 0
+    ) {
+        // сенсор разряжен или относится к специальному кластеру для умерших сенсоров
+        isDead = true
         color = 'black'
     } else {
-        if (sensor.ClusterId > -1) {
-            color = clusterColors[sensor.ClusterId % clusterColors.length]
-        } else {
-            color = 'orange'
-        }
+        // у сенсора есть кластер
+        color = clusterColors[sensor.ClusterId % clusterColors.length]
     }
 
     const setSelected = () => {
@@ -73,14 +80,20 @@ export default function SensorNode({ sensor }: Props) {
                 sensor.Position.Y / scale,
                 sensor.Position.Z / scale
             ]}
+            rotation={[Math.PI, 0, 0]}
             ref={meshRef}
             scale={isSelected ? 2 : 1}
             onClick={setSelected}
             onPointerOver={() => setHover(true)}
             onPointerOut={() => setHover(false)}
         >
-            {!sensor.IsReference && <boxGeometry args={[1, 1, 1]} />}
-            {sensor.IsReference && <sphereGeometry args={[1]} />}
+            {isDead ? (
+                <coneGeometry args={[0.5, 1, 8]} />
+            ) : sensor.IsReference ? (
+                <sphereGeometry args={[1]} />
+            ) : (
+                <boxGeometry args={[1, 1, 1]} />
+            )}
             <meshStandardMaterial
                 color={hovered ? 'pink' : isSelected ? 'white' : color}
             />

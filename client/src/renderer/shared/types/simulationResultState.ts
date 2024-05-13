@@ -1,8 +1,9 @@
-import { Sensor } from './sensor'
+import { SensorSimulationState } from './sensorSimulationState'
 import { Signal } from './signal'
 
 export type SimulationState = {
     Time: string
+    CycleId: number
     Signals: Signal[]
-    Sensors: Sensor[]
+    Sensors: SensorSimulationState[]
 }

@@ -1,15 +1,17 @@
 ﻿using UWSN.Model;
 using UWSN.Model.Sim;
-using System.IO;
 
 namespace UWSN.Utilities;
 
 public class Logger
 {
+    public const int PADDING_SIZE = 4;
+
     public static readonly StreamWriter File;
     public static readonly string FilePath;
-    public static bool ShouldWriteToConsole { get; set; } = false;
     public static bool SaveOutput { get; set; } = false;
+
+    public static int LeftPadding { get; set; } = 0;
 
     static Logger()
     {
@@ -26,11 +28,15 @@ public class Logger
         string str = withTime ? $"[{Simulation.Instance.Time:dd.MM.yyyy HH:mm:ss.fff}] " : "";
         str += value;
 
+        if (LeftPadding > 0)
+        {
+            str = new string(' ', LeftPadding * PADDING_SIZE) + str;
+        }
+
         if (SaveOutput)
             File.WriteLine(str);
 
-        if (ShouldWriteToConsole)
-            Console.WriteLine(str);
+        Console.WriteLine(str);
     }
 
     public static void WriteSensorLine(Sensor sensor, string value)

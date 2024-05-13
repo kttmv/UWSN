@@ -1,6 +1,7 @@
-import { ClusterizationAlgorithm } from './clsterizationAlgorith'
+import { ClusterizationAlgorithm } from './clusterizationAlgorithm'
 import { DataLinkProtocol } from './dataLinkProtocol'
 import { Modem } from './modem'
+import { NetworkProtocol } from './networkProtocol'
 
 export type SensorSettings = {
     Modem: Modem
@@ -8,9 +9,10 @@ export type SensorSettings = {
     DataLinkProtocol: DataLinkProtocol
     ClusterizationAlgorithm: ClusterizationAlgorithm
 
-    SensorSampleInterval: string
-    StartSamplingTime: string
+    SampleInterval: string
 
     InitialSensorBattery: number
     BatteryDeadCharge: number
+
+    NetworkProtocol: NetworkProtocol
 }

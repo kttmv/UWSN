@@ -1,11 +1,35 @@
-import { Button, Card, CardBody, Flex, Text } from '@chakra-ui/react'
-import { IconCaretDown, IconCaretUp } from '@tabler/icons-react'
-import { useEffect } from 'react'
+import {
+    Box,
+    Button,
+    Card,
+    Code,
+    Flex,
+    IconButton,
+    Text,
+    Tooltip,
+    useTheme
+} from '@chakra-ui/react'
+import { IconCaretDown, IconCaretUp, IconTrashX } from '@tabler/icons-react'
+import { useEffect, useRef } from 'react'
 import useConsoleStore from '../store/consoleStore'
 
 export default function Console() {
-    const { isOpen, setIsOpen, consoleOutput, addLineToConsoleOutput } =
-        useConsoleStore()
+    const {
+        isOpen,
+        setIsOpen,
+        consoleOutput,
+        clearConsoleOutput,
+        addLineToConsoleOutput
+    } = useConsoleStore()
+
+    const theme = useTheme()
+    const bg = theme.__cssMap['colors.chakra-body-bg'].value
+
+    const divRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (divRef.current) divRef.current.scrollIntoView()
+    }, [consoleOutput])
 
     useEffect(() => {
         const removeReplyListener = window.electronAPI.ipcRenderer.on(
@@ -19,7 +43,8 @@ export default function Console() {
             'run-shell-close',
             (data) => {
                 addLineToConsoleOutput(
-                    `Процесс завершен с кодом ${data as number}`
+                    `Процесс завершен с кодом ${data as number}`,
+                    true
                 )
             }
         )
@@ -33,7 +58,7 @@ export default function Console() {
     }, [])
 
     return (
-        <Flex direction='column' h={isOpen ? '33vh' : ''}>
+        <Flex position='relative' direction='column' h={isOpen ? '33vh' : ''}>
             <Button
                 borderBottomRadius={0}
                 size='xs'
@@ -49,16 +74,31 @@ export default function Console() {
                     </>
                 )}
             </Button>
+
             {isOpen && (
-                <Card h='100%' overflowY='scroll' borderTopRadius={0}>
-                    <CardBody fontFamily='monospace'>
+                <Card h='100%' borderTopRadius={0} overflowY='scroll'>
+                    <Code padding={4} whiteSpace='pre' backgroundColor={bg}>
                         {consoleOutput.length === 0
                             ? 'Пусто...'
                             : consoleOutput.map((value, index) => (
                                   <Text key={index}>{value}</Text>
                               ))}
-                    </CardBody>
+                        <Box ref={divRef}></Box>
+                    </Code>
                 </Card>
+            )}
+            {isOpen && (
+                <Tooltip label='Очистить консоль'>
+                    <IconButton
+                        onClick={clearConsoleOutput}
+                        aria-label='Очистить консоль'
+                        position='absolute'
+                        top={7}
+                        right={5}
+                    >
+                        <IconTrashX />
+                    </IconButton>
+                </Tooltip>
             )}
         </Flex>
     )

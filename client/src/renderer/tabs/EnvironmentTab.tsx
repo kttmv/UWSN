@@ -1,10 +1,10 @@
 import { TabPanel } from '@chakra-ui/react'
-import AreaLimits from './AreaLimits'
+import AreaLimitsSettings from './AreaLimitsSettings'
 
 export default function EnvironmentTab() {
     return (
         <TabPanel>
-            <AreaLimits />
+            <AreaLimitsSettings />
         </TabPanel>
     )
 }

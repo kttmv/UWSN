@@ -2,27 +2,40 @@
 using Newtonsoft.Json;
 using UWSN.Model.Protocols;
 using UWSN.Model.Protocols.DataLink;
+using UWSN.Model.Protocols.Network;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
-using static UWSN.Model.Protocols.NetworkProtocol;
 using static UWSN.Model.Sim.SimulationDelta;
 
 namespace UWSN.Model;
 
-public class NextClusterization
-{
-    public int ClusterId { get; set; }
-    public bool IsReference { get; set; }
-}
-
 public class Sensor
 {
+    #region Nested
+
     public enum State
     {
+        Idle,
         Listening,
         Receiving,
         Emitting
     }
+
+    public class Neighbour
+    {
+        public required int Id { get; set; }
+        public required Vector3 Position { get; set; }
+        public required int? ClusterId { get; set; }
+        public required bool? IsReference { get; set; }
+    }
+
+    public class Clusterization
+    {
+        public int ClusterId { get; set; }
+        public bool IsReference { get; set; }
+    }
+
+    #endregion Nested
 
     #region Properties
 
@@ -36,6 +49,10 @@ public class Sensor
         set
         {
             _currentState = value;
+            Simulation.Instance.Result!.AddSensorDelta(
+                new SensorDelta { Id = Id, State = value },
+                false
+            );
         }
     }
 
@@ -46,7 +63,7 @@ public class Sensor
     public DataLinkProtocol DataLink { get; set; }
 
     [JsonIgnore]
-    public NetworkProtocol Network { get; set; } = new();
+    public NetworkProtocol Network { get; set; }
 
     [JsonIgnore]
     private double _battery;
@@ -57,13 +74,18 @@ public class Sensor
         get { return _battery; }
         set
         {
-            Simulation.Instance.Result!.AddSensorDelta(new SensorDelta { Id = Id, Battery = _battery }, false);
+            Simulation.Instance.Result!.AddSensorDelta(
+                new SensorDelta { Id = Id, Battery = _battery },
+                false
+            );
 
             _battery = value;
 
             if (!IsDead && _battery < Simulation.Instance.SensorSettings.BatteryDeadCharge)
             {
-                Logger.WriteSensorLine(this, "Осталось мало зарядки");
+                if (Simulation.Instance.SimulationSettings.Verbose)
+                    Logger.WriteSensorLine(this, "Осталось мало зарядки");
+
                 IsDead = true;
 
                 // храним количество мертвых сенсоров в симуляции, так как это значительно
@@ -72,7 +94,6 @@ public class Sensor
                 Simulation.Instance.DeadSensorsCount += 1;
 
                 Network.SendDeathWarning();
-                StopAllAction();
             }
         }
     }
@@ -93,7 +114,7 @@ public class Sensor
     public bool? IsReference { get; set; } = null;
 
     [JsonIgnore]
-    public NextClusterization? NextClusterization { get; set; } = null;
+    public Clusterization? NextClusterization { get; set; } = null;
 
     private int _id;
 
@@ -121,6 +142,12 @@ public class Sensor
     [JsonIgnore]
     public List<Event> Events { get; set; } = new();
 
+    [JsonIgnore]
+    public Dictionary<int, Neighbour> Neighbours { get; set; } = new();
+
+    [JsonIgnore]
+    public List<int> DeadSensors { get; set; } = new();
+
     #endregion Properties
 
     public Sensor()
@@ -128,11 +155,13 @@ public class Sensor
         _battery = Simulation.Instance.SensorSettings.InitialSensorBattery;
 
         DataLink = Simulation.Instance.SensorSettings.DataLinkProtocol.Clone();
+        Network = Simulation.Instance.SensorSettings.NetworkProtocol.Clone();
     }
 
     public void StopAllAction()
     {
         RemoveAllEvents();
+        Physical.StopAllAction();
         DataLink.StopAllAction();
         Network.StopAllAction();
     }
@@ -180,6 +209,7 @@ public class Sensor
 
     public void WakeUp()
     {
+        CurrentState = State.Listening;
         ReceivedData.Clear();
 
         if (!Simulation.Instance.SimulationSettings.ShouldSkipHello)
@@ -192,7 +222,7 @@ public class Sensor
                 Type = Frame.FrameType.Hello,
                 TimeSend = Simulation.Instance.Time,
                 AckIsNeeded = false,
-                NeighboursData = Network.Neighbours,
+                NeighboursData = Neighbours,
                 BatteryLeft = Battery,
                 DeadSensors = null,
                 CollectedData = null,
@@ -208,13 +238,17 @@ public class Sensor
         }
         else
         {
-            Network.Neighbours = Clusterize();
+            Neighbours = Clusterize();
         }
     }
 
     public void CollectData()
     {
-        // тут надо выяснить сколько по времени сенсор собирает данные
+        CurrentState = State.Listening;
+
+        ReceivedData.Clear();
+
+        // todo: тут надо выяснить сколько по времени сенсор собирает данные
         Battery -= Simulation.Instance.SensorSettings.Modem.PowerSP * 0.02;
 
         if (!IsDead)
@@ -275,14 +309,20 @@ public class Sensor
 
         if (IsReference.Value)
         {
-            Logger.WriteSensorLine(
-                this,
-                $"Определил себя новым референсным узлом кластера {ClusterId}"
-            );
+            if (Simulation.Instance.SimulationSettings.Verbose)
+            {
+                Logger.WriteSensorLine(
+                    this,
+                    $"Определил себя новым референсным узлом кластера {ClusterId}"
+                );
+            }
         }
         else
         {
-            Logger.WriteSensorLine(this, $"Определил себя к кластеру {ClusterId}.");
+            if (Simulation.Instance.SimulationSettings.Verbose)
+            {
+                Logger.WriteSensorLine(this, $"Определил себя к кластеру {ClusterId}.");
+            }
         }
 
         return neighbours;

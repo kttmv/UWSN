@@ -16,7 +16,7 @@ export default function ApplicationTabs() {
     return (
         <Tabs minH={0} overflowY='auto' flexGrow={1}>
             <TabList position='sticky' top={0} bg={bgColor} zIndex={50}>
-                <Tab>Акватория</Tab>
+                <Tab>Окружение</Tab>
                 <Tab>Расстановка</Tab>
                 <Tab>Симуляция</Tab>
                 <Tab>Сенсор</Tab>

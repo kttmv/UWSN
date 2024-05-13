@@ -1,6 +1,7 @@
 import { ClusterizationAlgorithmType } from '../shared/types/clusterizationAlogirthmType'
 import { DataLinkProtocolType } from '../shared/types/dataLinkProtocolType'
 import { ModemType } from '../shared/types/modem'
+import { NetworkProtocolType } from '../shared/types/networkProtocolType'
 import { Project } from '../shared/types/project'
 
 export function createDefaultProject() {
@@ -10,8 +11,7 @@ export function createDefaultProject() {
                 $type: ModemType.AquaModem1000
             },
 
-            SensorSampleInterval: '00:10:00',
-            StartSamplingTime: '0001-01-02T00:00:00',
+            SampleInterval: '00:30:00',
 
             InitialSensorBattery: 864_000,
             BatteryDeadCharge: 100,
@@ -24,20 +24,33 @@ export function createDefaultProject() {
                 AckRetries: 3
             },
 
+            NetworkProtocol: {
+                $type: NetworkProtocolType.BasicNetworkProtocol,
+                ResendWarningCount: 1
+            },
+
             ClusterizationAlgorithm: {
                 $type: ClusterizationAlgorithmType.RetardedClusterization,
-                NumberOfClusters: 6
+                XClusterCount: 3,
+                ZClusterCount: 2
             }
         },
 
         SimulationSettings: {
             DeadSensorsPercent: 33,
 
-            MaxProcessedEvents: 5_000_000,
-            MaxCycles: 1_000,
+            MaxProcessedEvents: 0,
+            MaxCycles: 0,
             PrintEveryNthEvent: 10_000,
 
-            ShouldSkipHello: true
+            ShouldSkipHello: false,
+            ShouldSkipCycles: false,
+
+            CyclesCountBeforeSkip: 50,
+
+            Verbose: false,
+            CreateAllDeltas: false,
+            SaveOutput: false
         },
 
         AreaLimits: {

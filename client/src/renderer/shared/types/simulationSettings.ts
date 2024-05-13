@@ -1,4 +1,8 @@
 export type SimulationSettings = {
+    Verbose: boolean
+    CreateAllDeltas: boolean
+    SaveOutput: boolean
+
     MaxProcessedEvents: number
     MaxCycles: number
     PrintEveryNthEvent: number
@@ -6,4 +10,7 @@ export type SimulationSettings = {
     DeadSensorsPercent: number
 
     ShouldSkipHello: boolean
+
+    ShouldSkipCycles: boolean
+    CyclesCountBeforeSkip: number
 }

@@ -64,6 +64,10 @@ export default function CollectedDataPath() {
         for (let i = 0; i < project.Result.Deltas.length; i++) {
             const delta = project.Result.Deltas[i]
 
+            if (!delta.SignalDeltas) {
+                continue
+            }
+
             if (delta.SignalDeltas.length > 0) {
                 for (const signal of delta.SignalDeltas) {
                     if (signal.SignalId === signalWithData[0]) {

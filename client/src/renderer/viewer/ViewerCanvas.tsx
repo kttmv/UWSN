@@ -11,7 +11,7 @@ import Signal from './Signal'
 export default function ViewerCanvas() {
     const { project, simulationState } = useProjectStore()
 
-    const { scale, selectedSensor, setSelectedSensor } = useViewerStore()
+    const { isOpen, selectedSensor, setSelectedSensor } = useViewerStore()
 
     useEffect(() => {
         if (selectedSensor)
@@ -19,16 +19,10 @@ export default function ViewerCanvas() {
     }, [simulationState])
 
     return (
-        <Canvas>
+        <Canvas style={{ height: isOpen ? '100%' : '0' }}>
             <Sky />
             <ambientLight />
-            <spotLight
-                position={[10, 10, 10]}
-                angle={0.15}
-                penumbra={1}
-                decay={0}
-                intensity={Math.PI}
-            />
+            <ambientLight />
             <pointLight
                 position={[-10, -10, -10]}
                 decay={0}

@@ -1,9 +1,9 @@
 import { Card, Text } from '@chakra-ui/react'
-import { Sensor } from '../shared/types/sensor'
+import { SensorSimulationState } from '../shared/types/sensorSimulationState'
 import { useProjectStore } from '../store/projectStore'
 
 type Props = {
-    sensor: Sensor
+    sensor: SensorSimulationState
 }
 
 export default function SensorInfo({ sensor }: Props) {
@@ -18,7 +18,9 @@ export default function SensorInfo({ sensor }: Props) {
         `Z: ${sensor.Position.Z.toFixed(1)} }`
 
     let clusterString =
-        sensor.ClusterId > -1 ? sensor.ClusterId.toString() : 'Отсутствует'
+        sensor.ClusterId && sensor.ClusterId > -1
+            ? sensor.ClusterId.toString()
+            : 'Отсутствует'
 
     if (sensor.IsReference) {
         clusterString += ', является референсным'
@@ -26,8 +28,12 @@ export default function SensorInfo({ sensor }: Props) {
 
     return (
         <>
-            <Text whiteSpace='nowrap'>Координаты:</Text>
-            <Card padding='5px'>{positionString}</Card>
+            {sensor.State && (
+                <>
+                    <Text whiteSpace='nowrap'>Состояние:</Text>
+                    <Card padding='5px'>{sensor.State}</Card>
+                </>
+            )}
 
             <Text whiteSpace='nowrap'>Кластер:</Text>
             <Card padding='5px'>{clusterString}</Card>
@@ -42,6 +48,9 @@ export default function SensorInfo({ sensor }: Props) {
                 ).toFixed(2)}
                 %)
             </Card>
+
+            <Text whiteSpace='nowrap'>Координаты:</Text>
+            <Card padding='5px'>{positionString}</Card>
         </>
     )
 }

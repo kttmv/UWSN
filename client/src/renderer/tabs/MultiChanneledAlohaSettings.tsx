@@ -16,6 +16,12 @@ export default function MultiChanneledAlohaSettings({ form }: Props) {
             >
                 <Text whiteSpace='nowrap'>Время ожидания (сек):</Text>
                 <Input
+                    type='number'
+                    step='any'
+                    isInvalid={
+                        form.formState.errors.DataLinkProtocol?.Timeout !==
+                        undefined
+                    }
                     {...form.register('DataLinkProtocol.Timeout', {
                         required: true,
                         min: 0
@@ -29,6 +35,12 @@ export default function MultiChanneledAlohaSettings({ form }: Props) {
 
                 <Text>Отклонение времени ожидания:</Text>
                 <Input
+                    type='number'
+                    step='any'
+                    isInvalid={
+                        form.formState.errors.DataLinkProtocol
+                            ?.TimeoutRelativeDeviation !== undefined
+                    }
                     {...form.register(
                         'DataLinkProtocol.TimeoutRelativeDeviation',
                         { required: true, min: 0, max: 1 }
@@ -43,6 +55,12 @@ export default function MultiChanneledAlohaSettings({ form }: Props) {
 
                 <Text whiteSpace='nowrap'>Время ожидания ACK:</Text>
                 <Input
+                    type='number'
+                    step='any'
+                    isInvalid={
+                        form.formState.errors.DataLinkProtocol?.AckTimeout !==
+                        undefined
+                    }
                     {...form.register('DataLinkProtocol.AckTimeout', {
                         required: true,
                         min: 0
@@ -55,9 +73,14 @@ export default function MultiChanneledAlohaSettings({ form }: Props) {
                 />
 
                 <Text whiteSpace='nowrap'>
-                    Количество попыток ожидания Ack:
+                    Количество попыток ожидания ACK:
                 </Text>
                 <Input
+                    type='number'
+                    isInvalid={
+                        form.formState.errors.DataLinkProtocol?.AckRetries !==
+                        undefined
+                    }
                     {...form.register('DataLinkProtocol.AckRetries', {
                         required: true,
                         min: 0
