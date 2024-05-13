@@ -8,9 +8,15 @@ import Viewer from '../viewer/Viewer'
 
 export default function App() {
     const { project } = useProjectStore()
-    const { isOpen, isFullscreen } = useViewerStore()
 
-    console.log('test')
+    // если использовать useViewerStore без селектора, то
+    // при каждом изменении во viewerStore (например, выборе сенсора)
+    // будет перерисовываться ВСЕ приложение (в том числе и графики,
+    // которые рисуются достаточно долго), из-за чего будет пролаг
+    //
+    // вообще, на будущее, лучше делать так всегда
+    const isOpen = useViewerStore((state) => state.isOpen)
+    const isFullscreen = useViewerStore((state) => state.isFullscreen)
 
     if (!project) {
         return (
