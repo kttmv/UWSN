@@ -47,8 +47,8 @@ namespace UWSN.Utilities
             // в тестовых задачах положим p0/n0 = 6.71∙10^3
             snr = isPassiveEq ? CalculatePassiveSonarEq(
                 f, ps, r, 
-                Simulation.Instance.SimulationSettings.PassiveSonarEqParameterS, 
-                Simulation.Instance.SimulationSettings.PassiveSonarEqParameterW) : 20 * Math.Log10(6.71 * 1000 / r);
+                Simulation.Instance.Environment.PassiveSonarEqParameterS, 
+                Simulation.Instance.Environment.PassiveSonarEqParameterW) : 20 * Math.Log10(6.71 * 1000 / r);
 
             double beta;
 
