@@ -12,9 +12,9 @@ export default function Viewer() {
 
     return (
         <>
+            <ViewerCanvas />
             {isOpen && (
                 <>
-                    <ViewerCanvas />
                     <ViewerSettings />
                     <ViewerDeltaSettings />
                     <ViewerStateInfo />
