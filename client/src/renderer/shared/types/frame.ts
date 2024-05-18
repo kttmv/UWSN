@@ -2,7 +2,6 @@ import { CollectedData } from './collectedData'
 import { Vector3 } from './vector3'
 
 export enum FrameType {
-    RegularFrame = 'RegularFrame',
     Ack = 'Ack',
     Data = 'Data',
     Hello = 'Hello',

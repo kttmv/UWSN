@@ -147,9 +147,6 @@ public class Simulation
             {
                 PrintCurrentState();
 
-                if (CurrentCycle == 0)
-                    CheckHelloResult();
-
                 // так как в данном режиме не сохраняются изменения зарядов сенсоров,
                 // сохраняем их вручную после каждого цикла.
                 if (!SimulationSettings.CreateAllDeltas)
@@ -362,6 +359,9 @@ public class Simulation
 
     private void CheckCycleForErrors()
     {
+        if (CurrentCycle == 0)
+            CheckHelloResult();
+
         if (
             Environment.Sensors.Any(s =>
                 s.CurrentState != Sensor.State.Listening && s.CurrentState != Sensor.State.Idle

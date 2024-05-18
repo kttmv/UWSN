@@ -1,5 +1,6 @@
 import { Line } from '@react-three/drei'
 import { useState } from 'react'
+import { FrameType } from '../shared/types/frame'
 import { Signal } from '../shared/types/signal'
 import { useProjectStore } from '../store/projectStore'
 import useViewerStore from '../store/viewerStore'
@@ -17,7 +18,11 @@ export default function Signal({ signal }: Props) {
         throw new Error('Project не задан')
     }
 
-    const [hovered, setHover] = useState(false)
+    if (!project.Result) {
+        throw new Error('Результаты симуляции не определены')
+    }
+
+    const [isHovered, setIsHovered] = useState(false)
 
     const isSelected =
         selectedSignal && selectedSignal.FrameId === signal.FrameId
@@ -27,20 +32,55 @@ export default function Signal({ signal }: Props) {
         else setSelectedSignal(undefined)
     }
 
-    const vertexColors: [number, number, number][] = isSelected
-        ? [
-              [0.3, 0.6, 0.3],
-              [0.25, 0.35, 0.25]
-          ]
-        : hovered
-          ? [
-                [0.3, 0.4, 0.3],
-                [0.2, 0.2, 0.2]
-            ]
-          : [
-                [0.2, 0.3, 0.3],
-                [0.05, 0.05, 0.05]
-            ]
+    const frame = project.Result.AllFrames[signal.FrameId]
+
+    let vertexColors: [number, number, number][]
+
+    if (isSelected) {
+        vertexColors = [
+            [1.0, 1.0, 1.0],
+            [0.3, 0.6, 0.3]
+        ]
+    } else if (isHovered) {
+        vertexColors = [
+            [0.2, 0.2, 0.2],
+            [0.3, 0.4, 0.3]
+        ]
+    } else {
+        switch (frame.Type) {
+            case FrameType.Ack: {
+                vertexColors = [
+                    [0.0, 1.0, 0.0],
+                    [0.0, 0.0, 0.0]
+                ]
+                break
+            }
+            case FrameType.Data: {
+                vertexColors = [
+                    [1.0, 1.0, 0.0],
+                    [0.0, 0.0, 0.0]
+                ]
+                break
+            }
+            case FrameType.Hello: {
+                vertexColors = [
+                    [0.0, 0.0, 1.0],
+                    [0.0, 0.0, 0.0]
+                ]
+                break
+            }
+            case FrameType.Warning: {
+                vertexColors = [
+                    [1.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0]
+                ]
+                break
+            }
+            default: {
+                throw new Error('Неизвестный тип фрейма')
+            }
+        }
+    }
 
     const sender = project.Environment.Sensors[signal.SenderId]
     const receiver = project.Environment.Sensors[signal.ReceiverId]
@@ -61,8 +101,8 @@ export default function Signal({ signal }: Props) {
         <>
             <Line
                 onClick={setSelected}
-                onPointerOver={() => setHover(true)}
-                onPointerOut={() => setHover(false)}
+                onPointerOver={() => setIsHovered(true)}
+                onPointerOut={() => setIsHovered(false)}
                 points={[
                     [from.X, from.Y, from.Z],
                     [to.X, to.Y, to.Z]

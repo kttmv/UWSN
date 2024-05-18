@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UWSN.Utilities;
-
-namespace UWSN.Model.Sim;
+﻿namespace UWSN.Model.Sim;
 
 public class EventManager
 {
@@ -21,8 +14,8 @@ public class EventManager
         if (e.Time < Simulation.Instance.Time)
         {
             throw new ArgumentException(
-                "Была произведена попытка создания события в прошлом."
-                    + $"Текущее время симуляции: {Simulation.Instance.Time:dd.MM.yyyy HH:mm:ss.fff}."
+                "Была произведена попытка создания события в прошлом. "
+                    + $"Текущее время симуляции: {Simulation.Instance.Time:dd.MM.yyyy HH:mm:ss.fff}. "
                     + $"Время добавляемого события: {e.Time:dd.MM.yyyy HH:mm:ss.fff}"
             );
         }

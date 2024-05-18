@@ -8,7 +8,6 @@ public class Frame
 
     public enum FrameType
     {
-        RegularFrame,
         Ack,
         Data,
         Hello,
