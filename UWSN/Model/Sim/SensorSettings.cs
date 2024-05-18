@@ -15,7 +15,7 @@ public class SensorSettings
     public TimeSpan SampleInterval { get; set; } = TimeSpan.FromMinutes(30);
 
     public DataLinkProtocol DataLinkProtocol { get; set; } = new PureAloha();
-    public NetworkProtocol NetworkProtocol { get; set; } = new BasicNetworProtocol();
+    public NetworkProtocol NetworkProtocol { get; set; } = new BasicNetworkProtocol();
 
     public IClusterization ClusterizationAlgorithm { get; set; } =
         new AutoClusterization();

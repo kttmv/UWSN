@@ -4,7 +4,7 @@ using UWSN.Utilities;
 
 namespace UWSN.Model.Protocols.Network;
 
-public class BasicNetworProtocol : NetworkProtocol
+public class BasicNetworkProtocol : NetworkProtocol
 {
     public int ResendWarningCount { get; set; } = 1;
 
