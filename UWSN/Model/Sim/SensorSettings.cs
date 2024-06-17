@@ -7,7 +7,7 @@ namespace UWSN.Model.Sim;
 
 public class SensorSettings
 {
-    public ModemBase Modem { get; set; } = new AquaModem1000();
+    public ModemBase Modem { get; set; } = new SMTUTestModem();
 
     public double InitialSensorBattery { get; set; } = 864_000.0;
     public double BatteryDeadCharge { get; set; } = 100.0;

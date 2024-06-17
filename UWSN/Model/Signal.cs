@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using UWSN.Model.Modems;
 using UWSN.Model.Sim;
 using UWSN.Utilities;
 using static UWSN.Model.Sim.SimulationDelta;
@@ -285,11 +286,9 @@ public class Signal
         //PowerATWU = double.NaN;
         // взяты значения параметров модели среды для тестового моделирования
         return DeliveryProbabilityCalculator.Calculate(
-            26.0,
-            13.9,
+            Simulation.Instance.SensorSettings.Modem,
             sensor.Position,
-            Emitter.Position,
-            35.0
+            Emitter.Position
         );
 
         //return DeliveryProbabilityCalculator.CaulculateSensorDistance(new AquaModem1000(),
