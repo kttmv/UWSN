@@ -238,11 +238,6 @@ public class Simulation
         foreach (int cluster in clusterIds.Where(c => c != -1))
         {
             var result = Result!.GetOrCreateClusterCycleResult(CurrentCycle, cluster);
-
-            result.ReferenceSensorId = Environment
-                .Sensors.Where(s => s.ClusterId == cluster && s.IsReference!.Value)
-                .First()
-                .Id;
             result.SensorsCount = Environment.Sensors.Count(s => s.ClusterId == cluster);
         }
 
