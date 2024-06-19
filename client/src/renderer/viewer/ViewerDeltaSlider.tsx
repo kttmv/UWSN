@@ -31,7 +31,7 @@ export default function ViewerDeltaSlider() {
                 size='xs'
                 onClick={() => {
                     if (simulationDeltaIndex > min) {
-                        setDeltaIndex(simulationDeltaIndex - 1)
+                        setDeltaIndex(simulationDeltaIndex - 1, true)
                     }
                 }}
             >
@@ -43,7 +43,7 @@ export default function ViewerDeltaSlider() {
                 id='slider'
                 value={simulationDeltaIndex}
                 colorScheme='teal'
-                onChange={(v) => setDeltaIndex(v)}
+                onChange={(v) => setDeltaIndex(v, false)}
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
                 min={min}
@@ -70,7 +70,7 @@ export default function ViewerDeltaSlider() {
                 size='xs'
                 onClick={() => {
                     if (simulationDeltaIndex < max) {
-                        setDeltaIndex(simulationDeltaIndex + 1)
+                        setDeltaIndex(simulationDeltaIndex + 1, true)
                     }
                 }}
             >
