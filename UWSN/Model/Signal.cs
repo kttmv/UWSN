@@ -82,8 +82,7 @@ public class Signal
 
             Simulation.Instance.Result.AddSignalDelta(
                 new SignalDelta { SignalId = signalId, Type = SignalDeltaType.Add },
-                timeStartReceiving,
-                false
+                Simulation.Instance.Time
             );
 
             // создание событий начала и окончания приема сообщения
@@ -217,8 +216,7 @@ public class Signal
     {
         Simulation.Instance.Result!.AddSignalDelta(
             new SignalDelta { SignalId = id, Type = SimulationDelta.SignalDeltaType.Remove },
-            timeEndReceiving,
-            false
+            timeEndReceiving
         );
 
         if (sensor.CurrentState == Sensor.State.Receiving)
