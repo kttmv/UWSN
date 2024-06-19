@@ -20,8 +20,12 @@ namespace UWSN.Utilities
 
         private static readonly Dictionary<(double f, double fbit, Vector3 tx, Vector3 rx, double ps, bool isPassiveEq), double> Cache = new();
 
-        public static double Calculate(double f, double fbit, Vector3 tx, Vector3 rx, double ps, bool isPassiveEq = true)
+        public static double Calculate(ModemBase modem, Vector3 tx, Vector3 rx,  bool isPassiveEq = true)
         {
+            double f = modem.CenterFrequency;
+            double fbit = modem.Bitrate;
+            double ps = modem.PowerTX;
+
             var key = (f, fbit, tx, rx, ps, isPassiveEq);
             if (Cache.TryGetValue(key, out double probability))
             {
@@ -86,7 +90,7 @@ namespace UWSN.Utilities
         /// <summary>
         /// Вычисление отношения сигнал-шум SNR через уравнение пассивного сонара
         /// </summary>
-        public static double CalculatePassiveSonarEq(double f, double ps, double r, double s = 0.5, double w = 0.0, double k = 2.0)
+        public static double CalculatePassiveSonarEq(double f, double ps, double r, double s = 0.5, double w = 0.0, double k = 1.5)
         {
             double sl = 10 * Math.Log10(ps) + 170.8;
 
@@ -143,18 +147,20 @@ namespace UWSN.Utilities
             return area;
         }
 
-        public static double CaulculateSensorDistance(ModemBase modem, double s = 0.5, double w = 0.0, double k = 2.0)
+        public static double CaulculateSensorDistance(ModemBase modem, double s = 0.5, double w = 0.0, double k = 1.5)
         {
             //Попробуйте посчитать расстояние для мощности - 35 Вт, частоты - 26 кГц,
             //полосы пропускания – 16 кГц, SNR – 18,1 ДБ, битовой скорости 13,9 кБит.
             //Расстояние должно получиться в районе 3.5 км.
-
 
             // искомое максимальное допустимое расстояние между сенсорами
             double rmin = double.NaN;
             // договорились, что не ищем по битовой ошибке и модуляции снр, а просто берем 10
             double snrMin = 18.1;
 
+            //modem = new EvoLogics1224();
+            //modem = new EvoLogics717();
+            //modem = new LinkQuest3000();
             // мощность модема
             double ps = modem.PowerTX;
             // несущая частота модема
@@ -177,7 +183,7 @@ namespace UWSN.Utilities
 
             double bf = 10 * Math.Log10(b / fbit);
 
-            double sl = 10 * Math.Log10(ps) + 117.8;
+            double sl = 10 * Math.Log10(ps) + 100.8;
 
             double di = 0.0;
 
