@@ -32,7 +32,7 @@ export const useProjectStore = create<State>((set, get) => ({
     isShellRunning: false,
 
     setProjectFilePath: async (path: string) => {
-        await parseProjectFile(path, set, get)
+        await parseProjectFile(path, set)
         get().setDeltaIndex(-1, false)
         set({ projectFilePath: path })
     },
@@ -40,7 +40,7 @@ export const useProjectStore = create<State>((set, get) => ({
     updateProject: async () => {
         const path = get().projectFilePath
         get().setDeltaIndex(-1, false)
-        await parseProjectFile(path, set, get)
+        await parseProjectFile(path, set)
     },
 
     setProject: async (newProject: Project) => {
@@ -87,7 +87,7 @@ export const useProjectStore = create<State>((set, get) => ({
                     i === -1 ||
                     i === project.Result.Deltas.length - 1
                 ) {
-                    state = calculateSimulationState(i, project, get())
+                    state = calculateSimulationState(i, project)
                     set({ simulationDeltaIndex: i, simulationState: state })
 
                     return
@@ -97,7 +97,7 @@ export const useProjectStore = create<State>((set, get) => ({
             }
         }
 
-        state = calculateSimulationState(index, project, get())
+        state = calculateSimulationState(index, project)
         set({ simulationDeltaIndex: index, simulationState: state })
     },
 
@@ -108,21 +108,11 @@ export const useProjectStore = create<State>((set, get) => ({
 
 export function calculateSimulationState(
     index: number,
-    project: Project | undefined,
-    currentStoreState: State
+    project: Project
 ): SimulationState {
     let startIndex = 0
-    let state: SimulationState | null = null
 
-    if (
-        currentStoreState.simulationDeltaIndex <= index &&
-        currentStoreState.simulationDeltaIndex > 0
-    ) {
-        state = currentStoreState.simulationState
-        startIndex = currentStoreState.simulationDeltaIndex + 1
-    } else {
-        state = createDefaultState(project)
-    }
+    const state = createDefaultState(project)
 
     if (!project || !project.Result || index === -1) {
         return state
@@ -197,14 +187,13 @@ export function calculateSimulationState(
 
 async function parseProjectFile(
     path: string,
-    set: (partial: (state: State) => State | Partial<State>) => void,
-    get: () => State
+    set: (partial: (state: State) => State | Partial<State>) => void
 ) {
     try {
         const content = await readFile(path)
         const project = JSON.parse(content)
 
-        const state = calculateSimulationState(-1, project, get())
+        const state = calculateSimulationState(-1, project)
 
         set(() => ({
             simulationDeltaIndex: -1,
