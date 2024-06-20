@@ -723,6 +723,8 @@ public class Simulation
 
         Logger.WriteLine($"Количество отправленных сообщений: {Result.TotalSends:n0}");
         Logger.WriteLine($"Количество полученных сообщений: {Result.TotalReceives:n0}");
+        Logger.WriteLine($"Количество потерянных сообщений: {Result.TotalLosses:n0}");
+        Logger.WriteLine($"Количество пересылок сообщений: {Result.TotalResends:n0}");
 
         Logger.WriteLine("");
 

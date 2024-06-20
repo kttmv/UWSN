@@ -152,6 +152,7 @@ namespace UWSN.Model.Protocols.DataLink
 
             LogAckRetry(frame, attemptsLeft);
 
+            Simulation.Instance.Result!.TotalResends += 1;
             SendFrame(frame, false);
 
             CreateAckTimeout(frame, attemptsLeft - 1);

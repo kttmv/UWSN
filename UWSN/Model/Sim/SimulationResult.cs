@@ -54,6 +54,8 @@ public class SimulationResult
     public int TotalCycles { get; set; }
     public int TotalSends { get; set; }
     public int TotalReceives { get; set; }
+    public int TotalResends { get; set; }
+    public int TotalLosses { get; set; }
     public int TotalCollisions { get; set; }
     public int TotalSkippedCycles { get; set; }
     public int TotalBadCycles { get; set; }

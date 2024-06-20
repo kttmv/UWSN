@@ -158,9 +158,14 @@ namespace UWSN.Utilities
             // договорились, что не ищем по битовой ошибке и модуляции снр, а просто берем 10
             double snrMin = 18.1;
 
+            // 1.5 km deviation
             //modem = new EvoLogics1224();
+            // этот работает
             //modem = new EvoLogics717();
-            //modem = new LinkQuest3000();
+            // 1.3 km deviation
+            //modem = new LinkQuest10000();
+            // работает нормально
+            //modem = new EvoLogicsS2CM1834();
             // мощность модема
             double ps = modem.PowerTX;
             // несущая частота модема
@@ -171,10 +176,10 @@ namespace UWSN.Utilities
             // чо делать с пустыми значениями характеристик модемов - неясно
 
             // тестовый модем
-            //f = 26.0;
-            //ps = 35.0;
-            //b = 16.0;
-            //fbit = 13.9;
+            //f = 10.0;
+            //ps = 40.0;
+            //b = 5.0;
+            //fbit = 5.0;
 
             //f = 9.75;
             //ps = 20.0;

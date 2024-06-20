@@ -52,7 +52,10 @@ public class Signal
                 continue;
 
             if (!CheckProbablity(sensor))
+            {
+                Simulation.Instance.Result!.TotalLosses += 1;
                 continue;
+            }
 
             receiversCount++;
 
