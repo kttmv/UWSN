@@ -17,7 +17,7 @@ type State = {
     setProject: (value: Project) => void
     updateProject: () => void
 
-    setDeltaIndex: (value: number) => void
+    setDeltaIndex: (value: number, toClosestSignalDelta: boolean) => void
 
     setIsShellRunning: (value: boolean) => void
 }
@@ -33,13 +33,13 @@ export const useProjectStore = create<State>((set, get) => ({
 
     setProjectFilePath: async (path: string) => {
         await parseProjectFile(path, set)
-        get().setDeltaIndex(-1)
+        get().setDeltaIndex(-1, false)
         set({ projectFilePath: path })
     },
 
     updateProject: async () => {
         const path = get().projectFilePath
-        get().setDeltaIndex(-1)
+        get().setDeltaIndex(-1, false)
         await parseProjectFile(path, set)
     },
 
@@ -49,7 +49,7 @@ export const useProjectStore = create<State>((set, get) => ({
         try {
             writeFile(path, JSON.stringify(newProject, null, 4))
 
-            get().setDeltaIndex(-1)
+            get().setDeltaIndex(-1, false)
 
             set(() => ({ project: newProject }))
         } catch (error) {
@@ -60,11 +60,44 @@ export const useProjectStore = create<State>((set, get) => ({
         }
     },
 
-    setDeltaIndex: (index: number) => {
+    setDeltaIndex: (index: number, toClosestSignalDelta: boolean) => {
         const project = get().project
 
-        const state = calculateSimulationState(index, project)
+        if (!project || !project.Result || index === -1) {
+            return
+        }
 
+        if (index === get().simulationDeltaIndex) {
+            return
+        }
+
+        let state = createDefaultState(project)
+
+        const direction = index > get().simulationDeltaIndex ? 1 : -1
+
+        if (toClosestSignalDelta) {
+            let i = index
+            while (true) {
+                const simulationDelta = project.Result.Deltas[i]
+
+                const signalDeltas = simulationDelta.SignalDeltas
+
+                if (
+                    signalDeltas ||
+                    i === -1 ||
+                    i === project.Result.Deltas.length - 1
+                ) {
+                    state = calculateSimulationState(i, project)
+                    set({ simulationDeltaIndex: i, simulationState: state })
+
+                    return
+                }
+
+                i += direction
+            }
+        }
+
+        state = calculateSimulationState(index, project)
         set({ simulationDeltaIndex: index, simulationState: state })
     },
 
@@ -75,8 +108,10 @@ export const useProjectStore = create<State>((set, get) => ({
 
 export function calculateSimulationState(
     index: number,
-    project: Project | undefined
+    project: Project
 ): SimulationState {
+    let startIndex = 0
+
     const state = createDefaultState(project)
 
     if (!project || !project.Result || index === -1) {
@@ -87,7 +122,7 @@ export function calculateSimulationState(
         throw new Error('Неправильный индекс дельты симуляции')
     }
 
-    for (let i = 0; i <= index; i++) {
+    for (let i = startIndex; i <= index; i++) {
         const simulationDelta = project.Result.Deltas[i]
 
         state.Time = simulationDelta.Time

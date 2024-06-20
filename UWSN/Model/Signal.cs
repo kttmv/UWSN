@@ -21,8 +21,7 @@ public class Signal
         Sensor Receiver,
         Event StartReceiving,
         Event EndReceiving
-    )> ReceivingEvents
-    { get; }
+    )> ReceivingEvents { get; }
 
     public Signal(Sensor emitter, Frame frame, int channelId, bool pointSend)
     {
@@ -86,8 +85,7 @@ public class Signal
 
             Simulation.Instance.Result.AddSignalDelta(
                 new SignalDelta { SignalId = signalId, Type = SignalDeltaType.Add },
-                timeStartReceiving,
-                false
+                Simulation.Instance.Time
             );
 
             // создание событий начала и окончания приема сообщения
@@ -219,14 +217,13 @@ public class Signal
         double transmissionTime
     )
     {
+        Simulation.Instance.Result!.AddSignalDelta(
+            new SignalDelta { SignalId = id, Type = SimulationDelta.SignalDeltaType.Remove },
+            timeEndReceiving
+        );
+
         if (sensor.CurrentState == Sensor.State.Receiving)
         {
-            Simulation.Instance.Result!.AddSignalDelta(
-                new SignalDelta { SignalId = id, Type = SimulationDelta.SignalDeltaType.Remove },
-                timeEndReceiving,
-                false
-            );
-
             sensor.Physical.EndReceiving(Frame, transmissionTime);
         }
         else

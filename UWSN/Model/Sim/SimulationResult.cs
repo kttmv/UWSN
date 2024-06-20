@@ -15,7 +15,6 @@ public class SimulationResult
     public class ClusterCycleResult
     {
         public int ClusterId { get; set; }
-        public int ReferenceSensorId { get; set; }
         public int SensorsCount { get; set; }
         public int CollectedDataCount { get; set; }
         public int CollectedDataSameClusterCount { get; set; }
@@ -93,9 +92,9 @@ public class SimulationResult
         }
     }
 
-    public void AddSignalDelta(SignalDelta delta, DateTime time, bool force)
+    public void AddSignalDelta(SignalDelta delta, DateTime time)
     {
-        if (Simulation.Instance.SimulationSettings.CreateAllDeltas || force)
+        if (Simulation.Instance.SimulationSettings.CreateAllDeltas)
         {
             var simulationDelta = GetOrCreateSimulationDelta(time);
             simulationDelta.SignalDeltas.Add(delta);

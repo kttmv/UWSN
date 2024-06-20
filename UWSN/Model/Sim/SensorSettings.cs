@@ -17,7 +17,6 @@ public class SensorSettings
     public DataLinkProtocol DataLinkProtocol { get; set; } = new PureAloha();
     public NetworkProtocol NetworkProtocol { get; set; } = new BasicNetworkProtocol();
 
-    public IClusterization ClusterizationAlgorithm { get; set; } =
-        new AutoClusterization();
-        //new RetardedClusterization() { XClusterCount = 3, ZClusterCount = 2 };
+    public IClusterization ClusterizationAlgorithm { get; set; } = new AutoClusterization();
+    //new RetardedClusterization() { XClusterCount = 3, ZClusterCount = 2 };
 }
